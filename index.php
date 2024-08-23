@@ -21,7 +21,7 @@
 
 require_once './common.php';
 
-if (isset($_REQUEST['sname']) && $_REQUEST['sname'] == "RSS") {
+if (isset($_REQUEST['_nvkey']) && $_REQUEST['_nvkey'] == "RSS") {
   header("Location: " . $conf->base_url);
   exit();
 }

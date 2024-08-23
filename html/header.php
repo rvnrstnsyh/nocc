@@ -44,10 +44,10 @@ if (file_exists($custom_header)) {
 		//TODO: Why check for $_SESSION['quota_type'])?
 		if (isRssAllowed()) {
 			if (isset($_SESSION['quota_type'])) {
-				//$sname='NOCC_'.md5(uniqid(rand(),true));
+				//$_nvkey='NOCC_'.md5(uniqid(rand(),true));
 				$rss_url = "rss.php";
-				//$rss_url .= '?sname='.$sname.'&';
-				$rss_url .= '?sname=RSS&';
+				//$rss_url .= '?_nvkey='.$_nvkey.'&';
+				$rss_url .= '?_nvkey=RSS&';
 				$rss_url .= 'nocc_lang=' . base64_encode($_SESSION['nocc_lang']);
 				$rss_url .= '&amp;nocc_smtp_server=' . base64_encode($_SESSION['nocc_smtp_server']);
 				$rss_url .= '&amp;nocc_smtp_port=' . base64_encode($_SESSION['nocc_smtp_port']);
