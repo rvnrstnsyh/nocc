@@ -1,3 +1,42 @@
+:root {
+  --primary-color: #000080;
+  --secondary-color: #2a307f;
+  --tertiary-color: #1c274c;
+  --quaternary-color: #363755;
+  --white-color: #ffffff;
+  --gray-color: #f1f1f1;
+  --creamson-color: #fff0de;
+  --dim-color: #f9f9f9;
+  --dim-red-color: #8b0000;
+  --dim-white-color: #ffffffb3;
+  --black-200: #020202;
+  --black-300: #333333;
+  --black-400: #1f1e31;
+  --black-500: #555555;
+  --gray-100: #888888;
+  --success-color: #adff2f;
+}
+
+/* html {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+} */
+
+.success-message {
+  color: var(--success-color);
+}
+
+.success-message-bg {
+  background-color: var(--success-color);
+}
+
 .inbox label {
   color: #ffffff;
 }
@@ -169,7 +208,7 @@ table {
 
 #header h2 {
   float: left;
-  margin: 0;
+  margin: 9px 0 0 0;
   margin-left: 10px;
   padding: 5px;
 }
@@ -207,8 +246,8 @@ table {
  * main menu
  */
 .mainmenu {
-  color: #000000;
-  background-color: #0099cc;
+  color: white;
+  background-color: var(--tertiary-color);
 }
 
 .mainmenu ul {
@@ -229,6 +268,8 @@ table {
 .mainmenu ul li.selected a,
 .mainmenu ul li.selected span {
   font-weight: bold;
+  color: var(--dim-white-color);
+  text-decoration: underline;
 }
 
 .mainmenu a:link {
@@ -256,7 +297,7 @@ table {
  * sub menu
  */
 .submenu {
-  background-color: #006699;
+  background-color: var(--primary-color);
 }
 
 .submenu ul {
@@ -306,7 +347,7 @@ table {
 .pagenav {
   text-align: right;
   color: white;
-  background-color: #006699;
+  background-color: var(--primary-color);
 }
 
 .pagenav ul {
@@ -362,11 +403,11 @@ table {
 }
 
 div.messageSummary {
-  background-color: #006699;
+  background-color: var(--primary-color);
 }
 
 div.topNavigation {
-  background-color: #006699;
+  background-color: var(--primary-color);
 }
 
 div.topNavigation table {
@@ -388,7 +429,7 @@ div.messageList table {
 }
 
 div.bottomNavigation {
-  background-color: #006699;
+  background-color: var(--primary-color);
 }
 
 div.bottomNavigation table {
@@ -540,6 +581,8 @@ img.sort {
 
 #inboxStatus {
   text-align: center;
+  background-color: var(--success-color);
+  font-weight: 600;
 }
 
 .send {
@@ -751,7 +794,7 @@ hr.mailAttachSep {
 
 .contactsListRuler td {
   text-align: center;
-  background-color: #0099cc;
+  background-color: var(--tertiary-color);
 }
 
 .contactsListRulerHigh a {

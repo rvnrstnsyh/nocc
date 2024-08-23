@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Main configuration for NOCC
  *
@@ -365,24 +366,24 @@ $conf->tmpdir = '';
 //    - user clicks on logoff or
 //    - user closes the browser
 //    - the max_session_lifetime is reached
-$conf->min_session_lifetime = 60*60*6;   // = 6 hours (default)
+$conf->min_session_lifetime = 60 * 60 * 6;   // = 6 hours (default)
 
 // maximum session lifetime in seconds
 //  if "remember me" on login screen IS checked the session expires
 //    - after this time in seconds or
 //    - user clicks on logoff
-$conf->max_session_lifetime = 60*60*24*7*4;   // = 4 weeks (default)
+$conf->max_session_lifetime = 60 * 60 * 24 * 7 * 4;   // = 4 weeks (default)
 
 // close session if client IP has changed
 //  if the clients IP changes during a valid session the server
 //  closes the session and the client has to login again.
 //  Set this to true if you want this.
-$conf->check_client_ip=true;
+$conf->check_client_ip = true;
 
 // time in seconds to check the inbox for new or changed number of messages
 //  don't poll too frequently, the mail server may block
 //  set to 0 to switch off
-$conf->check_inbox_timer=600;
+$conf->check_inbox_timer = 600;
 
 // ###
 // ### Optional parameters ###
@@ -414,7 +415,7 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) { //if older as PHP 5.3.0...
 // Allow more memory than default setting in order to handle correctly
 // large mails attachments. Try to find correct setting (about 2.5x total
 // attachment size)
-$conf->memory_limit="20M";
+$conf->memory_limit = "20M";
 
 // Use Horde/Imap_Client Library instead of PHP's imap (c-client) extension.
 // https://dev.horde.org/imap_client/
@@ -459,7 +460,7 @@ $conf->default_smtp_port = 25;
 // Example: '^[a-zA-Z0-9_]+$' : login only with letters (upper and lower case),
 // numbers and '_' character
 // Set to '' to disable
-$conf->allowed_char='';
+$conf->allowed_char = '';
 
 // the user can logout or not (if nocc is used within your website
 // enter 'false' here else leave 'true')
@@ -494,10 +495,10 @@ $conf->default_theme = 'standard';
 
 // If you don't want to display images (GIF, JPEG and PNG) sent as attachements
 // set it to 'false'
-$conf->display_img_attach = true;
+$conf->display_img_attach = false;
 
 // If you don't want to display text/plain attachments set it to 'false'
-$conf->display_text_attach = true;
+$conf->display_text_attach = false;
 
 // force default language to be set, rather than browser prefered language
 $conf->force_default_lang = false;
@@ -547,7 +548,7 @@ $conf->ad = "___________________________________\r\nNOCC, https://nocc.sourcefor
 $conf->broken_forwarding = false;
 
 // Default encoding charset to use to display email which does not include one.
-$conf->default_charset = 'ISO-8859-1';                                                                                
+$conf->default_charset = 'ISO-8859-1';
 // Delay between 2 mail send (in second)
 $conf->send_delay = 30;
 
@@ -646,4 +647,3 @@ $conf->contact_ldap_options['suffix'] = '';
 $conf->auto_update['user'] = array();
 
 // ###################     End of Configuration     ####################
-?>
