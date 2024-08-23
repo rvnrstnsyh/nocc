@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Language configuration file for NOCC
  *
@@ -45,16 +46,16 @@ $title_prev_page = 'Previous page';
 $title_next_msg = 'Next message';
 $title_prev_msg = 'Previous message';
 $html_theme_label = 'Theme:';
-$html_welcome = 'Welcome to %1$s';
-$html_login = 'Login';
-$html_user_label = 'User:';
-$html_passwd_label = 'Password:';
+$html_welcome = 'Non-Violable Liberty Layers | Webmail'; //'Welcome to %1$s';
+$html_login = 'SIGN IN';
+$html_user_label = 'Username or IM Address';
+$html_passwd_label = 'Password';
 $html_submit = 'Submit';
 $html_help = 'Help';
 $html_server_label = 'Server:';
 $html_wrong = 'The login or the password are incorrect';
 $html_retry = 'Retry';
-$html_remember = 'Remember me';
+$html_remember = 'Keep me signed in';
 $html_lang_label = 'Language:';
 $html_msgperpage_label = 'Messages per page:';
 $html_preferences = 'Preferences';

@@ -1,5 +1,5 @@
-.inbox label{
-  color: #FFFFFF;
+.inbox label {
+  color: #ffffff;
 }
 
 .inbox img {
@@ -12,7 +12,7 @@
 }
 
 .titlew {
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: bold;
 }
 
@@ -54,25 +54,40 @@ label {
   font-weight: bold;
 }
 
-.currentInbox a:link { color:white; text-decoration:none; }
-.currentInbox a:visited { color:white; text-decoration:none; }
-.currentInbox a:focus { color:white; text-decoration:underline; }
-.currentInbox a:hover { color:white; text-decoration:underline; }
-.currentInbox a:active { color:white; text-decoration:underline; }
+.currentInbox a:link {
+  color: white;
+  text-decoration: none;
+}
+.currentInbox a:visited {
+  color: white;
+  text-decoration: none;
+}
+.currentInbox a:focus {
+  color: white;
+  text-decoration: underline;
+}
+.currentInbox a:hover {
+  color: white;
+  text-decoration: underline;
+}
+.currentInbox a:active {
+  color: white;
+  text-decoration: underline;
+}
 
-.rss:link{
+.rss:link {
   background: url(./img/rss.png) bottom center no-repeat;
   text-indent: -999em;
   text-decoration: none;
 }
 
-.rss:hover{
+.rss:hover {
   background: url(./img/rss.png) bottom center no-repeat;
   text-indent: -999em;
   text-decoration: none;
 }
 
-.rss:visited{
+.rss:visited {
   background: url(./img/rss.png) bottom center no-repeat;
   text-indent: -999em;
   text-decoration: none;
@@ -83,12 +98,12 @@ label {
 }
 
 .currentQuota {
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: bold;
 }
 
 .maxQuota {
-  color: #FFFFFF;
+  color: #ffffff;
   font-weight: bold;
 }
 
@@ -99,7 +114,7 @@ img {
 body {
   min-width: 40em;
   color: #000000;
-  background-color: #EBEBEB;
+  background-color: #ebebeb;
   font-family: Arial, Helvetica, sans-serif;
   font-size: small;
 }
@@ -114,18 +129,18 @@ textarea {
 
 a:link {
   color: #003298;
-  text-decoration:none;
-}    
+  text-decoration: none;
+}
 
 a:visited {
   color: #003298;
-  text-decoration:none;
-}    
+  text-decoration: none;
+}
 
 a:hover {
   color: #003298;
-  text-decoration:underline;
-}    
+  text-decoration: underline;
+}
 
 table {
   border: 0px;
@@ -135,17 +150,21 @@ table {
 #popup {
   min-width: 0;
   color: #000000;
-  background: #FFFFFF url(./img/shtamp.png) top right no-repeat;
+  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
 }
 
 #header h1 {
   float: left;
-  margin: 0;
+  margin: -7px 0 0 -12px;
   padding: 0;
-  width: 153px;
-  height: 60px;
+  width: 250px;
+  height: 64px;
   background: url(./img/logo.png) no-repeat;
   text-indent: -999em;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: inherit;
 }
 
 #header h2 {
@@ -174,8 +193,8 @@ table {
 }
 
 #footer {
-  padding-top: 5px;
-  text-align: center;
+  padding-top: 10px;
+  text-align: end;
 }
 
 #footerLogo {
@@ -189,7 +208,7 @@ table {
  */
 .mainmenu {
   color: #000000;
-  background-color: #0099CC;
+  background-color: #0099cc;
 }
 
 .mainmenu ul {
@@ -212,11 +231,26 @@ table {
   font-weight: bold;
 }
 
-.mainmenu a:link { color:white; text-decoration:none; }
-.mainmenu a:visited { color:white; text-decoration:none; }
-.mainmenu a:focus { color:white; text-decoration:underline; }
-.mainmenu a:hover { color:white; text-decoration:underline; }
-.mainmenu a:active { color:white; text-decoration:underline; }
+.mainmenu a:link {
+  color: white;
+  text-decoration: none;
+}
+.mainmenu a:visited {
+  color: white;
+  text-decoration: none;
+}
+.mainmenu a:focus {
+  color: white;
+  text-decoration: underline;
+}
+.mainmenu a:hover {
+  color: white;
+  text-decoration: underline;
+}
+.mainmenu a:active {
+  color: white;
+  text-decoration: underline;
+}
 
 /**
  * sub menu
@@ -245,11 +279,26 @@ table {
   font-weight: bold;
 }
 
-.submenu a:link { color:white; text-decoration:none; }
-.submenu a:visited { color:white; text-decoration:none; }
-.submenu a:focus { color:white; text-decoration:underline; }
-.submenu a:hover { color:white; text-decoration:underline; }
-.submenu a:active { color:white; text-decoration:underline; }
+.submenu a:link {
+  color: white;
+  text-decoration: none;
+}
+.submenu a:visited {
+  color: white;
+  text-decoration: none;
+}
+.submenu a:focus {
+  color: white;
+  text-decoration: underline;
+}
+.submenu a:hover {
+  color: white;
+  text-decoration: underline;
+}
+.submenu a:active {
+  color: white;
+  text-decoration: underline;
+}
 
 /**
  * page navigation
@@ -282,20 +331,35 @@ table {
 
 .pagenav ul li.prev span,
 .pagenav ul li.next span {
-  color: #CCCCCC;
+  color: #cccccc;
 }
 
 .pagenav ul li.current span {
   font-weight: bold;
   font-size: larger;
-  color: #FFC061;
+  color: #ffc061;
 }
 
-.pagenav a:link { color:white; text-decoration:none; }
-.pagenav a:visited { color:white; text-decoration:none; }
-.pagenav a:focus { color:#FFDEAD; text-decoration:underline; }
-.pagenav a:hover { color:#FFDEAD; text-decoration:underline; }
-.pagenav a:active { color:#FFDEAD; text-decoration:underline; }
+.pagenav a:link {
+  color: white;
+  text-decoration: none;
+}
+.pagenav a:visited {
+  color: white;
+  text-decoration: none;
+}
+.pagenav a:focus {
+  color: #ffdead;
+  text-decoration: underline;
+}
+.pagenav a:hover {
+  color: #ffdead;
+  text-decoration: underline;
+}
+.pagenav a:active {
+  color: #ffdead;
+  text-decoration: underline;
+}
 
 div.messageSummary {
   background-color: #006699;
@@ -315,12 +379,12 @@ div.topNavigation img {
 }
 
 div.messageList {
-  padding: .5em;
-  background: #FFFFFF url(./img/shtamp.png) top right no-repeat;
+  padding: 0.5em;
+  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
 }
 
 div.messageList table {
-  width: 100%
+  width: 100%;
 }
 
 div.bottomNavigation {
@@ -350,31 +414,31 @@ img.sort {
 }
 
 .errorTable {
-  border: 1px solid #DD2222;
-  background-color: #DD2222;
+  border: 1px solid #dd2222;
+  background-color: #dd2222;
   width: 400px;
 }
 
 .errorTitle {
   font-weight: bold;
-  color: #FFFFFF;
+  color: #ffffff;
   text-align: center;
   background: url(./img/error.png) top left no-repeat;
 }
 
 .errorText {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   text-align: center;
   padding: 2px;
 }
 
 #loginBox {
-  width: 27em;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
   font-size: larger;
-  background: #FFFFFF url(./img/shtamp.png) top center no-repeat;
+  background: #ffffff url(./img/postagestamp01.png) top center no-repeat;
   border: 1px solid #000000;
 }
 
@@ -393,24 +457,36 @@ img.sort {
   font-weight: normal;
 }
 
+#loginBox tr td.remember input[type="checkbox"] {
+  margin: 4px 0 0 0;
+}
+
+#loginBox tr td.remember label {
+  line-height: 14px;
+}
+
+#loginBox tr td.remember label span {
+  font-size: 11.5px;
+}
+
 #loginBox td {
   padding-left: 0.5em;
   text-align: left;
 }
 
 #loginBox p {
-  margin: 0;
+  margin: 0 0 0 40px;
   padding: 0.5em;
 }
 
 #inboxTable {
-  margin: .5em 0;
+  margin: 0.5em 0;
   border-collapse: collapse;
 }
 
 #inboxTable th {
   text-align: left;
-  background-color: #D6D6D6;
+  background-color: #d6d6d6;
 }
 
 #inboxTable .new {
@@ -418,25 +494,25 @@ img.sort {
 }
 
 #inboxTable .odd {
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 
 #inboxTable .even {
-  background-color: #EBEBEB;
+  background-color: #ebebeb;
 }
 
 #inboxTable .spamOdd {
   font-style: italic;
-  background-color: #FFCCCC;
+  background-color: #ffcccc;
 }
 
 #inboxTable .spamEven {
   font-style: italic;
-  background-color: #FFAAAA;
+  background-color: #ffaaaa;
 }
 
 #inboxTable th.sorted {
-  background-color: #FEEC85;
+  background-color: #feec85;
 }
 
 #inboxTable .column0 {
@@ -452,14 +528,14 @@ img.sort {
 }
 
 #inboxTable tr.marked {
-  background-color: #FFDEAD;
+  background-color: #ffdead;
 }
 
 #inboxTable tr.odd:hover,
 #inboxTable tr.even:hover,
 #inboxTable tr.hover {
   cursor: pointer;
-  background-color: #FFC061;
+  background-color: #ffc061;
 }
 
 #inboxStatus {
@@ -471,7 +547,7 @@ img.sort {
   text-align: center;
   width: 100%;
   padding: 0px;
-  background: #FFFFFF url(./img/shtamp.png) top right no-repeat;
+  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
 }
 
 .send table {
@@ -521,12 +597,12 @@ img.sort {
  * mail data (verbose header, body and attachments)
  */
 .mailData {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .mail {
   margin: 0;
-  padding: .5em;
+  padding: 0.5em;
 }
 
 hr.mailAttachSep {
@@ -536,7 +612,7 @@ hr.mailAttachSep {
 
 .mailTextAttach {
   margin: 0;
-  padding: .5em;
+  padding: 0.5em;
 }
 
 .mailImgAttach {
@@ -545,7 +621,7 @@ hr.mailAttachSep {
 
 .mailImgAttach img {
   margin: 0;
-  padding: .5em;
+  padding: 0.5em;
   background: url(./img/img-loader.gif) no-repeat 50% 50%;
 }
 
@@ -559,7 +635,7 @@ hr.mailAttachSep {
   text-align: center;
   padding: 0px;
   width: 100%;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 
 .mailNav table {
@@ -569,28 +645,28 @@ hr.mailAttachSep {
 }
 
 .mailSwitchHeaders {
- text-align: left;
- background-color: #F5F5F5;
+  text-align: left;
+  background-color: #f5f5f5;
 }
 
 .mailHeaderLabel {
- font-weight: normal;
- text-align: right;
- background-color: #F5F5F5;
+  font-weight: normal;
+  text-align: right;
+  background-color: #f5f5f5;
 }
 
 .mailHeaderData {
   font-weight: bold;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   text-align: left;
 }
 
 .mailVerboseHeader {
   margin: 0;
   padding: 2px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   text-align: left;
-  
+
   /* http://sw-guide.de/2006-10/code-bloecke-pre-elemente-auf-webseiten/ */
   white-space: pre-wrap; /* css-3 */
   white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
@@ -614,7 +690,7 @@ hr.mailAttachSep {
   width: 100%;
   text-align: center;
   color: #000000;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   border-collapse: collapse;
 }
 
@@ -626,7 +702,7 @@ hr.mailAttachSep {
   font-weight: bold;
   font-size: larger;
   color: #000000;
-  background-color: #D6D6D6;
+  background-color: #d6d6d6;
 }
 
 .contactsSubTitle {
@@ -635,11 +711,11 @@ hr.mailAttachSep {
 }
 
 .contactsAddLabel {
- text-align: right;
+  text-align: right;
 }
 
 .contactsAddData {
- text-align: left;
+  text-align: left;
 }
 
 .contactsList table {
@@ -655,17 +731,17 @@ hr.mailAttachSep {
 .contactsListHeader {
   text-align: left;
   color: #000000;
-  background-color: #D6D6D6;
+  background-color: #d6d6d6;
 }
 
 .contactsListOdd {
   color: #000000;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 
 .contactsListEven {
   color: #000000;
-  background-color: #EBEBEB;
+  background-color: #ebebeb;
 }
 
 .contactsAddLink {
@@ -674,14 +750,14 @@ hr.mailAttachSep {
 }
 
 .contactsListRuler td {
-	text-align: center;
-	background-color: #0099CC;
+  text-align: center;
+  background-color: #0099cc;
 }
 
 .contactsListRulerHigh a {
-	text-decoration:underline;
-	font-weight:bolder;
-	font-size:1.4em;
+  text-decoration: underline;
+  font-weight: bolder;
+  font-size: 1.4em;
 }
 
 .prefs {
@@ -689,7 +765,7 @@ hr.mailAttachSep {
   text-align: center;
   padding: 0px;
   width: 100%;
-  background: #FFFFFF url(./img/shtamp.png) top right no-repeat;
+  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
 }
 
 .prefs h3 {
@@ -729,16 +805,16 @@ hr.mailAttachSep {
 .nopic {
   text-align: center;
   color: #000000;
-  background-color: #FFFF99;
-  border: 1px solid #FFFF00;
+  background-color: #ffff99;
+  border: 1px solid #ffff00;
 }
 
 .spamWarning {
   text-align: center;
   font-weight: bold;
   color: #000000;
-  background-color: #FFCCCC;
-  border: 1px solid #FFAAAA;
+  background-color: #ffcccc;
+  border: 1px solid #ffaaaa;
 }
 
 /* colored quotes */
@@ -759,19 +835,18 @@ hr.mailAttachSep {
 }
 
 .debug {
-    font-family: monospace;
-    font-size: smaller;
+  font-family: monospace;
+  font-size: smaller;
 }
 
 .new-version {
-	background-color: red;
+  background-color: red;
 }
 
 .new-version-update-ok {
-	color: green;
+  color: green;
 }
 
 .new-version-update-missing {
-	color: red;
+  color: red;
 }
-
