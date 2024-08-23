@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class for handling user filters
  *
@@ -26,7 +27,8 @@ require_once 'exception.php';
  * @todo Add add() function?
  * @todo Add delete() function?
  */
-class NOCCUserFilters {
+class NOCCUserFilters
+{
     // TODO: Hide behind get/setKey()?
     var $key;
     // TODO: Hide behind get/setFilterset()?
@@ -42,12 +44,15 @@ class NOCCUserFilters {
      * @param object $ev Exception
      * @todo Rewrite to throw exception!
      */
-    function __construct($key, &$ev) {
+    function __construct($key, &$ev)
+    {
         global $conf;
 
-        $this->key = preg_replace("/(\\\|\/)/","_",$key);
+        $this->key = preg_replace("/(\\\|\/)/", "_", $key);
+        $this->key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
         $this->filterset = array();
         $this->dirty_flag = 1;
+
         if (empty($conf->prefs_dir)) {
             $ev = new NoccException("User preferences are turned off but tried to create object.");
             return;
@@ -64,19 +69,21 @@ class NOCCUserFilters {
      * @todo Rewrite to throw exception!
      * @todo Split in read() and readFromFile()?
      */
-    public static function read($key, &$ev) {
+    public static function read($key, &$ev)
+    {
         global $conf;
 
-	$key=preg_replace("/(\\\|\/)/","_",$key);
+        $key = preg_replace("/(\\\|\/)/", "_", $key);
+        $key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
 
         $filters = new NOCCUserFilters($key, $ev);
-
         /* Open the preferences file */
         $filename = $conf->prefs_dir . '/' . $key . '.filter';
+
         if (!file_exists($filename)) {
             $filters->dirty_flag = 1;
             $filters->commit($ev);
-            if(NoccException::isException($ev))
+            if (NoccException::isException($ev))
                 return;
         }
         $file = fopen($filename, 'r');
@@ -89,7 +96,7 @@ class NOCCUserFilters {
         while (!feof($file)) {
             $line = trim(fgets($file, 1024));
             $pipeAt = strpos($line, '|');
-            if($pipeAt <= 0) continue;
+            if ($pipeAt <= 0) continue;
 
             $name = substr($line, 0, $pipeAt);
             $type = substr($line, $pipeAt + 1, 6);
@@ -110,12 +117,13 @@ class NOCCUserFilters {
      * @param object $ev Exception
      * @todo Rewrite to throw exception!
      */
-    public function commit(&$ev) {
+    public function commit(&$ev)
+    {
         global $conf;
         global $html_prefs_file_error;
 
         // Do we need to write?
-        if(!$this->dirty_flag) return;
+        if (!$this->dirty_flag) return;
 
         // Write prefs to file
         $filename = $conf->prefs_dir . '/' . $this->key . '.filter';
@@ -137,7 +145,7 @@ class NOCCUserFilters {
         foreach ($this->filterset as $name => $filter) {
             foreach ($filter as $type => $thing) {
                 if ($type && $thing) {
-                    fwrite($file, $name.'|'.$type.'='.$thing."\n");
+                    fwrite($file, $name . '|' . $type . '=' . $thing . "\n");
                 }
             }
         }
@@ -151,10 +159,11 @@ class NOCCUserFilters {
      * Create the filter select box for the prefs page
      * @return string HTML select box
      */
-    public function html_filter_select() {
+    public function html_filter_select()
+    {
         $output = '';
-        $pre = '<select class="button" name="filter" size="5">'."\n";
-        $post = '</select>'."\n";
+        $pre = '<select class="button" name="filter" size="5">' . "\n";
+        $post = '</select>' . "\n";
 
         foreach ($this->filterset as $name => $filter) {
             $search = $filter['SEARCH'];
@@ -163,9 +172,8 @@ class NOCCUserFilters {
         }
 
         if ($output) {
-            return $pre.$output.$post;
-        }
-        else {
+            return $pre . $output . $post;
+        } else {
             return '';
         }
     }

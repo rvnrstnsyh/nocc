@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class for handling user preferences
  *
@@ -26,7 +27,8 @@ require_once 'nocc_mailaddress.php';
  * @todo Hide all preferenes behind getter/setter!
  * @todo Rewrite to avoid global variables!
  */
-class NOCCUserPrefs {
+class NOCCUserPrefs
+{
     // TODO: Hide behind get/setKey()?
     var $key;
     /**
@@ -170,8 +172,10 @@ class NOCCUserPrefs {
      * Initialize the default user profile
      * @param string $key Key
      */
-    function __construct($key) {
-        $this->key = preg_replace("/(\\\|\/)/","_",$key);
+    function __construct($key)
+    {
+        $this->key = preg_replace("/(\\\|\/)/", "_", $key);
+        $this->key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
         $this->_fullName = '';
         $this->_emailAddress = '';
         $this->_bccSelf = false;
@@ -199,7 +203,8 @@ class NOCCUserPrefs {
      * Get full name from user preferences
      * @return string Full name
      */
-    public function getFullName() {
+    public function getFullName()
+    {
         return $this->_fullName;
     }
 
@@ -207,7 +212,8 @@ class NOCCUserPrefs {
      * Set full name from user preferences
      * @param string $value Full name
      */
-    public function setFullName($value) {
+    public function setFullName($value)
+    {
         $this->_fullName = $this->_convertToString($value);
     }
 
@@ -217,7 +223,8 @@ class NOCCUserPrefs {
      * Get email address from user preferences
      * @return string Email address
      */
-    public function getEmailAddress() {
+    public function getEmailAddress()
+    {
         return $this->_emailAddress;
     }
 
@@ -225,7 +232,8 @@ class NOCCUserPrefs {
      * Set email address from user preferences
      * @param string $value Email address
      */
-    public function setEmailAddress($value) {
+    public function setEmailAddress($value)
+    {
         $this->_emailAddress = $this->_convertToString($value);
     }
 
@@ -237,7 +245,8 @@ class NOCCUserPrefs {
      * Get mail address from user preferences
      * @return NOCC_MailAddress Mail address
      */
-    public function getMailAddress() {
+    public function getMailAddress()
+    {
         return new NOCC_MailAddress($this->_emailAddress, $this->_fullName);
     }
 
@@ -245,7 +254,8 @@ class NOCCUserPrefs {
      * Get Bcc self sending from user preferences
      * @return boolean Bcc self?
      */
-    public function getBccSelf() {
+    public function getBccSelf()
+    {
         return $this->_bccSelf;
     }
 
@@ -253,7 +263,8 @@ class NOCCUserPrefs {
      * Set Bcc self sending from user preferences
      * @param mixed $value Bcc self?
      */
-    public function setBccSelf($value) {
+    public function setBccSelf($value)
+    {
         $this->_bccSelf = $this->_convertToFalse($value);
     }
 
@@ -261,7 +272,8 @@ class NOCCUserPrefs {
      * Get address hiding from user preferences
      * @return boolean Hide addresses?
      */
-    public function getHideAddresses() {
+    public function getHideAddresses()
+    {
         return $this->_hideAddresses;
     }
 
@@ -269,7 +281,8 @@ class NOCCUserPrefs {
      * Set address hiding from user preferences
      * @param mixed $value Hide addresses?
      */
-    public function setHideAddresses($value) {
+    public function setHideAddresses($value)
+    {
         $this->_hideAddresses = $this->_convertToFalse($value);
     }
 
@@ -277,7 +290,8 @@ class NOCCUserPrefs {
      * Get show alert from user preferences
      * @return boolean show alert?
      */
-    public function getShowAlert() {
+    public function getShowAlert()
+    {
         return $this->_showAlert;
     }
 
@@ -285,7 +299,8 @@ class NOCCUserPrefs {
      * Set show alert from user preferences
      * @param mixed $value show alert?
      */
-    public function setShowAlert($value) {
+    public function setShowAlert($value)
+    {
         $this->_showAlert = $this->_convertToFalse($value);
     }
 
@@ -293,7 +308,8 @@ class NOCCUserPrefs {
      * Get outlook quoting from user preferences
      * @return boolean Outlook quoting?
      */
-    public function getOutlookQuoting() {
+    public function getOutlookQuoting()
+    {
         return $this->_outlookQuoting;
     }
 
@@ -301,7 +317,8 @@ class NOCCUserPrefs {
      * Set outlook quoting from user preferences
      * @param mixed $value Outlook quoting?
      */
-    public function setOutlookQuoting($value) {
+    public function setOutlookQuoting($value)
+    {
         $this->_outlookQuoting = $this->_convertToFalse($value);
     }
 
@@ -309,7 +326,8 @@ class NOCCUserPrefs {
      * Get colored quotes from user preferences
      * @return boolean Colored quotes?
      */
-    public function getColoredQuotes() {
+    public function getColoredQuotes()
+    {
         return $this->_coloredQuotes;
     }
 
@@ -317,7 +335,8 @@ class NOCCUserPrefs {
      * Set colored quotes from user preferences
      * @param mixed $value Colored quotes?
      */
-    public function setColoredQuotes($value) {
+    public function setColoredQuotes($value)
+    {
         $this->_coloredQuotes = $this->_convertToTrue($value);
     }
 
@@ -325,7 +344,8 @@ class NOCCUserPrefs {
      * Get structured text displaying from user preferences
      * @return boolean Display structured text?
      */
-    public function getDisplayStructuredText() {
+    public function getDisplayStructuredText()
+    {
         return $this->_displayStructuredText;
     }
 
@@ -333,7 +353,8 @@ class NOCCUserPrefs {
      * Set structured text displaying from user preferences
      * @param mixed $value Display structured text?
      */
-    public function setDisplayStructuredText($value) {
+    public function setDisplayStructuredText($value)
+    {
         $this->_displayStructuredText = $this->_convertToFalse($value);
     }
 
@@ -341,7 +362,8 @@ class NOCCUserPrefs {
      * Get message wrapping from user preferences
      * @return integer Wrap messages?
      */
-    public function getWrapMessages() {
+    public function getWrapMessages()
+    {
         return $this->_wrapMessages;
     }
 
@@ -349,7 +371,8 @@ class NOCCUserPrefs {
      * Set message wrapping from user preferences
      * @param integer Wrap messages?
      */
-    public function setWrapMessages($value) {
+    public function setWrapMessages($value)
+    {
         $this->_wrapMessages = 0;
         if (is_numeric($value)) { //if numeric...
             switch ($value) {
@@ -367,7 +390,8 @@ class NOCCUserPrefs {
      * Get signature from user preferences
      * @return string Signature
      */
-    public function getSignature() {
+    public function getSignature()
+    {
         return $this->_signature;
     }
 
@@ -375,7 +399,8 @@ class NOCCUserPrefs {
      * Set signature from user preferences
      * @param string $value Signature
      */
-    public function setSignature($value) {
+    public function setSignature($value)
+    {
         $this->_signature = $this->_convertToString($value);
     }
 
@@ -383,7 +408,8 @@ class NOCCUserPrefs {
      * Get signature separator using from user preferences
      * @return boolean Use signature separator
      */
-    public function getUseSignatureSeparator() {
+    public function getUseSignatureSeparator()
+    {
         return $this->_useSignatureSeparator;
     }
 
@@ -391,7 +417,8 @@ class NOCCUserPrefs {
      * Set signature separator using from user preferences
      * @param mixed $value Use signature separator
      */
-    public function setUseSignatureSeparator($value) {
+    public function setUseSignatureSeparator($value)
+    {
         $this->_useSignatureSeparator = $this->_convertToFalse($value);
     }
 
@@ -399,7 +426,8 @@ class NOCCUserPrefs {
      * Get HTML mail sending from user preferences
      * @return boolean Display structured text?
      */
-    public function getSendHtmlMail() {
+    public function getSendHtmlMail()
+    {
         return $this->_sendHtmlMail;
     }
 
@@ -407,7 +435,8 @@ class NOCCUserPrefs {
      * Set HTML mail sending from user preferences
      * @param mixed $value Display structured text?
      */
-    public function setSendHtmlMail($value) {
+    public function setSendHtmlMail($value)
+    {
         $this->_sendHtmlMail = $this->_convertToFalse($value);
     }
 
@@ -415,7 +444,8 @@ class NOCCUserPrefs {
      * Get graphical smilies using from user preferences
      * @return boolean Use graphical smilies?
      */
-    public function getUseGraphicalSmilies() {
+    public function getUseGraphicalSmilies()
+    {
         return $this->_useGraphicalSmilies;
     }
 
@@ -423,7 +453,8 @@ class NOCCUserPrefs {
      * Set graphical smilies using from user preferences
      * @param mixed $value Use graphical smilies?
      */
-    public function setUseGraphicalSmilies($value) {
+    public function setUseGraphicalSmilies($value)
+    {
         $this->_useGraphicalSmilies = $this->_convertToFalse($value);
     }
 
@@ -431,7 +462,8 @@ class NOCCUserPrefs {
      * Get sent folder using from user preferences
      * @return boolean Use sent folder?
      */
-    public function getUseSentFolder() {
+    public function getUseSentFolder()
+    {
         return $this->_useSentFolder;
     }
 
@@ -439,7 +471,8 @@ class NOCCUserPrefs {
      * Set sent folder using from user preferences
      * @param mixed $value Use sent folder?
      */
-    public function setUseSentFolder($value) {
+    public function setUseSentFolder($value)
+    {
         $this->_useSentFolder = $this->_convertToFalse($value);
     }
 
@@ -447,7 +480,8 @@ class NOCCUserPrefs {
      * Get sent folder name from user preferences
      * @return string Sent folder name
      */
-    public function getSentFolderName() {
+    public function getSentFolderName()
+    {
         return $this->_sentFolderName;
     }
 
@@ -455,7 +489,8 @@ class NOCCUserPrefs {
      * Set sent folder name from user preferences
      * @param string $value Sent folder name
      */
-    public function setSentFolderName($value) {
+    public function setSentFolderName($value)
+    {
         $this->_sentFolderName = $this->_convertToString($value);
     }
 
@@ -463,7 +498,8 @@ class NOCCUserPrefs {
      * Get trash folder using from user preferences
      * @return boolean Use trash folder?
      */
-    public function getUseTrashFolder() {
+    public function getUseTrashFolder()
+    {
         return $this->_useTrashFolder;
     }
 
@@ -471,7 +507,8 @@ class NOCCUserPrefs {
      * Set trash folder using from user preferences
      * @param mixed $value Use trash folder?
      */
-    public function setUseTrashFolder($value) {
+    public function setUseTrashFolder($value)
+    {
         $this->_useTrashFolder = $this->_convertToFalse($value);
     }
 
@@ -479,7 +516,8 @@ class NOCCUserPrefs {
      * Get trash folder name from user preferences
      * @return string Trash folder name
      */
-    public function getTrashFolderName() {
+    public function getTrashFolderName()
+    {
         return $this->_trashFolderName;
     }
 
@@ -487,7 +525,8 @@ class NOCCUserPrefs {
      * Set trash folder name from user preferences
      * @param string $value Trash folder name
      */
-    public function setTrashFolderName($value) {
+    public function setTrashFolderName($value)
+    {
         $this->_trashFolderName = $this->_convertToString($value);
     }
 
@@ -499,7 +538,8 @@ class NOCCUserPrefs {
      * Get inbox folder using from user preferences
      * @return boolean Use inbox folder?
      */
-    public function getUseInboxFolder() {
+    public function getUseInboxFolder()
+    {
         return $this->_useInboxFolder;
     }
 
@@ -507,7 +547,8 @@ class NOCCUserPrefs {
      * Set inbox folder using from user preferences
      * @param mixed $value Use inbox folder?
      */
-    public function setUseInboxFolder($value) {
+    public function setUseInboxFolder($value)
+    {
         $this->_useInboxFolder = $this->_convertToFalse($value);
     }
 
@@ -515,7 +556,8 @@ class NOCCUserPrefs {
      * Get inbox folder name from user preferences
      * @return string Inbox folder name
      */
-    public function getInboxFolderName() {
+    public function getInboxFolderName()
+    {
         return $this->_inboxFolderName;
     }
 
@@ -523,7 +565,8 @@ class NOCCUserPrefs {
      * Set inbox folder name from user preferences
      * @param string $value Inbox folder name
      */
-    public function setInboxFolderName($value) {
+    public function setInboxFolderName($value)
+    {
         $this->_inboxFolderName = $this->_convertToString($value);
     }
 
@@ -535,7 +578,8 @@ class NOCCUserPrefs {
      * Get auto collect from user preferences
      * @param int $value
      */
-    public function getCollect() {
+    public function getCollect()
+    {
         return $this->_collect;
     }
 
@@ -543,7 +587,8 @@ class NOCCUserPrefs {
      * Set auto collect from user preferences
      * @param int $value
      */
-    public function setCollect($value) {
+    public function setCollect($value)
+    {
         $this->_collect = $value;
     }
 
@@ -560,10 +605,12 @@ class NOCCUserPrefs {
      * @static
      * @todo Rewrite to throw exception!
      */
-    public static function read($key, &$ev) {
+    public static function read($key, &$ev)
+    {
         global $conf;
 
-	$key=preg_replace("/(\\\|\/)/","_",$key);
+        $key = preg_replace("/(\\\|\/)/", "_", $key);
+        $key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
 
         $prefs = new NOCCUserPrefs($key);
 
@@ -588,7 +635,8 @@ class NOCCUserPrefs {
      * @static
      * @todo Rewrite to throw exception!
      */
-    public static function readFromFile($prefs, $filename, $ev) {
+    public static function readFromFile($prefs, $filename, $ev)
+    {
         /* Open the preferences file */
         if (!file_exists($filename)) {
             error_log("NOCC: $filename does not exist");
@@ -701,63 +749,64 @@ class NOCCUserPrefs {
      * @param object $ev Exception
      * @todo Rewrite to throw exception!
      */
-    public function commit(&$ev) {
+    public function commit(&$ev)
+    {
         global $conf;
         global $html_prefs_file_error;
 
         // Check it passes validation
         $this->validate($ev);
-        if(NoccException::isException($ev)) return;
-        
+        if (NoccException::isException($ev)) return;
+
         // Do we need to write?
-        if(!$this->dirty_flag) return;
+        if (!$this->dirty_flag) return;
 
         // Write prefs to file
         //TODO: Check key value! Not empty?
         $filename = $conf->prefs_dir . '/' . $this->key . '.pref';
         if (file_exists($filename) && !is_writable($filename)) {
             $ev = new NoccException($html_prefs_file_error);
-            return; 
+            return;
         }
         if (!is_writable($conf->prefs_dir)) {
             $ev = new NoccException($html_prefs_file_error);
             return;
         }
         $file = fopen($filename, 'w');
-        if (!$file){
+        if (!$file) {
             $ev = new NoccException($html_prefs_file_error);
             return;
         }
 
-        fwrite($file, "full_name=".$this->_fullName."\n");
-        fwrite($file, "email_address=".$this->_emailAddress."\n");
-        fwrite($file, "msg_per_page=".$this->msg_per_page."\n");
-        fwrite($file, "bcc_self=".$this->_bccSelf."\n");
-        fwrite($file, "hide_addresses=".$this->_hideAddresses."\n");
-        fwrite($file, "show_alert=".$this->_showAlert."\n");
-        fwrite($file, "outlook_quoting=".$this->_outlookQuoting."\n");
-        fwrite($file, "colored_quotes=".$this->_coloredQuotes."\n");
-        fwrite($file, "display_struct=".$this->_displayStructuredText."\n");
-        fwrite($file, "seperate_msg_win=".$this->seperate_msg_win."\n");
-        fwrite($file, "reply_leadin=".base64_encode($this->reply_leadin)."\n");
-        fwrite($file, "signature=".base64_encode($this->_signature)."\n");
-        fwrite($file, "wrap_msg=".$this->_wrapMessages."\n");
-        fwrite($file, "sig_sep=".$this->_useSignatureSeparator."\n");
-        fwrite($file, "html_mail_send=".$this->_sendHtmlMail."\n");
-        fwrite($file, "graphical_smilies=".$this->_useGraphicalSmilies."\n");
+        fwrite($file, "full_name=" . $this->_fullName . "\n");
+        fwrite($file, "email_address=" . $this->_emailAddress . "\n");
+        fwrite($file, "msg_per_page=" . $this->msg_per_page . "\n");
+        fwrite($file, "bcc_self=" . $this->_bccSelf . "\n");
+        fwrite($file, "hide_addresses=" . $this->_hideAddresses . "\n");
+        fwrite($file, "show_alert=" . $this->_showAlert . "\n");
+        fwrite($file, "outlook_quoting=" . $this->_outlookQuoting . "\n");
+        fwrite($file, "colored_quotes=" . $this->_coloredQuotes . "\n");
+        fwrite($file, "display_struct=" . $this->_displayStructuredText . "\n");
+        fwrite($file, "seperate_msg_win=" . $this->seperate_msg_win . "\n");
+        fwrite($file, "reply_leadin=" . base64_encode($this->reply_leadin) . "\n");
+        fwrite($file, "signature=" . base64_encode($this->_signature) . "\n");
+        fwrite($file, "wrap_msg=" . $this->_wrapMessages . "\n");
+        fwrite($file, "sig_sep=" . $this->_useSignatureSeparator . "\n");
+        fwrite($file, "html_mail_send=" . $this->_sendHtmlMail . "\n");
+        fwrite($file, "graphical_smilies=" . $this->_useGraphicalSmilies . "\n");
 
-        fwrite($file, "sent_folder=".$this->_useSentFolder."\n");
-        fwrite($file, "sent_folder_name=".str_replace($_SESSION['imap_namespace'], "", $this->_sentFolderName)."\n");
+        fwrite($file, "sent_folder=" . $this->_useSentFolder . "\n");
+        fwrite($file, "sent_folder_name=" . str_replace($_SESSION['imap_namespace'], "", $this->_sentFolderName) . "\n");
 
-        fwrite($file, "trash_folder=".$this->_useTrashFolder."\n");
-        fwrite($file, "trash_folder_name=".str_replace($_SESSION['imap_namespace'], "", $this->_trashFolderName)."\n");
+        fwrite($file, "trash_folder=" . $this->_useTrashFolder . "\n");
+        fwrite($file, "trash_folder_name=" . str_replace($_SESSION['imap_namespace'], "", $this->_trashFolderName) . "\n");
 
-        fwrite($file, "inbox_folder=".$this->_useInboxFolder."\n");
-        fwrite($file, "inbox_folder_name=".str_replace($_SESSION['imap_namespace'], "", $this->_inboxFolderName)."\n");
+        fwrite($file, "inbox_folder=" . $this->_useInboxFolder . "\n");
+        fwrite($file, "inbox_folder_name=" . str_replace($_SESSION['imap_namespace'], "", $this->_inboxFolderName) . "\n");
 
-        fwrite($file, "collect=".$this->_collect."\n");
-        fwrite($file, "lang=".$this->lang."\n");
-        fwrite($file, "theme=".$this->theme."\n");
+        fwrite($file, "collect=" . $this->_collect . "\n");
+        fwrite($file, "lang=" . $this->lang . "\n");
+        fwrite($file, "theme=" . $this->theme . "\n");
         fclose($file);
 
         $this->dirty_flag = 0;
@@ -771,27 +820,27 @@ class NOCCUserPrefs {
      * @global string $html_invalid_wrap_msg
      * @param object $ev Exception
      */
-    public function validate(&$ev) {
+    public function validate(&$ev)
+    {
         global $conf;
         global $html_invalid_email_address;
         global $html_invalid_msg_per_page;
         global $html_invalid_wrap_msg;
 
-	$allow_address_change=(
-		( isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change )
-		|| ( ! isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->allow_address_change  )
-	);
+        $allow_address_change = (
+            (isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->allow_address_change)
+        );
         if ($allow_address_change) {
-            if (strlen($this->_emailAddress)>0 && !NOCC_MailAddress::isValidAddress($this->_emailAddress)) {
+            if (strlen($this->_emailAddress) > 0 && !NOCC_MailAddress::isValidAddress($this->_emailAddress)) {
                 $ev = new NoccException($html_invalid_email_address);
                 return;
             }
-        }
-        else {
+        } else {
             $this->_emailAddress = '';
         }
 
-        if (isset($this->msg_per_page) && !is_numeric($this->msg_per_page) ) {
+        if (isset($this->msg_per_page) && !is_numeric($this->msg_per_page)) {
             $ev = new NoccException($html_invalid_msg_per_page);
             return;
         }
@@ -811,7 +860,8 @@ class NOCCUserPrefs {
      * @return bool Bool value
      * @access private
      */
-    private function _convertToFalse($value) {
+    private function _convertToFalse($value)
+    {
         if ($value === true || $value === 1 || $value === '1' || $value === 'on') {
             return true;
         }
@@ -824,7 +874,8 @@ class NOCCUserPrefs {
      * @return bool Bool value
      * @access private
      */
-    private function _convertToTrue($value) {
+    private function _convertToTrue($value)
+    {
         if ($value === false || $value === 0 || $value === '0' || $value === 'off') {
             return false;
         }
@@ -837,7 +888,8 @@ class NOCCUserPrefs {
      * @return string String value
      * @access private
      */
-    private function _convertToString($value) {
+    private function _convertToString($value)
+    {
         if (is_string($value)) {
             return $value;
         }
@@ -852,12 +904,13 @@ class NOCCUserPrefs {
      * @return string Parsed Reply Leadin
      * @static
      */
-    public static function parseLeadin($string, $content) {
+    public static function parseLeadin($string, $content)
+    {
         $string = str_replace('_DATE_', $content['date'], $string);
         $string = str_replace('_TIME_', $content['time'], $string);
         $string = str_replace('_FROM_', $content['from'], $string);
         $string = str_replace('_TO_', $content['to'], $string);
         $string = str_replace('_SUBJECT_', $content['subject'], $string);
-        return ($string."\n");
+        return ($string . "\n");
     }
 }

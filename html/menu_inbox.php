@@ -10,9 +10,9 @@ switch ($action) {
   case 'login':
   case 'cookie':
     $selected = 1;
-    $line = '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=write">' . $html_new_msg . '</a>';
+    $line = '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
     break;
-  case 'write':
+  case 'compose':
     $selected = 2;
     $line = '<span>' . $html_new_msg . '</span>';
     break;
@@ -30,7 +30,7 @@ switch ($action) {
     break;
   case 'managefolders':
     $selected = 3;
-    $line = '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=write">' . $html_new_msg . '</a>';
+    $line = '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
     break;
 }
 ?>

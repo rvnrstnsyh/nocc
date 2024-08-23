@@ -89,9 +89,9 @@ class NOCC_Session
 			if (isset($_SESSION['send_backup']) && ! isset($_GET['discard'])) {
 				$send_backup = $_SESSION['send_backup'];
 			}
-			$svalue = session_id();
+			$_nvvalue = session_id();
 			$_SESSION['_nvkey'] = $_nvkey;
-			$_SESSION['svalue'] = $svalue;
+			$_SESSION['_nvvalue'] = $_nvvalue;
 
 			if ($_SESSION['_nvkey'] == "RSS") {
 				$found_session = true;
@@ -132,9 +132,9 @@ class NOCC_Session
 					if (isset($_SESSION['send_backup'])) {
 						$send_backup = $_SESSION['send_backup'];
 					}
-					$svalue = session_id();
+					$_nvvalue = session_id();
 					$_SESSION['_nvkey'] = $_nvkey;
-					$_SESSION['svalue'] = $svalue;
+					$_SESSION['_nvvalue'] = $_nvvalue;
 					$_SESSION['restart_session'] = true;
 
 					if (isset($_SESSION['nocc_loggedin']) && $_SESSION['nocc_loggedin']) {
@@ -325,9 +325,9 @@ class NOCC_Session
 			$_nvkey = 'NOCCLI_' . md5(uniqid(rand(), true));
 			//session_name($_nvkey);
 			session_regenerate_id(true);
-			$svalue = session_id();
+			$_nvvalue = session_id();
 			$_SESSION['_nvkey'] = $_nvkey;
-			$_SESSION['svalue'] = $svalue;
+			$_SESSION['_nvvalue'] = $_nvvalue;
 
 			setcookie($old_nvkey, '', time() - 3600, '/', '', false);
 			//return true;
@@ -356,9 +356,9 @@ class NOCC_Session
 		session_name($_nvkey);
 		session_set_cookie_params($cookie_lifetime, '/', '', false);
 		session_start();
-		$svalue = session_id();
+		$_nvvalue = session_id();
 		$_SESSION['_nvkey'] = $_nvkey;
-		$_SESSION['svalue'] = $svalue;
+		$_SESSION['_nvvalue'] = $_nvvalue;
 		$_SESSION['creation_time'] = time();
 	}
 
@@ -401,16 +401,16 @@ class NOCC_Session
 			$filename = $conf->prefs_dir . '/' . $_SESSION['_nvkey'] . '.session';
 
 			if (file_exists($filename) && !is_writable($filename)) {
-				$ev = new NoccException($html_session_file_error);
+				// $ev = new NoccException($html_session_file_error);
 				return false;
 			}
 			if (!is_writable($conf->prefs_dir)) {
-				$ev = new NoccException($html_session_file_error);
+				// $ev = new NoccException($html_session_file_error);
 				return false;
 			}
 			$file = fopen($filename, 'w');
 			if (!$file) {
-				$ev = new NoccException($html_session_file_error);
+				// $ev = new NoccException($html_session_file_error);
 				return false;
 			}
 			fwrite($file, $save_string . "\n");
@@ -552,8 +552,8 @@ class NOCC_Session
 		if (isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
 			$_nvkey = $_SESSION['_nvkey'];
 		}
-		$svalue = session_id();
-		setcookie($_nvkey, $svalue, $cookie_lifetime, '/', '', false);
+		$_nvvalue = session_id();
+		setcookie($_nvkey, $_nvvalue, $cookie_lifetime, '/', '', false);
 	}
 
 	/**

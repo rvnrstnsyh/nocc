@@ -136,9 +136,9 @@ switch ($action) {
         break;
 
         //--------------------------------------------------------------------------------
-        // Write a mail...
+        // Compose/Write a mail...
         //--------------------------------------------------------------------------------
-    case 'write':
+    case 'compose':
 
         if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) {
             if (isset($_SESSION['send_backup']['mail_to'])) {
@@ -617,8 +617,8 @@ switch ($action) {
             }
             NOCC_Session::createCookie($remember);
             if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) {
-                //header("Location: ".$conf->base_url."action.php?".NOCC_Session::getUrlGetSession().'&action=write');
-                header("Location: " . $conf->base_url . "action.php?_nvkey=" . $new_session_name . '&action=write');
+                //header("Location: ".$conf->base_url."action.php?".NOCC_Session::getUrlGetSession().'&action=compose');
+                header("Location: " . $conf->base_url . "action.php?_nvkey=" . $new_session_name . '&action=compose');
             } else {
                 //header("Location: ".$conf->base_url."action.php?".NOCC_Session::getUrlGetSession());
                 header("Location: " . $conf->base_url . "action.php?_nvkey=" . $new_session_name);
@@ -782,8 +782,8 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         $subject = os_iconv($charset, 'UTF-8', $subject);
         $content = $content . $html_subject_label . " " . $subject . '<br />';
 
-        //$from=imap_rfc822_write_address($header->from[0]->mailbox,$header->from[0]->host,$header->from[0]->personal);
-        $from = $pop->write_address($header->from[0]->mailbox, $header->from[0]->host, $header->from[0]->personal);
+        $from = imap_rfc822_write_address($header->from[0]->mailbox, $header->from[0]->host, $header->from[0]->personal);
+        // $from = $pop->write_address($header->from[0]->mailbox, $header->from[0]->host, $header->from[0]->personal);
         $charset = detect_body_charset($from, 'default');
         $match = array();
         if (preg_match('/^=\?(.*?)\?/', $from, $match)) {
@@ -800,8 +800,8 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         $date = strtotime($header->date);
         $content = $content . $html_date_label . " " . format_date($date, $lang) . ' ' . format_time($date, $lang) . '<br />';
 
-        //$to=imap_rfc822_write_address($header->to[0]->mailbox,$header->to[0]->host,$header->to[0]->personal);
-        $to = $pop->write_address($header->to[0]->mailbox, $header->to[0]->host, $header->to[0]->personal);
+        $to = imap_rfc822_write_address($header->to[0]->mailbox, $header->to[0]->host, $header->to[0]->personal);
+        // $to = $pop->write_address($header->to[0]->mailbox, $header->to[0]->host, $header->to[0]->personal);
         $charset = detect_body_charset($to, 'default');
         $match = array();
         if (preg_match('/^=\?(.*?)\?/', $to, $match)) {

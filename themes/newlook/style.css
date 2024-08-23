@@ -17,7 +17,7 @@
   --success-color: #adff2f;
 }
 
-/* html {
+html {
   width: 100%;
   box-sizing: border-box;
 }
@@ -27,7 +27,7 @@ body {
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
-} */
+}
 
 .success-message {
   color: var(--success-color);
@@ -38,7 +38,7 @@ body {
 }
 
 .inbox label {
-  color: #ffffff;
+  color: var(--white-color);
 }
 
 .inbox img {
@@ -51,12 +51,12 @@ body {
 }
 
 .titlew {
-  color: #ffffff;
+  color: var(--white-color);
   font-weight: bold;
 }
 
 .menuOpts {
-  color: #000000;
+  color: var(--tertiary-color);
 }
 
 .menuOpts input {
@@ -137,12 +137,12 @@ label {
 }
 
 .currentQuota {
-  color: #ffffff;
+  color: var(--white-color);
   font-weight: bold;
 }
 
 .maxQuota {
-  color: #ffffff;
+  color: var(--white-color);
   font-weight: bold;
 }
 
@@ -152,7 +152,7 @@ img {
 
 body {
   min-width: 40em;
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #ebebeb;
   font-family: Arial, Helvetica, sans-serif;
   font-size: small;
@@ -188,8 +188,8 @@ table {
 
 #popup {
   min-width: 0;
-  color: #000000;
-  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
+  color: var(--tertiary-color);
+  background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
 }
 
 #header h1 {
@@ -421,7 +421,7 @@ div.topNavigation img {
 
 div.messageList {
   padding: 0.5em;
-  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
+  background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
 }
 
 div.messageList table {
@@ -462,13 +462,13 @@ img.sort {
 
 .errorTitle {
   font-weight: bold;
-  color: #ffffff;
+  color: var(--white-color);
   text-align: center;
   background: url(./img/error.png) top left no-repeat;
 }
 
 .errorText {
-  background-color: #ffffff;
+  background-color: var(--white-color);
   text-align: center;
   padding: 2px;
 }
@@ -479,8 +479,8 @@ img.sort {
   margin-right: auto;
   text-align: center;
   font-size: larger;
-  background: #ffffff url(./img/postagestamp01.png) top center no-repeat;
-  border: 1px solid #000000;
+  background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
+  border: 1px solid var(--gray-100);
 }
 
 #loginBox h2 {
@@ -590,7 +590,7 @@ img.sort {
   text-align: center;
   width: 100%;
   padding: 0px;
-  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
+  background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
 }
 
 .send table {
@@ -640,7 +640,7 @@ img.sort {
  * mail data (verbose header, body and attachments)
  */
 .mailData {
-  background-color: #ffffff;
+  background-color: var(--white-color);
 }
 
 .mail {
@@ -675,7 +675,7 @@ hr.mailAttachSep {
 
 .mailNav {
   border: 0px;
-  text-align: center;
+  text-align: start;
   padding: 0px;
   width: 100%;
   background-color: #f5f5f5;
@@ -732,7 +732,7 @@ hr.mailAttachSep {
 .contactAdd table {
   width: 100%;
   text-align: center;
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #f5f5f5;
   border-collapse: collapse;
 }
@@ -744,7 +744,7 @@ hr.mailAttachSep {
 .contactsTitle {
   font-weight: bold;
   font-size: larger;
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #d6d6d6;
 }
 
@@ -773,17 +773,17 @@ hr.mailAttachSep {
 
 .contactsListHeader {
   text-align: left;
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #d6d6d6;
 }
 
 .contactsListOdd {
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #f5f5f5;
 }
 
 .contactsListEven {
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #ebebeb;
 }
 
@@ -808,7 +808,7 @@ hr.mailAttachSep {
   text-align: center;
   padding: 0px;
   width: 100%;
-  background: #ffffff url(./img/postagestamp01.png) top right no-repeat;
+  background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
 }
 
 .prefs h3 {
@@ -826,7 +826,8 @@ hr.mailAttachSep {
 }
 
 .prefs fieldset legend {
-  margin-left: 2em;
+  margin-left: 0; /* Menghapus margin kiri */
+  text-align: left; /* Mengatur teks agar rata kiri */
   font-weight: bold;
   font-size: larger;
 }
@@ -847,7 +848,7 @@ hr.mailAttachSep {
 
 .nopic {
   text-align: center;
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #ffff99;
   border: 1px solid #ffff00;
 }
@@ -855,7 +856,7 @@ hr.mailAttachSep {
 .spamWarning {
   text-align: center;
   font-weight: bold;
-  color: #000000;
+  color: var(--tertiary-color);
   background-color: #ffcccc;
   border: 1px solid #ffaaaa;
 }

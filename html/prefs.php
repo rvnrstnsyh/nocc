@@ -46,37 +46,40 @@ if (count($big_list) > 1) {
 ?>
 
 <div class="prefs">
-  <h3><?php echo convertLang2Html($html_preferences) ?></h3>
+  <br>
   <form method="POST" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
     <div>
       <input type="hidden" name="action" value="setprefs" />
       <input type="hidden" name="submit_prefs" value="set" />
-      <table>
-        <tr>
-          <td class="prefsLabel"><label for="full_name"><?php echo convertLang2Html($html_full_name_label) ?></label></td>
-          <td class="prefsData">
-            <input class="button" type="text" name="full_name" id="full_name" value="<?php echo $user_prefs->getFullName() ?>" size="40" />
-          </td>
-        </tr>
-        <?php
-        $allow_address_change = (
-          (isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change)
-          || (! isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->allow_address_change)
-        );
-        if ($allow_address_change) {
-          //$from_email_show=($user_prefs->getEmailAddress() != '') ? $user_prefs->getEmailAddress() : get_default_from_address();
-          $from_email_show = $user_prefs->getEmailAddress();
-        ?>
+      <fieldset>
+        <legend><?php echo strtoupper(convertLang2Html($html_preferences)) ?></legend>
+        <table>
           <tr>
-            <td class="prefsLabel"><label for="email_address"><?php echo convertLang2Html($html_email_address_label) ?></label></td>
+            <td class="prefsLabel"><label for="full_name"><?php echo convertLang2Html($html_full_name_label) ?></label></td>
             <td class="prefsData">
-              <input class="button" type="text" name="email_address" id="email_address" value="<?php echo $from_email_show ?>" size="40" />
+              <input class="button" type="text" name="full_name" id="full_name" value="<?php echo $user_prefs->getFullName() ?>" size="40" />
             </td>
           </tr>
-        <?php } ?>
-      </table>
+          <?php
+          $allow_address_change = (
+            (isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->allow_address_change)
+          );
+          if ($allow_address_change) {
+            //$from_email_show=($user_prefs->getEmailAddress() != '') ? $user_prefs->getEmailAddress() : get_default_from_address();
+            $from_email_show = $user_prefs->getEmailAddress();
+          ?>
+            <tr>
+              <td class="prefsLabel"><label for="email_address"><?php echo convertLang2Html($html_email_address_label) ?></label></td>
+              <td class="prefsData">
+                <input class="button" type="text" name="email_address" id="email_address" value="<?php echo $from_email_show ?>" size="40" />
+              </td>
+            </tr>
+          <?php } ?>
+        </table>
+      </fieldset>
       <fieldset>
-        <legend><?php echo convertLang2Html($html_inbox); ?></legend>
+        <legend><?php echo strtoupper(convertLang2Html($html_inbox)); ?></legend>
         <table>
           <tr>
             <td class="prefsLabel"><label for="msg_per_page"><?php echo convertLang2Html($html_msgperpage_label) ?></label></td>
@@ -105,7 +108,7 @@ if (count($big_list) > 1) {
         </table>
       </fieldset>
       <fieldset>
-        <legend><?php echo convertLang2Html($html_msg); ?></legend>
+        <legend><?php echo strtoupper(convertLang2Html($html_msg)); ?></legend>
         <table>
           <tr>
             <td class="prefsLabel">&nbsp;</td>
@@ -128,7 +131,7 @@ if (count($big_list) > 1) {
         </table>
       </fieldset>
       <fieldset>
-        <legend><?php echo convertLang2Html($html_reply); ?></legend>
+        <legend><?php echo strtoupper(convertLang2Html($html_reply)); ?></legend>
         <table>
           <?php if ($conf->enable_reply_leadin) { ?>
             <tr>
@@ -147,7 +150,7 @@ if (count($big_list) > 1) {
         </table>
       </fieldset>
       <fieldset>
-        <legend><?php echo convertLang2Html($html_send); ?></legend>
+        <legend><?php echo strtoupper(convertLang2Html($html_send)); ?></legend>
         <table>
           <tr>
             <td class="prefsLabel">&nbsp;</td>
@@ -177,7 +180,7 @@ if (count($big_list) > 1) {
         </table>
       </fieldset>
       <fieldset>
-        <legend><?php echo convertLang2Html($html_signature); ?></legend>
+        <legend><?php echo strtoupper(convertLang2Html($html_signature)); ?></legend>
         <table>
           <tr>
             <td class="prefsLabel"><label for="signature"><?php echo convertLang2Html($html_signature_label) ?></label></td>
@@ -211,7 +214,7 @@ if (count($big_list) > 1) {
       </fieldset>
       <?php if ($pop->is_imap()) { ?>
         <fieldset>
-          <legend><?php echo convertLang2Html($html_folders); ?></legend>
+          <legend><?php echo strtoupper(convertLang2Html($html_folders)); ?></legend>
           <table>
             <tr>
               <td class="prefsLabel">&nbsp;</td>
@@ -238,19 +241,8 @@ if (count($big_list) > 1) {
         </fieldset>
       <?php } ?>
       <fieldset>
-        <legend>NOCC</legend>
+        <legend>OTHER</legend>
         <table>
-          <tr>
-            <td class="prefsLabel"><label for="collect"><?php echo convertLang2Html($html_collect_label) ?></label></td>
-            <td class="prefsData">
-              <select class="button" name="collect" id="collect">
-                <option value="0" <?php if (0 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option0) ?></option>
-                <option value="1" <?php if (1 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option1) ?></option>
-                <option value="2" <?php if (2 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option2) ?></option>
-                <option value="3" <?php if (3 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option3) ?></option>
-              </select>
-            </td>
-          </tr>
           <?php if ($conf->use_language == true) { ?>
             <tr>
               <td class="prefsLabel"><label for="lang"><?php echo convertLang2Html($html_lang_label) ?></label></td>
@@ -272,6 +264,13 @@ if (count($big_list) > 1) {
                   }
                   ?>
                 </select>
+              </td>
+            </tr>
+          <?php } else { ?>
+            <tr>
+              <td class="prefsLabel"><label for="lang"><?php echo convertLang2Html($html_lang_label) ?></label></td>
+              <td class="prefsData">
+                <?php echo strtoupper($conf->default_lang); ?>
               </td>
             </tr>
           <?php } ?>
@@ -301,7 +300,25 @@ if (count($big_list) > 1) {
                 </select>
               </td>
             </tr>
+          <?php } else { ?>
+            <tr>
+              <td class="prefsLabel"><label for="theme"><?php echo convertLang2Html($html_theme_label) ?></label></td>
+              <td class="prefsData">
+                <?php echo $conf->default_theme; ?>
+              </td>
+            </tr>
           <?php } ?>
+          <tr>
+            <td class="prefsLabel"><label for="collect"><?php echo convertLang2Html($html_collect_label) ?></label></td>
+            <td class="prefsData">
+              <select class="button" name="collect" id="collect">
+                <option value="0" <?php if (0 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option0) ?></option>
+                <option value="1" <?php if (1 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option1) ?></option>
+                <option value="2" <?php if (2 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option2) ?></option>
+                <option value="3" <?php if (3 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option3) ?></option>
+              </select>
+            </td>
+          </tr>
         </table>
       </fieldset>
       <?php
