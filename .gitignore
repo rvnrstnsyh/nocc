@@ -1,4 +1,7 @@
 conf.php
 conf.local.php
 
+vendor
 tmp
+
+composer.lock

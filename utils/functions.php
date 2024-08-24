@@ -18,16 +18,16 @@
  * @version    SVN: $Id: functions.php 3060 2023-03-05 19:06:00Z oheil $
  */
 
+require_once './vendor/autoload.php';
+
 require_once './classes/class_local.php';
-require_once './classes/nocc_mailreader.php';
+require_once './classes/class_htmlpurifier.php';
+
 require_once './classes/nocc_theme.php';
+require_once './classes/nocc_mailreader.php';
 require_once './classes/nocc_quotausage.php';
 require_once './classes/nocc_mailaddress.php';
 require_once './classes/nocc_attachedfile.php';
-
-require_once './htmlpurifier/library/HTMLPurifier.auto.php';
-
-
 
 /**
  * recursivle traverse a directory and return an array of all files and directories
@@ -444,21 +444,6 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
         $body = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $body . '</span>';
     }
 
-    class HTMLPurifier_URIScheme_cid extends HTMLPurifier_URIScheme
-    {
-        public $browsable = true;
-        public $allowed_types = array(
-            'image/jpeg' => true,
-            'image/gif' => true,
-            'image/png' => true,
-            'application/octet-stream' => true,
-        );
-        public $may_omit_host = true;
-        public function doValidate(&$uri, $config, $context)
-        {
-            return true;
-        }
-    }
     HTMLPurifier_URISchemeRegistry::instance()->register("cid", new HTMLPurifier_URIScheme_cid());
 
     $hp_config = HTMLPurifier_Config::createDefault();

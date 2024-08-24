@@ -245,12 +245,13 @@ switch ($action) {
         // Forward a mail...
         //--------------------------------------------------------------------------------
     case 'forward':
-        if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) {
-            unset($_SESSION['send_backup']);
-        }
+        if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) unset($_SESSION['send_backup']);
+
         clear_attachments();
+
         $mail_list = explode('$', $_REQUEST['mail']);
         $mail_body = '';
+
         for ($mail_num = 0; $mail_num < count($mail_list); $mail_num++) {
             try {
                 $content = aff_mail($pop, $mail_list[$mail_num], NOCC_Request::getBoolValue('verbose'));
@@ -266,7 +267,7 @@ switch ($action) {
             if (count($mail_list) == 1) {
                 $mail_subject = $html_forward_short . ' ' . $content['subject'];
             } else {
-                $mail_subject = '';
+                $mail_subject = 'Fwd: ';
             }
 
             if (isset($conf->broken_forwarding) && $conf->broken_forwarding) {
@@ -286,6 +287,7 @@ switch ($action) {
                 $broken_forwarding = false;
             }
         }
+
         // Let send.php know to attach the original message
         $forward_msgnum = $_REQUEST['mail'];
 
