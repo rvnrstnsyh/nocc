@@ -52,7 +52,7 @@ if (count($big_list) > 1) {
       <input type="hidden" name="action" value="setprefs" />
       <input type="hidden" name="submit_prefs" value="set" />
       <fieldset>
-        <legend><?php echo strtoupper(convertLang2Html($html_preferences)) ?></legend>
+        <legend><?php echo strtoupper(convertLang2Html($html_personal_information)) ?></legend>
         <table>
           <tr>
             <td class="prefsLabel"><label for="full_name"><?php echo convertLang2Html($html_full_name_label) ?></label></td>
@@ -73,6 +73,46 @@ if (count($big_list) > 1) {
               <td class="prefsLabel"><label for="email_address"><?php echo convertLang2Html($html_email_address_label) ?></label></td>
               <td class="prefsData">
                 <input class="button" type="text" name="email_address" id="email_address" value="<?php echo $from_email_show ?>" size="40" />
+              </td>
+            </tr>
+          <?php } else { ?>
+            <tr>
+              <td class="prefsLabel"><label><?php echo convertLang2Html($html_email_address_label) ?></label></td>
+              <td class="prefsData">
+                <?php if (preg_match('/<(.+?)>/', get_default_from_address(), $matches)) echo htmlspecialchars($matches[1], ENT_COMPAT | ENT_SUBSTITUTE); ?>
+              </td>
+            </tr>
+          <?php } ?>
+        </table>
+      </fieldset>
+      <fieldset>
+        <legend><?php echo strtoupper(convertLang2Html($html_signature)); ?></legend>
+        <table>
+          <tr>
+            <td class="prefsLabel"><label for="signature"><?php echo convertLang2Html($html_signature_label) ?></label></td>
+            <td class="prefsData">
+              <?php if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
+                include 'ckeditor.php';
+                $oCKEditor = new CKEditor();
+                $oCKEditor->basePath = 'ckeditor/';
+                $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
+                $oCKEditor->editor('signature', $user_prefs->getSignature());
+              } else if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
+                // use ckeditor5
+                print('<textarea id="mail_body" name="mail_body" cols="82" rows="20">');
+                $ckeditor5_mb = $user_prefs->getSignature();
+                print('</textarea>');
+                include "ckeditor5.php";
+              } else { ?>
+                <textarea class="button" name="signature" id="signature" rows="5" cols="42"><?php echo $user_prefs->getSignature(); ?></textarea>
+              <?php } ?>
+            </td>
+          </tr>
+          <?php if (!$user_prefs->getSendHtmlMail()) { ?>
+            <tr>
+              <td class="prefsLabel">&nbsp;</td>
+              <td class="prefsData">
+                <input type="checkbox" name="sig_sep" id="sig_sep" value="on" <?php if ($user_prefs->getUseSignatureSeparator()) echo 'checked="checked"'; ?> /><label for="sig_sep"><?php echo convertLang2Html($html_usenet_separator) ?></label>
               </td>
             </tr>
           <?php } ?>
@@ -110,12 +150,19 @@ if (count($big_list) > 1) {
       <fieldset>
         <legend><?php echo strtoupper(convertLang2Html($html_msg)); ?></legend>
         <table>
-          <tr>
-            <td class="prefsLabel">&nbsp;</td>
-            <td class="prefsData">
-              <input type="checkbox" name="graphical_smilies" id="graphical_smilies" value="on" <?php if ($user_prefs->getUseGraphicalSmilies()) echo 'checked="checked"'; ?> /><label for="graphical_smilies"><?php echo convertLang2Html($html_use_graphical_smilies) ?></label>
-            </td>
-          </tr>
+          <?php if ($conf->use_graphical_smilies) { ?>
+            <tr>
+              <td class="prefsLabel">&nbsp;</td>
+              <td class="prefsData">
+                <input type="checkbox" name="graphical_smilies" id="graphical_smilies" value="on" <?php if ($user_prefs->getUseGraphicalSmilies()) echo 'checked="checked"'; ?> /><label for="graphical_smilies"><?php echo convertLang2Html($html_use_graphical_smilies) ?></label>
+              </td>
+            </tr>
+          <?php } else { ?>
+            <tr>
+              <td class="prefsLabel"><label><?php echo convertLang2Html($html_use_graphical_smilies) ?>:</label></td>
+              <td class="prefsData">False</td>
+            </tr>
+          <?php } ?>
           <tr>
             <td class="prefsLabel">&nbsp;</td>
             <td class="prefsData">
@@ -152,18 +199,17 @@ if (count($big_list) > 1) {
       <fieldset>
         <legend><?php echo strtoupper(convertLang2Html($html_send)); ?></legend>
         <table>
-          <tr>
-            <td class="prefsLabel">&nbsp;</td>
-            <td class="prefsData">
-              <input type="checkbox" name="cc_self" id="cc_self" value="on" <?php if ($user_prefs->getBccSelf()) echo 'checked="checked"'; ?> /><label for="cc_self"><?php echo convertLang2Html($html_bccself) ?></label>
-            </td>
-          </tr>
-          <?php if (file_exists('ckeditor.php')) { ?>
+          <?php if (file_exists('ckeditor.php') && $conf->use_ckeditor) { ?>
             <tr>
               <td class="prefsLabel">&nbsp;</td>
               <td class="prefsData">
                 <input type="checkbox" name="html_mail_send" id="html_mail_send" value="on" <?php if ($user_prefs->getSendHtmlMail()) echo 'checked="checked"'; ?> /><label for="html_mail_send"><?php echo convertLang2Html($html_send_html_mail) ?></label>
               </td>
+            </tr>
+          <?php } else { ?>
+            <tr>
+              <td class="prefsLabel"><label>Content-Type:</label></td>
+              <td class="prefsData">text/plain</td>
             </tr>
           <?php } ?>
           <tr>
@@ -177,39 +223,12 @@ if (count($big_list) > 1) {
               <input type="radio" name="wrap_msg" id="wrap_msg_0" value="0" <?php if ($user_prefs->getWrapMessages() == 0) echo 'checked="checked"'; ?> /><label for="wrap_msg_0"><?php echo convertLang2Html($html_wrap_none) ?></label>
             </td>
           </tr>
-        </table>
-      </fieldset>
-      <fieldset>
-        <legend><?php echo strtoupper(convertLang2Html($html_signature)); ?></legend>
-        <table>
           <tr>
-            <td class="prefsLabel"><label for="signature"><?php echo convertLang2Html($html_signature_label) ?></label></td>
+            <td class="prefsLabel">&nbsp;</td>
             <td class="prefsData">
-              <?php if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
-                include 'ckeditor.php';
-                $oCKEditor = new CKEditor();
-                $oCKEditor->basePath = 'ckeditor/';
-                $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
-                $oCKEditor->editor('signature', $user_prefs->getSignature());
-              } else if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
-                // use ckeditor5
-                print('<textarea id="mail_body" name="mail_body" cols="82" rows="20">');
-                $ckeditor5_mb = $user_prefs->getSignature();
-                print('</textarea>');
-                include "ckeditor5.php";
-              } else { ?>
-                <textarea class="button" name="signature" id="signature" rows="5" cols="40"><?php echo $user_prefs->getSignature(); ?></textarea>
-              <?php } ?>
+              <input type="checkbox" name="cc_self" id="cc_self" value="on" <?php if ($user_prefs->getBccSelf()) echo 'checked="checked"'; ?> /><label for="cc_self"><?php echo convertLang2Html($html_bccself) ?></label>
             </td>
           </tr>
-          <?php if (!$user_prefs->getSendHtmlMail()) { ?>
-            <tr>
-              <td class="prefsLabel">&nbsp;</td>
-              <td class="prefsData">
-                <input type="checkbox" name="sig_sep" id="sig_sep" value="on" <?php if ($user_prefs->getUseSignatureSeparator()) echo 'checked="checked"'; ?> /><label for="sig_sep"><?php echo convertLang2Html($html_usenet_separator) ?></label>
-              </td>
-            </tr>
-          <?php } ?>
         </table>
       </fieldset>
       <?php if ($pop->is_imap()) { ?>
@@ -241,6 +260,23 @@ if (count($big_list) > 1) {
         </fieldset>
       <?php } ?>
       <fieldset>
+        <legend>SERVER</legend>
+        <table>
+          <tr>
+            <td class="prefsLabel"><label>SMTP:</label></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nocc_domainnum']]->smtp . ':' . $conf->domains[$_SESSION['nocc_domainnum']]->smtp_port; ?></td>
+          </tr>
+          <tr>
+            <td class="prefsLabel"><label><?php echo $pop->is_imap() ? 'IMAP:' : 'POP3'; ?></label></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nocc_domainnum']]->in; ?></td>
+          </tr>
+          <tr>
+            <td class="prefsLabel"><label>Authentication:</label></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nocc_domainnum']]->smtp_auth_method ? $conf->domains[$_SESSION['nocc_domainnum']]->smtp_auth_method : 'PLAIN'; ?></td>
+          </tr>
+        </table>
+      </fieldset>
+      <fieldset>
         <legend>OTHER</legend>
         <table>
           <?php if ($conf->use_language == true) { ?>
@@ -268,7 +304,7 @@ if (count($big_list) > 1) {
             </tr>
           <?php } else { ?>
             <tr>
-              <td class="prefsLabel"><label for="lang"><?php echo convertLang2Html($html_lang_label) ?></label></td>
+              <td class="prefsLabel"><label><?php echo convertLang2Html($html_lang_label) ?></label></td>
               <td class="prefsData">
                 <?php echo strtoupper($conf->default_lang); ?>
               </td>
@@ -302,9 +338,9 @@ if (count($big_list) > 1) {
             </tr>
           <?php } else { ?>
             <tr>
-              <td class="prefsLabel"><label for="theme"><?php echo convertLang2Html($html_theme_label) ?></label></td>
+              <td class="prefsLabel"><label><?php echo convertLang2Html($html_theme_label) ?></label></td>
               <td class="prefsData">
-                <?php echo $conf->default_theme; ?>
+                <?php echo ucfirst($conf->default_theme); ?>
               </td>
             </tr>
           <?php } ?>
@@ -338,8 +374,7 @@ if (count($big_list) > 1) {
         </div>
       <?php
       } else {
-        if (isset($_REQUEST['submit_prefs']))
-          echo '<p class="success-message-bg">' . convertLang2Html($html_prefs_updated) . '</p>';
+        if (isset($_REQUEST['submit_prefs'])) echo '<p class="success-message-bg">' . convertLang2Html($html_prefs_updated) . '</p>';
       }
       ?>
       <p class="sendButtons">

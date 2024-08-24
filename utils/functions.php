@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Miscellaneous functions
  *
@@ -34,62 +35,61 @@ require_once './htmlpurifier/library/HTMLPurifier.auto.php';
  * @param string $regExpression a regular expression to filter entries
  * @return array of files and directory
  */
-function recursive_directory($dir="",$regExpression="/.*/") {
-	$result=array();
-	if( $dir != "" ) {
-		$Directory=new RecursiveDirectoryIterator($dir);
-		$Iterator=new RecursiveIteratorIterator($Directory,RecursiveIteratorIterator::CHILD_FIRST,RecursiveIteratorIterator::CATCH_GET_CHILD);
-		$RegEx=new RegexIterator($Iterator,$regExpression,RecursiveRegexIterator::GET_MATCH);
-		$result=array_keys(iterator_to_array($RegEx));
-	}
-	return $result;
+function recursive_directory($dir = "", $regExpression = "/.*/")
+{
+    $result = array();
+    if ($dir != "") {
+        $Directory = new RecursiveDirectoryIterator($dir);
+        $Iterator = new RecursiveIteratorIterator($Directory, RecursiveIteratorIterator::CHILD_FIRST, RecursiveIteratorIterator::CATCH_GET_CHILD);
+        $RegEx = new RegexIterator($Iterator, $regExpression, RecursiveRegexIterator::GET_MATCH);
+        $result = array_keys(iterator_to_array($RegEx));
+    }
+    return $result;
 }
 
 /**
  * handle NOCC version
  * @return 0,1,2 or new version string
  */
-function version() {
-	global $conf;
-	if( isset($_SESSION['auto_update']) && $_SESSION['auto_update'] ) {
-		if( isset($_SESSION['auto_update_new']) ) {
-			return $_SESSION['auto_update_new'];
-		}
-		else {
-			if( ini_get("allow_url_fopen")==1 ) {
-				$news=file_get_contents('http://nocc.sourceforge.net/docs/NEWS?v='.$conf->nocc_version); 
-				$matches[]=array();
-				if( preg_match("/Latest version is (.*)\R/",$news,$matches) ) {
-					$new_version=str_ireplace("-dev","",trim($matches[1]));
-					$new_v=explode('.',$new_version);
-					$old_v=explode('.',str_ireplace("-dev","",$conf->nocc_version));
-					$old_dev_version=false;
-					if( preg_match("/-dev/",$conf->nocc_version) ) {
-						$old_dev_version=true;
-					}
-					if(	
-						($old_dev_version && $old_v[0]==$new_v[0] && $old_v[1]==$new_v[1] && $old_v[2]<=$new_v[2]) ||
-						($old_v[0]==$new_v[0] && $old_v[1]==$new_v[1] && $old_v[2]<$new_v[2]) ||
-						($old_v[0]==$new_v[0] && $old_v[1]<$new_v[1]) ||
-						($old_v[0]<$new_v[0]) ||
-						0
-					) {
-						$_SESSION['auto_update_new']=$new_version;
-						return $_SESSION['auto_update_new'];
-					}
-					else {
-						$_SESSION['auto_update_new']=1;
-						return $_SESSION['auto_update_new'];
-					}
-				}
-			}
-			$_SESSION['auto_update_new']=2;
-			return $_SESSION['auto_update_new'];
-		}
-	}
-	else {
-		return 0;
-	}
+function version()
+{
+    global $conf;
+    if (isset($_SESSION['auto_update']) && $_SESSION['auto_update']) {
+        if (isset($_SESSION['auto_update_new'])) {
+            return $_SESSION['auto_update_new'];
+        } else {
+            if (ini_get("allow_url_fopen") == 1) {
+                $news = file_get_contents('http://nocc.sourceforge.net/docs/NEWS?v=' . $conf->nocc_version);
+                $matches[] = array();
+                if (preg_match("/Latest version is (.*)\R/", $news, $matches)) {
+                    $new_version = str_ireplace("-dev", "", trim($matches[1]));
+                    $new_v = explode('.', $new_version);
+                    $old_v = explode('.', str_ireplace("-dev", "", $conf->nocc_version));
+                    $old_dev_version = false;
+                    if (preg_match("/-dev/", $conf->nocc_version)) {
+                        $old_dev_version = true;
+                    }
+                    if (
+                        ($old_dev_version && $old_v[0] == $new_v[0] && $old_v[1] == $new_v[1] && $old_v[2] <= $new_v[2]) ||
+                        ($old_v[0] == $new_v[0] && $old_v[1] == $new_v[1] && $old_v[2] < $new_v[2]) ||
+                        ($old_v[0] == $new_v[0] && $old_v[1] < $new_v[1]) ||
+                        ($old_v[0] < $new_v[0]) ||
+                        0
+                    ) {
+                        $_SESSION['auto_update_new'] = $new_version;
+                        return $_SESSION['auto_update_new'];
+                    } else {
+                        $_SESSION['auto_update_new'] = 1;
+                        return $_SESSION['auto_update_new'];
+                    }
+                }
+            }
+            $_SESSION['auto_update_new'] = 2;
+            return $_SESSION['auto_update_new'];
+        }
+    } else {
+        return 0;
+    }
 }
 
 /**
@@ -97,7 +97,8 @@ function version() {
  * @param string $string UTF-8 string
  * @return int UTF-8 string length
  */
-function utf8_strlen($string) {
+function utf8_strlen($string)
+{
     return mb_strlen($string, 'UTF-8');
 }
 
@@ -108,7 +109,8 @@ function utf8_strlen($string) {
  * @param int $length Length
  * @return string UTF-8 string part
  */
-function utf8_substr($string, $start, $length = 0) {
+function utf8_substr($string, $start, $length = 0)
+{
     return mb_substr($string, $start, $length, 'UTF-8');
 }
 
@@ -119,7 +121,8 @@ function utf8_substr($string, $start, $length = 0) {
  * @return array
  * @todo Rename!
  */
-function inbox(&$pop, $skip = 0) {
+function inbox(&$pop, $skip = 0)
+{
     $msg_list = array();
 
     $lang = $_SESSION['nocc_lang'];
@@ -153,21 +156,22 @@ function inbox(&$pop, $skip = 0) {
         $timestamp = $mail_reader->getTimestamp();
         $date = format_date($timestamp, $lang);
         $time = format_time($timestamp, $lang);
-        $msg_list[$i] =  Array(
-                'index' => $i,
-                'new' => $newmail,
-                'number' => $msgnum,
-                'attach' => $mail_reader->hasAttachments(),
-                'to' => $mail_reader->getToAddress(),
-                'from' => $mail_reader->getFromAddress(),
-                'subject' => $mail_reader->getSubject(),
-                'date' => $date,
-                'time' => $time,
-                'size' => $mail_reader->getSize(),
-                'priority' => $mail_reader->getPriority(),
-                'priority_text' => $mail_reader->getPriorityText(),
-                'flagged' => $mail_reader->isFlagged(),
-                'spam' => $mail_reader->isSpam());
+        $msg_list[$i] =  array(
+            'index' => $i,
+            'new' => $newmail,
+            'number' => $msgnum,
+            'attach' => $mail_reader->hasAttachments(),
+            'to' => $mail_reader->getToAddress(),
+            'from' => $mail_reader->getFromAddress(),
+            'subject' => $mail_reader->getSubject(),
+            'date' => $date,
+            'time' => $time,
+            'size' => $mail_reader->getSize(),
+            'priority' => $mail_reader->getPriority(),
+            'priority_text' => $mail_reader->getPriorityText(),
+            'flagged' => $mail_reader->isFlagged(),
+            'spam' => $mail_reader->isSpam()
+        );
     }
     return ($msg_list);
 }
@@ -185,7 +189,8 @@ function inbox(&$pop, $skip = 0) {
  * @return array
  * @todo Rename!
  */
-function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null) {
+function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
+{
     global $conf;
     global $lang_invalid_msg_num;
 
@@ -234,45 +239,45 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null) {
 
         $body_mime = $bodyPart->getInternetMediaType()->__toString();
         $body_transfer = $bodyPart->getEncoding()->__toString();
-        $body = $pop->fetchbody($mail, $bodyPart->getPartNumber(), $bodyPart->getMimeId(), false );
+        $body = $pop->fetchbody($mail, $bodyPart->getPartNumber(), $bodyPart->getMimeId(), false);
 
         $body = nocc_imap::decode($body, $bodyPart->getEncoding()->__toString());
 
         $body_charset = detect_body_charset($body, $bodyPartStructure->getCharset());
         // If user has selected another charset, we'll use it
         if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-          $body_charset = $_REQUEST['user_charset'];
+            $body_charset = $_REQUEST['user_charset'];
         }
 
-        $body = remove_stuff($body,$body_mime,$body_charset);
+        $body = remove_stuff($body, $body_mime, $body_charset);
 
         //TODO: Move to a own function!?
         $body_converted = os_iconv($body_charset, 'UTF-8', $body);
-        $body = ($body_converted===false) ? $body : $body_converted;
+        $body = ($body_converted === false) ? $body : $body_converted;
         //tmp['charset'] = ($body_converted===false) ? $body_charset : 'UTF-8';
     }
 
-    $link_att = GetAttachmentsTableRow($mail_reader,$pop->is_horde());
+    $link_att = GetAttachmentsTableRow($mail_reader, $pop->is_horde());
 
     $attachmentParts = $mail_reader->getAttachmentParts();
 
-	//show special attachments inline
-	if( trim($body) == "" ) {
-		foreach ($attachmentParts as $attachmentPart) {
-			$partStructure = $attachmentPart->getPartStructure();
-			if( strtolower($partStructure->getInternetMediaType()->getSubtype()) == "pkcs7-mime" ) {
-				$verified=false;
-				$content_type='text/plain';
-				$charset=$partStructure->getCharset();
-				$body=pkcs7_attachment_view($pop,$mail,$attachmentPart->getPartNumber(),$content_type,$charset,$verified);
-				$body_mime=$content_type;
-			}
-		}
-	}
+    //show special attachments inline
+    if (trim($body) == "") {
+        foreach ($attachmentParts as $attachmentPart) {
+            $partStructure = $attachmentPart->getPartStructure();
+            if (strtolower($partStructure->getInternetMediaType()->getSubtype()) == "pkcs7-mime") {
+                $verified = false;
+                $content_type = 'text/plain';
+                $charset = $partStructure->getCharset();
+                $body = pkcs7_attachment_view($pop, $mail, $attachmentPart->getPartNumber(), $content_type, $charset, $verified);
+                $body_mime = $content_type;
+            }
+        }
+    }
     $timestamp = $mail_reader->getTimestamp();
     $date = format_date($timestamp, $lang);
     $time = format_time($timestamp, $lang);
-    $content = Array(
+    $content = array(
         'message_id' => $mail_reader->getMessageId(),
         'from' => $mail_reader->getFromAddress(),
         'to' => $mail_reader->getToAddress(),
@@ -307,7 +312,8 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null) {
  * @param string $suspectedCharset Suspected charset
  * @return string Detected charset
  */
-function detect_body_charset($body, $suspectedCharset) {
+function detect_body_charset($body, $suspectedCharset)
+{
     global $conf;
 
     $body_charset = ($suspectedCharset == 'default') ? detect_charset($body) : $suspectedCharset;
@@ -320,8 +326,7 @@ function detect_body_charset($body, $suspectedCharset) {
     if ($body_charset == '' || $body_charset == null) {
         if (isset($conf->default_charset) && $conf->default_charset != '') {
             $body_charset = $conf->default_charset;
-        }
-        else {
+        } else {
             $body_charset = 'ISO-8859-1';
         }
     }
@@ -334,14 +339,15 @@ function detect_body_charset($body, $suspectedCharset) {
  * @param array $attach_tab Attachments
  * @todo Only temporary needed!
  */
-function fillAttachTabFromMailReader($mail_reader, &$attach_tab) {
+function fillAttachTabFromMailReader($mail_reader, &$attach_tab)
+{
     global $html_part_x;
 
     $parts = $mail_reader->getAttachmentParts();
     foreach ($parts as $part) { //for all parts...
         $defaultname = sprintf($html_part_x, $part->getPartNumber());
         $partstructure = $part->getPartStructure();
-        $tmp = Array(
+        $tmp = array(
             'number' => $part->getPartNumber(),
             'id' => $partstructure->getId(),
             'name' => $partstructure->getName($defaultname),
@@ -361,7 +367,8 @@ function fillAttachTabFromMailReader($mail_reader, &$attach_tab) {
  * @param NOCC_MailReader $mail_reader Mail reader
  * @todo Only temporary needed!
  */
-function GetAttachmentsTableRow($mail_reader,$is_horde=false) {
+function GetAttachmentsTableRow($mail_reader, $is_horde = false)
+{
     global $html_att_label, $html_atts_label;
 
     $attach_tab = array();
@@ -389,42 +396,42 @@ function GetAttachmentsTableRow($mail_reader,$is_horde=false) {
  * @param string $mime
  * @return string
  */
-function remove_stuff($body,$mime,$charset='UTF-8') {
+function remove_stuff($body, $mime, $charset = 'UTF-8')
+{
     if (preg_match('|html|i', $mime)) {
 
-	//get base href url
-	$base_href="";
-	$matches=array();
-	preg_match("/<head.*?>.*<base .*href=\"(http.*?)\".*?>.*<\/head>/i",$body,$matches);
-	if( isset($matches[1]) ) {
-		$base_href=$matches[1];
-		$base_href=$base_href."/";
-		$base_href=preg_replace("/\/+$/","/",$base_href);
-		//insert base url
-		$matches=array();
-		while( preg_match("/(<img .*src=\"(?:(?!http.*:))(?:(?!cid:)).*\")/iU",$body,$matches) ) {
-			$img_tag=$matches[1];
-			$img_tag_based=preg_replace("/(<img .*src=\")(.*\")/iU","$1".$base_href."$2",$img_tag);
-			$body=str_replace($img_tag,$img_tag_based,$body);
-			$matches=array();
-		}
-	}
-	
-//replaced by htmlpurifier, see below, it's applied always
-//        $body = NOCC_Security::cleanHtmlBody($body);
-//        $body = NOCC_Security::removeJsEventHandler($body);
-//        $body = NOCC_Security::purifyHtml($body);
+        //get base href url
+        $base_href = "";
+        $matches = array();
+        preg_match("/<head.*?>.*<base .*href=\"(http.*?)\".*?>.*<\/head>/i", $body, $matches);
+        if (isset($matches[1])) {
+            $base_href = $matches[1];
+            $base_href = $base_href . "/";
+            $base_href = preg_replace("/\/+$/", "/", $base_href);
+            //insert base url
+            $matches = array();
+            while (preg_match("/(<img .*src=\"(?:(?!http.*:))(?:(?!cid:)).*\")/iU", $body, $matches)) {
+                $img_tag = $matches[1];
+                $img_tag_based = preg_replace("/(<img .*src=\")(.*\")/iU", "$1" . $base_href . "$2", $img_tag);
+                $body = str_replace($img_tag, $img_tag_based, $body);
+                $matches = array();
+            }
+        }
+
+        //replaced by htmlpurifier, see below, it's applied always
+        //        $body = NOCC_Security::cleanHtmlBody($body);
+        //        $body = NOCC_Security::removeJsEventHandler($body);
+        //        $body = NOCC_Security::purifyHtml($body);
 
         //TODO: Move to NOCC_Security::cleanHtmlBody() too?
-//        $body = preg_replace("|href=\"(.*)script:|i", 'href="nocc_removed_script:', $body);
-//        $body = preg_replace("|<([^>]*)java|i", '<nocc_removed_java_tag', $body);
-//        $body = preg_replace("|<([^>]*)&{.*}([^>]*)>|i", "<&{;}\\3>", $body);
+        //        $body = preg_replace("|href=\"(.*)script:|i", 'href="nocc_removed_script:', $body);
+        //        $body = preg_replace("|<([^>]*)java|i", '<nocc_removed_java_tag', $body);
+        //        $body = preg_replace("|<([^>]*)&{.*}([^>]*)>|i", "<&{;}\\3>", $body);
 
         $body = NOCC_Body::prepareHtmlLinks($body);
-    }
-    elseif (preg_match('|plain|i', $mime)) {
+    } elseif (preg_match('|plain|i', $mime)) {
         $user_prefs = NOCC_Session::getUserPrefs();
-        $body = htmlspecialchars($body,ENT_COMPAT | ENT_SUBSTITUTE,$charset);
+        $body = htmlspecialchars($body, ENT_COMPAT | ENT_SUBSTITUTE, $charset);
         $body = NOCC_Body::prepareTextLinks($body);
         if ($user_prefs->getColoredQuotes()) {
             $body = NOCC_Body::addColoredQuotes($body);
@@ -433,33 +440,36 @@ function remove_stuff($body,$mime,$charset='UTF-8') {
             $body = NOCC_Body::addStructuredText($body);
         }
 
-	$body=trim($body);
-	$body='<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">'.$body.'</span>';
+        $body = trim($body);
+        $body = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $body . '</span>';
     }
 
-	class HTMLPurifier_URIScheme_cid extends HTMLPurifier_URIScheme {
-		public $browsable = true;
-		public $allowed_types = array(
-			'image/jpeg' => true,
-			'image/gif' => true,
-			'image/png' => true,
-			'application/octet-stream' => true,
-		);
-		public $may_omit_host = true;
-		public function doValidate(&$uri, $config, $context) {
-			return true;
-		}
-	}
-	HTMLPurifier_URISchemeRegistry::instance()->register("cid", new HTMLPurifier_URIScheme_cid());
+    class HTMLPurifier_URIScheme_cid extends HTMLPurifier_URIScheme
+    {
+        public $browsable = true;
+        public $allowed_types = array(
+            'image/jpeg' => true,
+            'image/gif' => true,
+            'image/png' => true,
+            'application/octet-stream' => true,
+        );
+        public $may_omit_host = true;
+        public function doValidate(&$uri, $config, $context)
+        {
+            return true;
+        }
+    }
+    HTMLPurifier_URISchemeRegistry::instance()->register("cid", new HTMLPurifier_URIScheme_cid());
 
-	$hp_config = HTMLPurifier_Config::createDefault();
-	$hp_config->set('Core.Encoding',$charset);
-	$hp_config->set('Attr.DefaultImageAlt','');
-	$hp_config->set('URI.AllowedSchemes',
-		array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true, 'tel' => true, 'cid' => true)
-	);
-	$hp_purifier = new HTMLPurifier($hp_config);
-	$body = $hp_purifier->purify($body);
+    $hp_config = HTMLPurifier_Config::createDefault();
+    $hp_config->set('Core.Encoding', $charset);
+    $hp_config->set('Attr.DefaultImageAlt', '');
+    $hp_config->set(
+        'URI.AllowedSchemes',
+        array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true, 'tel' => true, 'cid' => true)
+    );
+    $hp_purifier = new HTMLPurifier($hp_config);
+    $body = $hp_purifier->purify($body);
 
     return ($body);
 }
@@ -472,22 +482,36 @@ function remove_stuff($body,$mime,$charset='UTF-8') {
  * @return string
  * @todo Rewrite to use direct a NOCC_MailReader object!
  */
-function link_att($mail, $attach_tab, $is_horde=false) {
+function link_att($mail, $attach_tab, $is_horde = false)
+{
     global $html_kb;
     sort($attach_tab);
     $html = '<ul class="attachments">';
     while ($tmp = array_shift($attach_tab)) {
         if (!empty($tmp['name'])) {
             $mime = str_replace('/', '-', $tmp['mime']);
-	    $decode = $is_horde ? false : true;
-	    $att_name = nocc_imap::mime_header_decode($tmp['name'],$decode,$is_horde);
-            //$att_name = $tmp['name'];
-            $att_name_dl = $att_name;
+            $decode = $is_horde ? false : true;
+            $att_name = nocc_imap::mime_header_decode($tmp['name'], $decode, $is_horde);
             $att_name = htmlentities($att_name, ENT_COMPAT, 'UTF-8');
-            if (empty($att_name)) { //if we got a problem with the $att_name encoding...
-                $att_name = htmlentities($att_name_dl, ENT_COMPAT);
-            }
-            $html .= '<li><a href="download.php?'.NOCC_Session::getUrlGetSession().'&amp;mail=' . $mail . '&amp;part=' . $tmp['number'] . '&amp;transfer=' . $tmp['transfer'] . '&amp;filename=' . base64_encode($att_name_dl) . '&amp;mime=' . $mime . '">' . $att_name . '</a> <em>' . $tmp['size'] . ' ' . $html_kb . '</em></li>';
+            $att_name_dl = $att_name;
+
+            if ($mime === 'message-rfc822') {
+                $att_name .= '.eml';
+                $att_name_dl .= '.eml';
+            };
+            //if we got a problem with the $att_name encoding...
+            if (empty($att_name)) $att_name = htmlentities($att_name_dl, ENT_COMPAT);
+
+            $html .= '<li><a href="download.php?' .
+                http_build_query([
+                    'session' => NOCC_Session::getUrlGetSession(),
+                    'mail' => $mail,
+                    'part' => $tmp['number'],
+                    'transfer' => $tmp['transfer'],
+                    'filename' => base64_encode($att_name_dl),
+                    'mime' => $mime
+                ]) .
+                '">' . htmlspecialchars($att_name) . '</a><em>(' . htmlspecialchars($tmp['size']) . ' ' . htmlspecialchars($html_kb) . ')</em></li>';
         }
     }
     $html .= '</ul>';
@@ -503,7 +527,8 @@ function link_att($mail, $attach_tab, $is_horde=false) {
  * @param string $lang
  * @return string
  */
-function format_date(&$date, &$lang) {
+function format_date(&$date, &$lang)
+{
     global $default_date_format;
     global $lang_locale;
     global $no_locale_date_format;
@@ -518,9 +543,9 @@ function format_date(&$date, &$lang) {
 
     // format dates
     //return strftime($default_date_format, $date);
-    $default_date_format=str_replace("%A","%l",$default_date_format);
-    $default_date_format=str_replace("%B","%F",$default_date_format);
-    $default_date_format=str_replace("%","",$default_date_format);
+    $default_date_format = str_replace("%A", "%l", $default_date_format);
+    $default_date_format = str_replace("%B", "%F", $default_date_format);
+    $default_date_format = str_replace("%", "", $default_date_format);
     return date($default_date_format, $date);
 }
 
@@ -532,7 +557,8 @@ function format_date(&$date, &$lang) {
  * @param string $lang
  * @return string
  */
-function format_time(&$time, &$lang) {
+function format_time(&$time, &$lang)
+{
     global $default_time_format;
     global $lang_locale;
 
@@ -545,11 +571,11 @@ function format_time(&$time, &$lang) {
 
     // format dates
     //return strftime($default_time_format, $time);
-    $default_time_format=str_replace("%M","%i",$default_time_format);
-    $default_time_format=str_replace("%I","%h",$default_time_format);
-    $default_time_format=str_replace("%p","%A",$default_time_format);
-    $default_time_format=str_replace("%S","%s",$default_time_format);
-    $default_time_format=str_replace("%","",$default_time_format);
+    $default_time_format = str_replace("%M", "%i", $default_time_format);
+    $default_time_format = str_replace("%I", "%h", $default_time_format);
+    $default_time_format = str_replace("%p", "%A", $default_time_format);
+    $default_time_format = str_replace("%S", "%s", $default_time_format);
+    $default_time_format = str_replace("%", "", $default_time_format);
     return date($default_time_format, $time);
 }
 
@@ -558,7 +584,8 @@ function format_time(&$time, &$lang) {
  * @param string $body Body
  * @return string Body
  */
-function graphicalsmilies($body) {
+function graphicalsmilies($body)
+{
     $user_prefs = NOCC_Session::getUserPrefs();
     if ($user_prefs->getUseGraphicalSmilies()) {
         $theme = new NOCC_Theme($_SESSION['nocc_theme']);
@@ -572,29 +599,27 @@ function graphicalsmilies($body) {
  * @param string $adresses list of email adresses
  * @return array of all email addresses in $emails
  */
-function semisplit_address_list($adresses,&$emails,$sep=',') {
-	$emails=array();
-	$all_emails=array();
-	$all_first=array();
-	$all_last=array();
-	split_address_list($adresses,$all_emails,$all_first,$all_last,$sep);
-	for($j=0;$j<count($all_emails);$j++) {
-		$tmp_email="";
-		if( strlen($all_first[$j])>0 && strlen($all_last[$j])>0 ) {
-			$tmp_email='"'.$all_first[$j].' '.$all_last[$j].'" <'.$all_emails[$j].'>';
-		}
-		else if( strlen($all_first[$j])==0 && strlen($all_last[$j])>0 ) {
-			$tmp_email='"'.$all_last[$j].'" <'.$all_emails[$j].'>';
-		}
-		else if( strlen($all_first[$j])>0 && strlen($all_last[$j])==0 ) {
-			$tmp_email='"'.$all_first[$j].'" <'.$all_emails[$j].'>';
-		}
-		else {
-			$tmp_email=$all_emails[$j];
-		}
-		$emails[]=$tmp_email;
-	}
-	return;
+function semisplit_address_list($adresses, &$emails, $sep = ',')
+{
+    $emails = array();
+    $all_emails = array();
+    $all_first = array();
+    $all_last = array();
+    split_address_list($adresses, $all_emails, $all_first, $all_last, $sep);
+    for ($j = 0; $j < count($all_emails); $j++) {
+        $tmp_email = "";
+        if (strlen($all_first[$j]) > 0 && strlen($all_last[$j]) > 0) {
+            $tmp_email = '"' . $all_first[$j] . ' ' . $all_last[$j] . '" <' . $all_emails[$j] . '>';
+        } else if (strlen($all_first[$j]) == 0 && strlen($all_last[$j]) > 0) {
+            $tmp_email = '"' . $all_last[$j] . '" <' . $all_emails[$j] . '>';
+        } else if (strlen($all_first[$j]) > 0 && strlen($all_last[$j]) == 0) {
+            $tmp_email = '"' . $all_first[$j] . '" <' . $all_emails[$j] . '>';
+        } else {
+            $tmp_email = $all_emails[$j];
+        }
+        $emails[] = $tmp_email;
+    }
+    return;
 }
 
 /**
@@ -604,60 +629,57 @@ function semisplit_address_list($adresses,&$emails,$sep=',') {
  * @return array of all firstnames in $firstnames
  * @return array of all lastnames in $lastnames
  */
-function split_address_list($adresses,&$emails,&$firstnames,&$lastnames,$sep=',') {
-	if( strlen($adresses)==0 || ! is_array($emails) || ! is_array($firstnames) || ! is_array($lastnames) ) {
-		return;
-	}
+function split_address_list($adresses, &$emails, &$firstnames, &$lastnames, $sep = ',')
+{
+    if (strlen($adresses) == 0 || ! is_array($emails) || ! is_array($firstnames) || ! is_array($lastnames)) {
+        return;
+    }
 
-	$all=$sep.$adresses.$sep;
-	$all=preg_replace("/^".$sep."*(.*?)".$sep."*$/",$sep."$1".$sep,$all);
-	$all=preg_replace("/".$sep."/",$sep.$sep,$all);
-	
-	$regexp=array();
-	$regexp[]="/(\s*'.+'\s*)<(.+)>/U"; // example: 'name name' <email@mail.com>, 'name, name' <email@mail.com>
-	$regexp[]="/(\s*\".+\"\s*)<(.+)>/U"; // example: "name name" <email@mail.com>, "name, name" <email@mail.com>
-	$regexp[]='/'.$sep.'{1}\s*([^'.$sep.']\S+@\S+)\s*'.$sep.'/U'; // example: email@mail.com
-	$regexp[]='/'.$sep.'\s*([^'.$sep.']+\s*)<(\S+)>\s*'.$sep.'/U'; // example: name name <email@mail.com>
-	$matches=array();
-	for($r=0;$r<count($regexp);$r++) {
-		$matches[]=array();
-		if( preg_match_all($regexp[$r],$all,$matches[$r]) ) {
-			for($i=0;$i<count($matches[$r][0]);$i++) {
-				if( $r==2 ) {
-					$found=$matches[$r][1][$i];
-				}
-				else {
-					$found=$matches[$r][1][$i]."<".$matches[$r][2][$i].">";
-				}
-				$all=str_replace($found,"###".$r."_".$i."###",$all);
-				if( $r==2 ) {
-					$emails[]=trim($matches[$r][1][$i]," \t\n\r\0\x0B\"");
-					$lastnames[]="";
-					$firstnames[]="";
-				}
-				else {
-					if( $r==0 ) $quote="'";
-					if( $r==1 ) $quote="\"";
-					if( $r==3 ) $quote="";
-					$emails[]=trim($matches[$r][2][$i]," \t\n\r\0\x0B\"");
-					$submatches=array();
-					if( preg_match("/^".$quote."(.*)[,;](.*)".$quote."$/U",trim($matches[$r][1][$i]),$submatches) ) {
-						$lastnames[]=trim($submatches[1]," \t\n\r\0\x0B\"");
-						$firstnames[]=trim($submatches[2]," \t\n\r\0\x0B\"");
-					}
-					else if( preg_match("/^".$quote."(.*)\s+(.*)".$quote."$/U",trim($matches[$r][1][$i]),$submatches) ) {
-						$firstnames[]=trim($submatches[1]," \t\n\r\0\x0B\"");
-						$lastnames[]=trim($submatches[2]," \t\n\r\0\x0B\"");
-					}					
-					else {
-						$lastnames[]=trim($matches[$r][1][$i]," \t\n\r\0\x0B\"");
-						$firstnames[]="";
-					}
-				}
-			}
-		}
-	}
-	return;
+    $all = $sep . $adresses . $sep;
+    $all = preg_replace("/^" . $sep . "*(.*?)" . $sep . "*$/", $sep . "$1" . $sep, $all);
+    $all = preg_replace("/" . $sep . "/", $sep . $sep, $all);
+
+    $regexp = array();
+    $regexp[] = "/(\s*'.+'\s*)<(.+)>/U"; // example: 'name name' <email@mail.com>, 'name, name' <email@mail.com>
+    $regexp[] = "/(\s*\".+\"\s*)<(.+)>/U"; // example: "name name" <email@mail.com>, "name, name" <email@mail.com>
+    $regexp[] = '/' . $sep . '{1}\s*([^' . $sep . ']\S+@\S+)\s*' . $sep . '/U'; // example: email@mail.com
+    $regexp[] = '/' . $sep . '\s*([^' . $sep . ']+\s*)<(\S+)>\s*' . $sep . '/U'; // example: name name <email@mail.com>
+    $matches = array();
+    for ($r = 0; $r < count($regexp); $r++) {
+        $matches[] = array();
+        if (preg_match_all($regexp[$r], $all, $matches[$r])) {
+            for ($i = 0; $i < count($matches[$r][0]); $i++) {
+                if ($r == 2) {
+                    $found = $matches[$r][1][$i];
+                } else {
+                    $found = $matches[$r][1][$i] . "<" . $matches[$r][2][$i] . ">";
+                }
+                $all = str_replace($found, "###" . $r . "_" . $i . "###", $all);
+                if ($r == 2) {
+                    $emails[] = trim($matches[$r][1][$i], " \t\n\r\0\x0B\"");
+                    $lastnames[] = "";
+                    $firstnames[] = "";
+                } else {
+                    if ($r == 0) $quote = "'";
+                    if ($r == 1) $quote = "\"";
+                    if ($r == 3) $quote = "";
+                    $emails[] = trim($matches[$r][2][$i], " \t\n\r\0\x0B\"");
+                    $submatches = array();
+                    if (preg_match("/^" . $quote . "(.*)[,;](.*)" . $quote . "$/U", trim($matches[$r][1][$i]), $submatches)) {
+                        $lastnames[] = trim($submatches[1], " \t\n\r\0\x0B\"");
+                        $firstnames[] = trim($submatches[2], " \t\n\r\0\x0B\"");
+                    } else if (preg_match("/^" . $quote . "(.*)\s+(.*)" . $quote . "$/U", trim($matches[$r][1][$i]), $submatches)) {
+                        $firstnames[] = trim($submatches[1], " \t\n\r\0\x0B\"");
+                        $lastnames[] = trim($submatches[2], " \t\n\r\0\x0B\"");
+                    } else {
+                        $lastnames[] = trim($matches[$r][1][$i], " \t\n\r\0\x0B\"");
+                        $firstnames[] = "";
+                    }
+                }
+            }
+        }
+    }
+    return;
 }
 
 /**
@@ -667,76 +689,74 @@ function split_address_list($adresses,&$emails,&$firstnames,&$lastnames,$sep=','
  * @param string $sep the separator, typically , or ;
  * @return string new reformated adress list
  */
-function reformat_address_list($adresses,$remove=array(),$sep=',') {
-	if( ! is_array($remove) ) {
-		$remove=array($remove);
-	}
-	$all=$sep.$adresses.$sep;
-	$all=preg_replace("/^".$sep."*(.*?)".$sep."*$/",$sep."$1".$sep,$all);
-	$all=preg_replace("/".$sep."/",$sep.$sep,$all);
+function reformat_address_list($adresses, $remove = array(), $sep = ',')
+{
+    if (! is_array($remove)) {
+        $remove = array($remove);
+    }
+    $all = $sep . $adresses . $sep;
+    $all = preg_replace("/^" . $sep . "*(.*?)" . $sep . "*$/", $sep . "$1" . $sep, $all);
+    $all = preg_replace("/" . $sep . "/", $sep . $sep, $all);
 
-	$regexp=array();
-	$regexp[]="/(\s*'.+'\s*)<(.+)>/U"; // example: 'name name' <email@mail.com>, 'name, name' <email@mail.com>
-	$regexp[]="/(\s*\".+\"\s*)<(.+)>/U"; // example: "name name" <email@mail.com>, "name, name" <email@mail.com>
-	$regexp[]='/'.$sep.'{1}\s*([^'.$sep.']\S+@\S+)\s*'.$sep.'/U'; // example: email@mail.com
-	$regexp[]='/'.$sep.'\s*([^'.$sep.']+\s*)<(\S+)>\s*'.$sep.'/U'; // example: name name <email@mail.com>
-	$matches=array();
-	for($r=0;$r<count($regexp);$r++) {
-		$matches[]=array();
-		if( preg_match_all($regexp[$r],$all,$matches[$r]) ) {
-			for($i=0;$i<count($matches[$r][0]);$i++) {
-				if( $r==2 ) {
-					$found=$matches[$r][1][$i];
-				}
-				else {
-					$found=$matches[$r][1][$i]."<".$matches[$r][2][$i].">";
-				}
-				$all=str_replace($found,"###".$r."_".$i."###",$all);
-			}
-		}
-	}
-	$all=preg_replace("/\s*".$sep."+\s*/",";",$all);
-	$all=preg_replace("/^\s*;+\s*(.*?)\s*;+\s*$/","$1",$all);
-	$all=preg_replace("/;+/",";",$all);
-	$all=preg_replace("/^;$/","",$all);
-	$rcpt=$all;
+    $regexp = array();
+    $regexp[] = "/(\s*'.+'\s*)<(.+)>/U"; // example: 'name name' <email@mail.com>, 'name, name' <email@mail.com>
+    $regexp[] = "/(\s*\".+\"\s*)<(.+)>/U"; // example: "name name" <email@mail.com>, "name, name" <email@mail.com>
+    $regexp[] = '/' . $sep . '{1}\s*([^' . $sep . ']\S+@\S+)\s*' . $sep . '/U'; // example: email@mail.com
+    $regexp[] = '/' . $sep . '\s*([^' . $sep . ']+\s*)<(\S+)>\s*' . $sep . '/U'; // example: name name <email@mail.com>
+    $matches = array();
+    for ($r = 0; $r < count($regexp); $r++) {
+        $matches[] = array();
+        if (preg_match_all($regexp[$r], $all, $matches[$r])) {
+            for ($i = 0; $i < count($matches[$r][0]); $i++) {
+                if ($r == 2) {
+                    $found = $matches[$r][1][$i];
+                } else {
+                    $found = $matches[$r][1][$i] . "<" . $matches[$r][2][$i] . ">";
+                }
+                $all = str_replace($found, "###" . $r . "_" . $i . "###", $all);
+            }
+        }
+    }
+    $all = preg_replace("/\s*" . $sep . "+\s*/", ";", $all);
+    $all = preg_replace("/^\s*;+\s*(.*?)\s*;+\s*$/", "$1", $all);
+    $all = preg_replace("/;+/", ";", $all);
+    $all = preg_replace("/^;$/", "", $all);
+    $rcpt = $all;
 
-	for($r=0;$r<count($regexp);$r++) {
-		for($i=0;$i<count($matches[$r][0]);$i++) {
-			if( $r==2 ) {
-				$found=trim($matches[$r][1][$i]);
-			}
-			else {
-				$name=$matches[$r][1][$i];
-				$name=preg_replace("/^[\s'\"\\\\]*/","",$name);
-				$name=preg_replace("/[\s'\"\\\\]*$/","",$name);
-				$name='"'.$name.'"';
-				$found=$name." <".trim($matches[$r][2][$i]).">";
-			}
-			$found=str_replace($sep.$sep,$sep,$found);
-			$remove_this=false;
+    for ($r = 0; $r < count($regexp); $r++) {
+        for ($i = 0; $i < count($matches[$r][0]); $i++) {
+            if ($r == 2) {
+                $found = trim($matches[$r][1][$i]);
+            } else {
+                $name = $matches[$r][1][$i];
+                $name = preg_replace("/^[\s'\"\\\\]*/", "", $name);
+                $name = preg_replace("/[\s'\"\\\\]*$/", "", $name);
+                $name = '"' . $name . '"';
+                $found = $name . " <" . trim($matches[$r][2][$i]) . ">";
+            }
+            $found = str_replace($sep . $sep, $sep, $found);
+            $remove_this = false;
 
-			foreach($remove as $single_remove) {
-				if( strlen($single_remove) > 0 &&  preg_match("/".$single_remove."/i",$found) ) {
-					$remove_this=true;
-				}
-			}
-			if( $remove_this ) {
-				$rcpt=str_replace($sep."###".$r."_".$i."###","",$rcpt);
-				$rcpt=str_replace("###".$r."_".$i."###".$sep,"",$rcpt);
-				$rcpt=str_replace("###".$r."_".$i."###","",$rcpt);
-			}
-			else {
-				$rcpt=preg_replace("/^###".$r."_".$i."###/",$found,$rcpt);
-				$rcpt=str_replace("###".$r."_".$i."###"," ".$found,$rcpt);
-			}
-		}
-	}
-	$rcpt=preg_replace("/###\S+?###".$sep."/","",$rcpt);
-	$rcpt=preg_replace("/".$sep."###\S+?###/","",$rcpt);
-	$rcpt=preg_replace("/###\S+?###/","",$rcpt);
-	$rcpt=preg_replace("/^\s*(.*?)\s*$/","$1",$rcpt);
-	return ($rcpt);
+            foreach ($remove as $single_remove) {
+                if (strlen($single_remove) > 0 &&  preg_match("/" . $single_remove . "/i", $found)) {
+                    $remove_this = true;
+                }
+            }
+            if ($remove_this) {
+                $rcpt = str_replace($sep . "###" . $r . "_" . $i . "###", "", $rcpt);
+                $rcpt = str_replace("###" . $r . "_" . $i . "###" . $sep, "", $rcpt);
+                $rcpt = str_replace("###" . $r . "_" . $i . "###", "", $rcpt);
+            } else {
+                $rcpt = preg_replace("/^###" . $r . "_" . $i . "###/", $found, $rcpt);
+                $rcpt = str_replace("###" . $r . "_" . $i . "###", " " . $found, $rcpt);
+            }
+        }
+    }
+    $rcpt = preg_replace("/###\S+?###" . $sep . "/", "", $rcpt);
+    $rcpt = preg_replace("/" . $sep . "###\S+?###/", "", $rcpt);
+    $rcpt = preg_replace("/###\S+?###/", "", $rcpt);
+    $rcpt = preg_replace("/^\s*(.*?)\s*$/", "$1", $rcpt);
+    return ($rcpt);
 }
 
 /**
@@ -746,18 +766,19 @@ function reformat_address_list($adresses,$remove=array(),$sep=',') {
  * @param string $cc
  * @return string
  */
-function get_reply_all(&$from, &$to, &$cc) {
-	$login = $_SESSION['nocc_login'];
-	$domain = $_SESSION['nocc_domain'];
-	$my1=$login.'@'.$domain;
-	$my2=reformat_address_list(get_default_from_address());
-	$my2=preg_replace("/^.*<(\S+)>.*$/","$1",$my2);
-	$remove=array($my1,$my2);
+function get_reply_all(&$from, &$to, &$cc)
+{
+    $login = $_SESSION['nocc_login'];
+    $domain = $_SESSION['nocc_domain'];
+    $my1 = $login . '@' . $domain;
+    $my2 = reformat_address_list(get_default_from_address());
+    $my2 = preg_replace("/^.*<(\S+)>.*$/", "$1", $my2);
+    $remove = array($my1, $my2);
 
-	$all=$from."; ".$to."; ".$cc;
-	$rcpt=reformat_address_list($all,$remove,";");
+    $all = $from . "; " . $to . "; " . $cc;
+    $rcpt = reformat_address_list($all, $remove, ";");
 
-	return ($rcpt);
+    return ($rcpt);
 }
 
 /**
@@ -767,7 +788,8 @@ function get_reply_all(&$from, &$to, &$cc) {
  * @return array
  * TODO: Move to NOCC_MailAddress as static function and rename?
  */
-function cut_address($addr, $charset) {
+function cut_address($addr, $charset)
+{
     // Strip slashes from input
     $addr = safestrip($addr);
 
@@ -810,59 +832,60 @@ function cut_address($addr, $charset) {
         // Wrap address in brackets, if not already
         $pos = strrpos($addresses[$i], '<');
         if (!is_int($pos))
-            $addresses[$i] = '<'.$addresses[$i].'>';
+            $addresses[$i] = '<' . $addresses[$i] . '>';
         else {
             $name = '';
-		if ($pos != 0) {
-			$name=substr($addresses[$i], 0, $pos - 1);
-			$name=preg_replace("/^\s*\"/","",$name);
-			$name=preg_replace("/\"\s*$/","",$name);
-			$name = '=?'.$charset.'?B?'.base64_encode($name).'?=';
-		}
+            if ($pos != 0) {
+                $name = substr($addresses[$i], 0, $pos - 1);
+                $name = preg_replace("/^\s*\"/", "", $name);
+                $name = preg_replace("/\"\s*$/", "", $name);
+                $name = '=?' . $charset . '?B?' . base64_encode($name) . '?=';
+            }
             $addr = substr($addresses[$i], $pos);
-            $addresses[$i] = '"'.$name.'" '.$addr.'';
+            $addresses[$i] = '"' . $name . '" ' . $addr . '';
         }
     }
     return ($addresses);
 }
 
 
-function pkcs7_attachment_view(&$pop,$mail,$part_no,&$content_type,&$charset,&$verified) {
-	$body='';
-	if( extension_loaded("openssl") && function_exists("openssl_pkcs7_verify") ) {
-		$body=$pop->fetchbody($mail,$part_no,$part_no,false);
-		$ciphertext_file = tempnam('','nocc');
-		$head='MIME-Version: 1.0'."\n".
-			'Content-Disposition: attachment; filename="smime.p7m"'."\n".
-			'Content-Type: application/pkcs7-mime; smime-type=signed-data; name="smime.p7m"'."\n".
-			'Content-Transfer-Encoding: base64'."\n\n";
-		file_put_contents($ciphertext_file,$head);
-		file_put_contents($ciphertext_file,$body,FILE_APPEND);
-		openssl_pkcs7_verify($ciphertext_file,0,$ciphertext_file.'.cert');
+function pkcs7_attachment_view(&$pop, $mail, $part_no, &$content_type, &$charset, &$verified)
+{
+    $body = '';
+    if (extension_loaded("openssl") && function_exists("openssl_pkcs7_verify")) {
+        $body = $pop->fetchbody($mail, $part_no, $part_no, false);
+        $ciphertext_file = tempnam('', 'nocc');
+        $head = 'MIME-Version: 1.0' . "\n" .
+            'Content-Disposition: attachment; filename="smime.p7m"' . "\n" .
+            'Content-Type: application/pkcs7-mime; smime-type=signed-data; name="smime.p7m"' . "\n" .
+            'Content-Transfer-Encoding: base64' . "\n\n";
+        file_put_contents($ciphertext_file, $head);
+        file_put_contents($ciphertext_file, $body, FILE_APPEND);
+        openssl_pkcs7_verify($ciphertext_file, 0, $ciphertext_file . '.cert');
 
-		$verified=openssl_pkcs7_verify($ciphertext_file,0,$ciphertext_file.'.cert',array(),$ciphertext_file.'.cert',$ciphertext_file.'.out');
+        $verified = openssl_pkcs7_verify($ciphertext_file, 0, $ciphertext_file . '.cert', array(), $ciphertext_file . '.cert', $ciphertext_file . '.out');
 
-		$body=file_get_contents($ciphertext_file.'.out');
+        $body = file_get_contents($ciphertext_file . '.out');
 
-		unlink($ciphertext_file);
-		unlink($ciphertext_file.'.cert');
-		unlink($ciphertext_file.'.out');
+        unlink($ciphertext_file);
+        unlink($ciphertext_file . '.cert');
+        unlink($ciphertext_file . '.out');
 
-		$match=array();
-		if( preg_match('/Content-Type:\s*(\S+);/i',$body,$match) ) {
-			$content_type=$match[1];
-		}
-		$match=array();
-		if( preg_match('/Content-Type:.*charset=\"(.*)\"/i',$body,$match) ) {
-			$charset=$match[1];
-		}
-		$charset=detect_body_charset($body,$charset);
+        $match = array();
+        if (preg_match('/Content-Type:\s*(\S+);/i', $body, $match)) {
+            $content_type = $match[1];
+        }
+        $match = array();
+        if (preg_match('/Content-Type:.*charset=\"(.*)\"/i', $body, $match)) {
+            $charset = $match[1];
+        }
+        $charset = detect_body_charset($body, $charset);
 
-		$body=remove_stuff($body,$content_type,$charset);
+        $body = remove_stuff($body, $content_type, $charset);
 
-		$body=preg_replace("/Content-Type:.*/i","",$body);
-	}
-	return $body;
+        $body = preg_replace("/Content-Type:.*/i", "", $body);
+    }
+    return $body;
 }
 
 /**
@@ -874,17 +897,18 @@ function pkcs7_attachment_view(&$pop,$mail,$part_no,&$content_type,&$charset,&$v
  * @param string $msg_charset
  * @return string
  */
-function view_part(&$pop, &$mail, $part_no, $transfer, $msg_charset) {
+function view_part(&$pop, &$mail, $part_no, $transfer, $msg_charset)
+{
     if (isset($ev) && NoccException::isException($ev)) {
         return '<p class="error">' . $ev->getMessage . '</p>';
     }
-    $text = $pop->fetchbody($mail, $part_no, $part_no,false);
-	$charset=detect_body_charset($text,$msg_charset);
-	if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-		$charset = $_REQUEST['user_charset'];
-	}
-	$text=nl2br(htmlspecialchars(nocc_imap::decode($text, $transfer),ENT_COMPAT | ENT_SUBSTITUTE,$charset));
-	$text=os_iconv($charset,'UTF-8',$text);
+    $text = $pop->fetchbody($mail, $part_no, $part_no, false);
+    $charset = detect_body_charset($text, $msg_charset);
+    if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
+        $charset = $_REQUEST['user_charset'];
+    }
+    $text = nl2br(htmlspecialchars(nocc_imap::decode($text, $transfer), ENT_COMPAT | ENT_SUBSTITUTE, $charset));
+    $text = os_iconv($charset, 'UTF-8', $text);
 
     return $text;
 }
@@ -893,13 +917,14 @@ function view_part(&$pop, &$mail, $part_no, $transfer, $msg_charset) {
  * This function removes temporary attachment files and
  * removes any attachment information from the session
  */
-function clear_attachments() {
-	if ( !isset($_SESSION['send_backup']) && isset($_SESSION['nocc_attach_array']) && is_array($_SESSION['nocc_attach_array'])) {
-		while ($tmp = array_shift($_SESSION['nocc_attach_array'])) {
-			$tmp->delete();
-		}
-		unset($_SESSION['nocc_attach_array']);
-	}
+function clear_attachments()
+{
+    if (!isset($_SESSION['send_backup']) && isset($_SESSION['nocc_attach_array']) && is_array($_SESSION['nocc_attach_array'])) {
+        while ($tmp = array_shift($_SESSION['nocc_attach_array'])) {
+            $tmp->delete();
+        }
+        unset($_SESSION['nocc_attach_array']);
+    }
 }
 
 /**
@@ -911,16 +936,17 @@ function clear_attachments() {
  * @return string
  * TODO: Move to NOCC_MailAddress as static function and rename?
  */
-function display_address($address) {
+function display_address($address)
+{
     global $html_unknown;
 
     // Check for null
     if ($address == '')
         return $html_unknown;
-    
-    $remove=array();
-    $address = reformat_address_list($address,$remove,";");
-    
+
+    $remove = array();
+    $address = reformat_address_list($address, $remove, ";");
+
     // Get preference
     $user_prefs = NOCC_Session::getUserPrefs();
 
@@ -938,76 +964,76 @@ function display_address($address) {
  * @param string $html_wrote
  * @return string
  */
-function mailquote(&$body, $from='', $html_wrote='', $mime='text/html') {
-	$user_prefs = NOCC_Session::getUserPrefs();
-	$rewrap_pre=false;
-	$crlf = "\r\n";
-	if( $user_prefs->getSendHtmlMail() ) {
-		$body=preg_replace("/<span\s+[^>]*>\s*<\/span>/Ui","",$body);
-		$body=preg_replace("/<span>\s*<\/span>/Ui","",$body);
-		$body=preg_replace("/<span style=\"white-space:pre-wrap.*>(.*?)<\/span>/sUi","$1",$body);
-		$body=preg_replace("/<p\s+[^>]*>\s*<\/p>/Ui","",$body);
-		$body=preg_replace("/<p>\s*<\/p>/Ui","",$body);
+function mailquote(&$body, $from = '', $html_wrote = '', $mime = 'text/html')
+{
+    $user_prefs = NOCC_Session::getUserPrefs();
+    $rewrap_pre = false;
+    $crlf = "\r\n";
+    if ($user_prefs->getSendHtmlMail()) {
+        $body = preg_replace("/<span\s+[^>]*>\s*<\/span>/Ui", "", $body);
+        $body = preg_replace("/<span>\s*<\/span>/Ui", "", $body);
+        $body = preg_replace("/<span style=\"white-space:pre-wrap.*>(.*?)<\/span>/sUi", "$1", $body);
+        $body = preg_replace("/<p\s+[^>]*>\s*<\/p>/Ui", "", $body);
+        $body = preg_replace("/<p>\s*<\/p>/Ui", "", $body);
 
-		$body=trim($body);
+        $body = trim($body);
 
-		if( $mime == 'text/plain' ) {
-			$body=$body.$crlf;
-			$body='<pre style="overflow:auto">'.$body.'</pre>';
-		}
-		
-		$body='<blockquote style="border-left:1px solid;margin: 0px;padding-left: 10px;">'.$body."</blockquote>";
+        if ($mime == 'text/plain') {
+            $body = $body . $crlf;
+            $body = '<pre style="overflow:auto">' . $body . '</pre>';
+        }
 
-		$wrap_msg = $user_prefs->getWrapMessages();
-		if( $wrap_msg ) { //If we must wrap the message...
-			$body=wrap_outgoing_msg($body,$wrap_msg);
-		}
-	}
-	else {
-		$body=str_replace("\r\n","\n",$body);
-		$body=str_replace("\r","\n",$body);
-		$body=str_replace("\n",$crlf,$body);
-		$tmp_body=preg_replace('/^<pre style="overflow:auto">/i',"",$body);
-		$tmp_body=preg_replace("/<\/pre>$/i","",$tmp_body);
-		//$tmp_body=preg_replace('/^<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">/i',"",$body);
-		//$tmp_body=preg_replace("/<\/span>$/i","",$tmp_body);
-		if( $tmp_body != $body ) {
-			$rewrap_pre=true;
-			$body=$tmp_body;
-		}
-		$body=preg_replace("/<br\s*>/iU","<br />",$body);
-		$body=preg_replace("/<br\s*\/\s*>/iU","<br />",$body);
-		$body=preg_replace("/(\S+)\s*".$crlf."\s*<br \/>/iU","$1<br />",$body);
-		$body=preg_replace("/<br \/>\s*".$crlf."/iU","<br />",$body);
-		$body=preg_replace("/<br \/>/Ui","<br />".$crlf,$body);
+        $body = '<blockquote style="border-left:1px solid;margin: 0px;padding-left: 10px;">' . $body . "</blockquote>";
 
-		$body=trim($body).$crlf;
+        $wrap_msg = $user_prefs->getWrapMessages();
+        if ($wrap_msg) { //If we must wrap the message...
+            $body = wrap_outgoing_msg($body, $wrap_msg);
+        }
+    } else {
+        $body = str_replace("\r\n", "\n", $body);
+        $body = str_replace("\r", "\n", $body);
+        $body = str_replace("\n", $crlf, $body);
+        $tmp_body = preg_replace('/^<pre style="overflow:auto">/i', "", $body);
+        $tmp_body = preg_replace("/<\/pre>$/i", "", $tmp_body);
+        //$tmp_body=preg_replace('/^<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">/i',"",$body);
+        //$tmp_body=preg_replace("/<\/span>$/i","",$tmp_body);
+        if ($tmp_body != $body) {
+            $rewrap_pre = true;
+            $body = $tmp_body;
+        }
+        $body = preg_replace("/<br\s*>/iU", "<br />", $body);
+        $body = preg_replace("/<br\s*\/\s*>/iU", "<br />", $body);
+        $body = preg_replace("/(\S+)\s*" . $crlf . "\s*<br \/>/iU", "$1<br />", $body);
+        $body = preg_replace("/<br \/>\s*" . $crlf . "/iU", "<br />", $body);
+        $body = preg_replace("/<br \/>/Ui", "<br />" . $crlf, $body);
 
-		$wrap_msg = $user_prefs->getWrapMessages();
-		if( $wrap_msg ) { //If we must wrap the message...
-			$body=wrap_outgoing_msg($body,$wrap_msg,$crlf,"> ");
-		} else {
-			$body = "> " . preg_replace("|".$crlf."|", $crlf."> ", $body);
-		}
+        $body = trim($body) . $crlf;
 
-		if( $mime == 'text/html' ) {
-			$body=preg_replace('/((>\s*?)+'.$crlf.'){2,}/','$1$1',$body);
-		}
+        $wrap_msg = $user_prefs->getWrapMessages();
+        if ($wrap_msg) { //If we must wrap the message...
+            $body = wrap_outgoing_msg($body, $wrap_msg, $crlf, "> ");
+        } else {
+            $body = "> " . preg_replace("|" . $crlf . "|", $crlf . "> ", $body);
+        }
 
-		if( $rewrap_pre ) {
-			$body='<pre style="overflow:auto">'.$body."</pre>";
-			//$body='<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">'.$body.'</span>';
-		}
-	}
+        if ($mime == 'text/html') {
+            $body = preg_replace('/((>\s*?)+' . $crlf . '){2,}/', '$1$1', $body);
+        }
 
-	if( $from != '' ) {
-		$from = trim(preg_replace("|&lt;.*&gt;|", "", str_replace("\"", "", $from)));
-		$from = trim(preg_replace("/<.*>/","",$from));
-	}
-	if( $html_wrote!='' ) {
-		$body=$from . ' ' . $html_wrote . " :".$crlf.$crlf. $body;
-	}
-	return($body);
+        if ($rewrap_pre) {
+            $body = '<pre style="overflow:auto">' . $body . "</pre>";
+            //$body='<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">'.$body.'</span>';
+        }
+    }
+
+    if ($from != '') {
+        $from = trim(preg_replace("|&lt;.*&gt;|", "", str_replace("\"", "", $from)));
+        $from = trim(preg_replace("/<.*>/", "", $from));
+    }
+    if ($html_wrote != '') {
+        $body = $from . ' ' . $html_wrote . " :" . $crlf . $crlf . $body;
+    }
+    return ($body);
 }
 
 /**
@@ -1017,7 +1043,8 @@ function mailquote(&$body, $from='', $html_wrote='', $mime='text/html') {
  * @param string $string
  * @return string
  */
-function safestrip(&$string) {
+function safestrip(&$string)
+{
     //if(get_magic_quotes_gpc())
     //    $string = stripslashes($string);
     return $string;
@@ -1032,54 +1059,55 @@ function safestrip(&$string) {
  * @todo Move to class_send.php?
  * @return string
  */
-function wrap_outgoing_msg($txt,$length,$newline="\r\n",$initial_quote="") {
-	$msg = '';
+function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = "")
+{
+    $msg = '';
 
-	$crlf=$newline;
-	$txt=str_replace("\r\n","\n",$txt);
-	$txt=str_replace("\r","\n",$txt);
-	$txt=str_replace("\n",$crlf,$txt);
+    $crlf = $newline;
+    $txt = str_replace("\r\n", "\n", $txt);
+    $txt = str_replace("\r", "\n", $txt);
+    $txt = str_replace("\n", $crlf, $txt);
 
-	$user_prefs = NOCC_Session::getUserPrefs();
-	$br="";
-	if( $user_prefs->getSendHtmlMail() ) {
-		$br="<br />";
-		$txt=preg_replace("/(<\S+?[^>]*>)/",$crlf."$1".$crlf,$txt);
-	}
+    $user_prefs = NOCC_Session::getUserPrefs();
+    $br = "";
+    if ($user_prefs->getSendHtmlMail()) {
+        $br = "<br />";
+        $txt = preg_replace("/(<\S+?[^>]*>)/", $crlf . "$1" . $crlf, $txt);
+    }
 
-	//Break message in table with "\r\n" as separator
-	$tbl = explode($crlf, $txt);
-	foreach( $tbl as $line ) {
-		$new_line=$initial_quote.rtrim($line);
-		$quote="";
-		$match=array();
-		$quote_line=$new_line;
-		while( 1===preg_match("/^(>\s*)(.*)$/",$quote_line,$match) ) {
-			$quote=$quote.$match[1];
-			$quote_line=$match[2];
-		}
-		$match=array();
-		if( ! preg_match("/^</",$new_line) ) {
-			while( 1===preg_match("/^(.{".$length."})(.*)$/",$new_line,$match) ) {
-				$head=$match[1];
-				$tail=$match[2];
-				$match=array();
-				if( 1===preg_match("/^(".$quote.".*\S+)\s+(\S+?)$/",$head,$match) ) {
-					$head=$match[1];
-					$tail=$match[2].$tail;
-				}
-				if( ! $user_prefs->getSendHtmlMail() || strlen(trim($head))>0 ) {
-					$msg=$msg.$head.$br.$crlf;
-				}
-				$new_line=$quote.$tail;
-			}
-		}
-		if( ! $user_prefs->getSendHtmlMail() || strlen(trim($new_line))>0 ) {
-			$msg=$msg.$new_line.$crlf;
-		}
-	}
+    //Break message in table with "\r\n" as separator
+    $tbl = explode($crlf, $txt);
+    foreach ($tbl as $line) {
+        $new_line = $initial_quote . rtrim($line);
+        $quote = "";
+        $match = array();
+        $quote_line = $new_line;
+        while (1 === preg_match("/^(>\s*)(.*)$/", $quote_line, $match)) {
+            $quote = $quote . $match[1];
+            $quote_line = $match[2];
+        }
+        $match = array();
+        if (! preg_match("/^</", $new_line)) {
+            while (1 === preg_match("/^(.{" . $length . "})(.*)$/", $new_line, $match)) {
+                $head = $match[1];
+                $tail = $match[2];
+                $match = array();
+                if (1 === preg_match("/^(" . $quote . ".*\S+)\s+(\S+?)$/", $head, $match)) {
+                    $head = $match[1];
+                    $tail = $match[2] . $tail;
+                }
+                if (! $user_prefs->getSendHtmlMail() || strlen(trim($head)) > 0) {
+                    $msg = $msg . $head . $br . $crlf;
+                }
+                $new_line = $quote . $tail;
+            }
+        }
+        if (! $user_prefs->getSendHtmlMail() || strlen(trim($new_line)) > 0) {
+            $msg = $msg . $new_line . $crlf;
+        }
+    }
 
-	return $msg;
+    return $msg;
 }
 
 /**
@@ -1088,7 +1116,8 @@ function wrap_outgoing_msg($txt,$length,$newline="\r\n",$initial_quote="") {
  * @return string
  * @todo Move to class_send.php?
  */
-function escape_dots($txt) {
+function escape_dots($txt)
+{
     $crlf = "\r\n";
     $msg = '';
 
@@ -1111,7 +1140,8 @@ function escape_dots($txt) {
  * @param string $allow
  * @return string
  */
-function strip_tags2(&$string, $allow) {
+function strip_tags2(&$string, $allow)
+{
     $string = preg_replace('|<<|', '<nocc_less_than_tag><', $string);
     $string = preg_replace('|>>|', '><nocc_greater_than_tag>;', $string);
     $string = strip_tags($string, $allow . '<nocc_less_than_tag><nocc_greater_than_tag>');
@@ -1124,7 +1154,8 @@ function strip_tags2(&$string, $allow) {
  * @global object $conf
  * @return int
  */
-function get_per_page() {
+function get_per_page()
+{
     global $conf;
 
     $user_prefs = NOCC_Session::getUserPrefs();
@@ -1145,7 +1176,8 @@ function get_per_page() {
  * @param string $string
  * @return string
  */
-function unhtmlentities($string) {
+function unhtmlentities($string)
+{
     $trans_tbl = get_html_translation_table(HTML_ENTITIES);
     $trans_tbl = array_flip($trans_tbl);
     return strtr($string, $trans_tbl);
@@ -1157,11 +1189,12 @@ function unhtmlentities($string) {
  * @param int $cutafter
  * @return string
  */
-function convertMailData2Html($maildata, $cutafter = 0) {
+function convertMailData2Html($maildata, $cutafter = 0)
+{
     if (($cutafter > 0) && (utf8_strlen($maildata) > $cutafter)) {
-        return htmlspecialchars(utf8_substr($maildata, 0, $cutafter),ENT_COMPAT | ENT_SUBSTITUTE) . '&hellip;';
+        return htmlspecialchars(utf8_substr($maildata, 0, $cutafter), ENT_COMPAT | ENT_SUBSTITUTE) . '&hellip;';
     } else {
-        return htmlspecialchars($maildata,ENT_COMPAT | ENT_SUBSTITUTE);
+        return htmlspecialchars($maildata, ENT_COMPAT | ENT_SUBSTITUTE);
     }
 }
 
@@ -1170,11 +1203,12 @@ function convertMailData2Html($maildata, $cutafter = 0) {
  * @param string $langstring
  * @return string
  */
-function convertLang2Html($langstring) {
-	$langstring=htmlentities($langstring, ENT_COMPAT, 'UTF-8');
-	//allow line breaks:
-	$langstring=preg_replace("/\\n/","<br />",$langstring);
-	return $langstring;
+function convertLang2Html($langstring)
+{
+    $langstring = htmlentities($langstring, ENT_COMPAT, 'UTF-8');
+    //allow line breaks:
+    $langstring = preg_replace("/\\n/", "<br />", $langstring);
+    return $langstring;
 }
 
 /**
@@ -1184,7 +1218,8 @@ function convertLang2Html($langstring) {
  * @param string $text
  * @return string
  */
-function os_iconv($input_charset, $output_charset, &$text) {
+function os_iconv($input_charset, $output_charset, &$text)
+{
     if (strlen($text) == 0) {
         return $text;
     }
@@ -1212,7 +1247,8 @@ function os_iconv($input_charset, $output_charset, &$text) {
  * Build a folder breadcrumb navigation...
  * @param string $folder
  */
-function buildfolderlink($folder) {
+function buildfolderlink($folder)
+{
     $folderpath = '';
     // split the string at the periods
     $elements = explode('.', $folder);
@@ -1222,7 +1258,7 @@ function buildfolderlink($folder) {
             echo ".";
         }
         $folderpath = $folderpath . $elements[$i];
-        echo "<a href=\"action.php?".NOCC_Session::getUrlGetSession()."&folder=" . $folderpath . "\">" . $elements[$i] . "</a>";
+        echo "<a href=\"action.php?" . NOCC_Session::getUrlGetSession() . "&folder=" . $folderpath . "\">" . $elements[$i] . "</a>";
     }
     echo "\n";
 }
@@ -1239,80 +1275,80 @@ function buildfolderlink($folder) {
  * @param int $skip
  * @return string
  */
-function get_page_nav($pages, $skip) {
-  global $html_page, $html_of, $alt_prev, $title_prev_page, $alt_next, $title_next_page;
+function get_page_nav($pages, $skip)
+{
+    global $html_page, $html_of, $alt_prev, $title_prev_page, $alt_next, $title_next_page;
 
-  $html = '';
-  if ($pages > 1) { // if there several pages...
-    $form_select = '<select class="button" name="skip" onchange="submit();">';
-    $selected = '';
-    for ($i = 0; $i < $pages; $i++) {
-        $xpage = $i + 1;
-        if ($i == $skip) {
-            $selected = 'selected="selected"';
-        } else {
-            $selected = '';
+    $html = '';
+    if ($pages > 1) { // if there several pages...
+        $form_select = '<select class="button" name="skip" onchange="submit();">';
+        $selected = '';
+        for ($i = 0; $i < $pages; $i++) {
+            $xpage = $i + 1;
+            if ($i == $skip) {
+                $selected = 'selected="selected"';
+            } else {
+                $selected = '';
+            }
+            $form_select .= '<option ' . $selected . ' value="' . $i . '">' . $xpage . '</option>';
         }
-        $form_select .= '<option '.$selected.' value="'.$i.'">'.$xpage.'</option>';
-    }
-    $form_select .= '</select>';
+        $form_select .= '</select>';
 
-    $page = $skip + 1;
-    $pskip = $skip - 1;
-    $nskip = $skip + 1;
+        $page = $skip + 1;
+        $pskip = $skip - 1;
+        $nskip = $skip + 1;
 
-    $start_page = $page - 2;
-    $end_page = $page + 2;
-    if ($page < 4) { // if first three pages...
-      $start_page = 1;
-      $end_page = 6;
-    }
-    elseif ($page > ($pages - 3)) { // if last three pages...
-      $start_page = $pages - 5;
-      $end_page = $pages;
-    }
-    if ($start_page < 1) {
-      $end_page = $end_page - $start_page;
-      $start_page = 1;
-    }
-    if ($end_page > $pages) {
-      $end_page = $pages;
-    }
+        $start_page = $page - 2;
+        $end_page = $page + 2;
+        if ($page < 4) { // if first three pages...
+            $start_page = 1;
+            $end_page = 6;
+        } elseif ($page > ($pages - 3)) { // if last three pages...
+            $start_page = $pages - 5;
+            $end_page = $pages;
+        }
+        if ($start_page < 1) {
+            $end_page = $end_page - $start_page;
+            $start_page = 1;
+        }
+        if ($end_page > $pages) {
+            $end_page = $pages;
+        }
 
-    $html = '<form method="post" action="action.php?'.NOCC_Session::getUrlGetSession().'">';
-    $html .= '<div class="pagenav"><ul>';
-    $html .= '<li class="pagexofy"><span>' . $html_page . ' ' . $form_select . ' ' . $html_of . ' ' . $pages . '</span></li>';
-    if ($pskip > -1 ) // if NOT first page...
-      $html .= '<li class="prev"><a href="action.php?'.NOCC_Session::getUrlGetSession().'&skip=' . $pskip . '" title="' . $title_prev_page . '" rel="prev">&laquo; ' . $alt_prev . '</a></li>';
-    else // if first page...
-      $html .= '<li class="prev"><span> &laquo; ' . $alt_prev . '</span></li>';
-    if ($start_page > 1) {
-      $html .= '<li class="page"><a href="action.php?'.NOCC_Session::getUrlGetSession().'&skip=0" title="' . $html_page . ' 1" rel="first">1</a></li>';
-      if ($start_page > 2) {
-        $html .= '<li class="extend"><span>&hellip;</span></li>';
-      }
+        $html = '<form method="post" action="action.php?' . NOCC_Session::getUrlGetSession() . '">';
+        $html .= '<div class="pagenav"><ul>';
+        $html .= '<li class="pagexofy"><span>' . $html_page . ' ' . $form_select . ' ' . $html_of . ' ' . $pages . '</span></li>';
+        if ($pskip > -1) // if NOT first page...
+            $html .= '<li class="prev"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . $pskip . '" title="' . $title_prev_page . '" rel="prev">&laquo; ' . $alt_prev . '</a></li>';
+        else // if first page...
+            $html .= '<li class="prev"><span> &laquo; ' . $alt_prev . '</span></li>';
+        if ($start_page > 1) {
+            $html .= '<li class="page"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=0" title="' . $html_page . ' 1" rel="first">1</a></li>';
+            if ($start_page > 2) {
+                $html .= '<li class="extend"><span>&hellip;</span></li>';
+            }
+        }
+        for ($xpage = $start_page; $xpage <= $end_page; $xpage++) { // for all visible pages...
+            $xskip = $xpage - 1;
+            if ($xpage == $page) // if current page...
+                $html .= '<li class="current"><span>' . $xpage . '</span></li>';
+            else // if NOT current page...
+                $html .= '<li class="page"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . $xskip . '" title="' . $html_page . ' ' . $xpage . '">' . $xpage . '</a></li>';
+        }
+        if ($end_page < $pages) {
+            if ($end_page < $pages - 1) {
+                $html .= '<li class="extend"><span>&hellip;</span></li>';
+            }
+            $html .= '<li class="page"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . ($pages - 1) . '" title="' . $html_page . ' ' . $pages . '" rel="last">' . $pages . '</a></li>';
+        }
+        if ($nskip < $pages) // if NOT last page...
+            $html .= '<li class="next"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . $nskip . '" title="' . $title_next_page . '" rel="next">' . $alt_next . ' &raquo;</a></li>';
+        else // if last page...
+            $html .= '<li class="next"><span>' . $alt_next . ' &raquo;</span></li>';
+        $html .= '</ul></div>';
+        $html .= '</form>';
     }
-    for ($xpage = $start_page; $xpage <= $end_page; $xpage++) { // for all visible pages...
-      $xskip = $xpage - 1;
-      if ($xpage == $page) // if current page...
-        $html .= '<li class="current"><span>' . $xpage . '</span></li>';
-      else // if NOT current page...
-        $html .= '<li class="page"><a href="action.php?'.NOCC_Session::getUrlGetSession().'&skip=' . $xskip . '" title="' . $html_page . ' ' . $xpage . '">' . $xpage . '</a></li>';
-    }
-    if ($end_page < $pages) {
-      if ($end_page < $pages - 1) {
-        $html .= '<li class="extend"><span>&hellip;</span></li>';
-      }
-      $html .= '<li class="page"><a href="action.php?'.NOCC_Session::getUrlGetSession().'&skip=' . ($pages - 1) . '" title="' . $html_page . ' ' . $pages . '" rel="last">' . $pages . '</a></li>';
-    }
-    if ($nskip < $pages) // if NOT last page...
-      $html .= '<li class="next"><a href="action.php?'.NOCC_Session::getUrlGetSession().'&skip=' . $nskip . '" title="' . $title_next_page . '" rel="next">' . $alt_next . ' &raquo;</a></li>';
-    else // if last page...
-      $html .= '<li class="next"><span>' . $alt_next . ' &raquo;</span></li>';
-    $html .= '</ul></div>';
-    $html .= '</form>';
-  }
-  return $html;
+    return $html;
 }
 
 /**
@@ -1320,20 +1356,17 @@ function get_page_nav($pages, $skip) {
  * @param string $data
  * @return string
  */
-function removeUnicodeBOM($data) {
+function removeUnicodeBOM($data)
+{
     if (substr($data, 0, 3) == pack('CCC', 0xEF, 0xBB, 0xBF)) { //UTF-8...
         return substr($data, 3);
-    }
-    elseif (substr($data, 0, 2) == pack('CC', 0xFE, 0xFF)) { //UTF-16 (BE)...
+    } elseif (substr($data, 0, 2) == pack('CC', 0xFE, 0xFF)) { //UTF-16 (BE)...
         return substr($data, 2);
-    }
-    elseif (substr($data, 0, 2) == pack('CC', 0xFF, 0xFE)) { //UTF-16 (LE)...
+    } elseif (substr($data, 0, 2) == pack('CC', 0xFF, 0xFE)) { //UTF-16 (LE)...
         return substr($data, 2);
-    }
-    elseif (substr($data, 0, 4) == pack('CCCC', 0x00, 0x00, 0xFE, 0xFF)) { //UTF-32 (BE)...
+    } elseif (substr($data, 0, 4) == pack('CCCC', 0x00, 0x00, 0xFE, 0xFF)) { //UTF-32 (BE)...
         return substr($data, 4);
-    }
-    elseif (substr($data, 0, 4) == pack('CCCC', 0x00, 0x00, 0xFF, 0xFE)) { //UTF-32 (LE)...
+    } elseif (substr($data, 0, 4) == pack('CCCC', 0x00, 0x00, 0xFF, 0xFE)) { //UTF-32 (LE)...
         return substr($data, 4);
     }
     return $data;
@@ -1343,26 +1376,23 @@ function removeUnicodeBOM($data) {
  * Check if RSS feed is allowed
  * @return bool
  */
-function isRssAllowed() {
-	global $conf;
-	$is_globally_allowed=false;
-        if( isset($conf->allow_rss) ) {
-		$is_globally_allowed=$conf->allow_rss;
-	}
-	$is_domain_allowed=false;
-	if( 
-		isset($_SESSION['nocc_domainnum']) &&
-		isset($conf->domains[$_SESSION['nocc_domainnum']]) &&
-		isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_rss) &&
-		true
-	) {
-		$is_domain_allowed=$conf->domains[$_SESSION['nocc_domainnum']]->allow_rss;
-	}
-	else {
-		$is_domain_allowed=true;
-	}
-	return $is_globally_allowed & $is_domain_allowed;
+function isRssAllowed()
+{
+    global $conf;
+    $is_globally_allowed = false;
+    if (isset($conf->allow_rss)) {
+        $is_globally_allowed = $conf->allow_rss;
+    }
+    $is_domain_allowed = false;
+    if (
+        isset($_SESSION['nocc_domainnum']) &&
+        isset($conf->domains[$_SESSION['nocc_domainnum']]) &&
+        isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_rss) &&
+        true
+    ) {
+        $is_domain_allowed = $conf->domains[$_SESSION['nocc_domainnum']]->allow_rss;
+    } else {
+        $is_domain_allowed = true;
+    }
+    return $is_globally_allowed & $is_domain_allowed;
 }
-
-
-

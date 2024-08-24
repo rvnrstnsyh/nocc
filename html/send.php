@@ -55,7 +55,7 @@ $mail_from = get_default_from_address();
     </p>
     <table>
       <tr>
-        <td class="sendLabel"><label for="mail_from"><?php echo $html_from_label ?></label></td>
+        <td class="sendLabel"><label <?php echo $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change ? 'for="mail_from"' : '' ?>><?php echo $html_from_label ?></label></td>
         <td class="sendData">
           <?php
           $prefs_show_email = (
