@@ -51,6 +51,7 @@ $html_login = 'SIGN IN';
 $html_user_label = 'Username or IM Address';
 $html_passwd_label = 'Password';
 $html_save = 'Save';
+$html_save_selected = 'Save selected';
 $html_submit = 'Submit';
 $html_help = 'Help';
 $html_server_label = 'Server:';

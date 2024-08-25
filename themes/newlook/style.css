@@ -611,6 +611,12 @@ img.sort {
   text-align: end;
 }
 
+.foldersSubmitButtons {
+  margin: 0 0 0 10px;
+  padding: 0.5em 0 0.5em 0;
+  text-align: start;
+}
+
 .sendLabel {
   width: 15%;
   text-align: right;

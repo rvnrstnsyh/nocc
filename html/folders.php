@@ -22,21 +22,23 @@ if (count($big_list) > 1) {
 
 ?>
 <div class="prefs">
-  <h3><?php echo convertLang2Html($html_folders) ?></h3>
+  <?php if (isset($_REQUEST['submit_folders'])) echo '<p class="success-message-bg">' . convertLang2Html($html_folders_updated) . '</p>'; ?>
+  <br>
+  <fieldset>
+    <legend><?php echo strtoupper(convertLang2Html($html_folders)); ?></legend>
+  </fieldset>
   <form method="post" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>" accept-charset="UTF-8">
     <div>
       <input type="hidden" name="action" value="managefolders" />
       <input type="hidden" name="submit_folders" value="1" />
       <table>
         <tr>
-          <td class="prefsLabel"></td>
           <td class="prefsData">
             <input type="radio" id="do_create_folder" name="do" value="create_folder" />
             <label for="do_create_folder"><?php echo convertLang2Html($html_folder_create) ?></label> <input class="button" type="text" name="createnewbox" size="15" maxlength="32" />
           </td>
         </tr>
         <tr>
-          <td class="prefsLabel"></td>
           <td class="prefsData">
             <input type="radio" id="do_rename_folder" name="do" value="rename_folder" />
             <label for="do_rename_folder"><?php echo convertLang2Html($html_folder_rename) ?></label> <?php echo $renameoldbox ?>
@@ -44,14 +46,12 @@ if (count($big_list) > 1) {
           </td>
         </tr>
         <tr>
-          <td class="prefsLabel"></td>
           <td class="prefsData">
             <input type="radio" id="do_subscribe_folder" name="do" value="subscribe_folder" />
             <label for="do_subscribe_folder"><?php echo convertLang2Html($html_folder_subscribe) ?></label> <select class="button" name="subscribenewbox"> <?php echo join('', $select_list) ?> </select>
           </td>
         </tr>
         <tr>
-          <td class="prefsLabel"></td>
           <td class="prefsData">
             <input type="radio" id="do_remove_folder" name="do" value="remove_folder" />
             <label for="do_remove_folder"><?php echo convertLang2Html($html_folder_remove) ?></label> <?php echo $removeoldbox ?>
@@ -59,7 +59,6 @@ if (count($big_list) > 1) {
         </tr>
 
         <tr>
-          <td class="prefsLabel"></td>
           <td class="prefsData">
             <input type="radio" id="do_download_folder" name="do" value="download_folder" />
             <label for="do_download_folder"><?php echo convertLang2Html($html_down_mail) ?></label> <?php echo $downloadbox ?>
@@ -67,7 +66,6 @@ if (count($big_list) > 1) {
         </tr>
 
         <tr>
-          <td class="prefsLabel"></td>
           <td class="prefsData">
             <input type="radio" id="do_delete_folder" name="do" value="delete_folder" />
             <label for="do_delete_folder"><?php echo convertLang2Html($html_folder_delete) ?></label> <select class="button" name="deletebox"> <?php echo join('', $select_list) ?> </select>
@@ -89,14 +87,14 @@ if (count($big_list) > 1) {
             </tr>
           </table>
         </div>
-      <?php
-      } else {
-      }
-      ?>
-      <p class="sendButtons">
-        <input type="submit" class="button" value="<?php echo convertLang2Html($html_submit) ?>" />
+      <?php } ?>
+      <br>
+      <p class="foldersSubmitButtons">
+        <input type="submit" class="button" value="<?php echo convertLang2Html($html_save_selected) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_cancel) ?></a>
+        <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+          <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
+        </a>
       </p>
 
       <?php
@@ -134,8 +132,6 @@ if (count($big_list) > 1) {
           }
           echo '<br />';
           unset($_SESSION['fd_message']);
-        } else {
-          echo '<p class="success-message-bg">' . convertLang2Html($html_folders_updated) . '</p>';
         }
       }
       ?>
