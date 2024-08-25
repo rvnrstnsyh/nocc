@@ -26,7 +26,7 @@ if (!isset($conf->loaded))
       <?php
       if ($pop->is_imap()) {
       ?>
-        <input type="submit" name="bottom_mark_read_mode" class="button" value="<?php echo convertLang2Html($html_mark_as); ?>" />
+        <input type="submit" name="bottom_set_flag" class="button" value="<?php echo convertLang2Html($html_mark_as); ?>" />
         <select class="button" name="bottom_mark_mode">
           <option value="read"><?php echo convertLang2Html($html_read); ?></option>
           <option value="unread"><?php echo convertLang2Html($html_unread); ?></option>

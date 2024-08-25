@@ -1,7 +1,6 @@
 <!-- start of $Id: html_inbox.php 2567 2013-08-06 10:44:40Z oheil $ -->
 <?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
+if (!isset($conf->loaded)) die('Hacking attempt');
 
 $even_odd_class = ($tmp['index'] % 2) ? 'even' : 'odd';
 
@@ -26,6 +25,7 @@ echo '<tr class="' . $even_odd_class . $new_class . $spam_class . '">';
 echo '<td class="column0">';
 echo '  <input type="checkbox" name="msg-' . $tmp['number'] . '" value="Y" />';
 echo '</td>';
+
 foreach ($conf->column_order as $column) { //For all columns...
   echo '<td class="column' . $column;
   if ($_SESSION['nocc_sort'] == $column) echo ' sorted';
@@ -52,32 +52,41 @@ foreach ($conf->column_order as $column) { //For all columns...
       break;
     case '6': //Read/Unread...
       if ($tmp['new'] == true) { //if unread...
-        echo '<img src="themes/' . $_SESSION['nocc_theme'] . '/img/new.png" alt="" />';
+        if ($conf->use_icon) {
+          echo '<img src="themes/' . $_SESSION['nocc_theme'] . '/img/svg/unread.svg" alt="" />';
+        } else {
+          echo '+U';
+        }
       } else { //if read...
-        echo '&nbsp;';
+        echo '';
       }
       break;
     case '7': //Attachment...
       if ($tmp['attach'] == true) { //if has attachments...
-        echo '<img src="themes/' . $_SESSION['nocc_theme'] . '/img/attach.png" alt="" />';
+        if ($conf->use_icon) {
+          echo '<img src="themes/' . $_SESSION['nocc_theme'] . '/img/svg/has-attachment.svg" alt="" />';
+        } else {
+          echo '+A';
+        }
       } else { //if NOT has attachments...
-        echo '&nbsp;';
+        echo '';
       }
       break;
     case '8': //Priority Text...
       echo $tmp['priority_text'];
       break;
     case '9': //Priority Number...
-      echo '<span title="' . $html_priority_label . ' ' . $tmp['priority_text'] . '">' . $tmp['priority'] . '</span>';
+      echo '<span title="' . $html_priority_label . ' ' . $tmp['priority_text'] . '">' . '+' . $tmp['priority'] . '</span>';
       break;
     case '10': //Flagged...
       if ($tmp['flagged']) {
-        echo '<span title="' . $html_flagged . '">*</span>';
+        echo '+F';
       }
       break;
     case '11': //SPAM...
       if ($tmp['spam']) {
-        echo $html_spam;
+        // echo $html_spam;
+        echo '+S';
       }
       break;
   }

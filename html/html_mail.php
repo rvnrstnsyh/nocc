@@ -1,31 +1,12 @@
 <!-- start of $Id: html_mail.php 2870 2020-04-11 16:39:37Z oheil $ -->
 <div class="mailNav">
-  <table>
+  <table class="head">
     <?php
-    if (!isset($conf->loaded))
-      die('Hacking attempt');
+    if (!isset($conf->loaded)) die('Hacking attempt');
 
+    $verbose = (isset($_REQUEST['verbose']) && $_REQUEST['verbose'] == 1) ? '1' : '0';
     $has_images = NOCC_Security::hasDisabledHtmlImages($content['body']);
     $display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
-
-    // Show/hide header link
-    $verbose = (isset($_REQUEST['verbose']) && $_REQUEST['verbose'] == 1) ? '1' : '0';
-    if ($conf->use_verbose)
-      if ($verbose == '1')
-        echo '<tr><td class="mailSwitchHeaders dontPrint"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['msgnum'] . '&amp;verbose=0&amp;display_images=' . $display_images . '">' . $html_remove_header . '</a></td>';
-      else
-        echo '<tr><td class="mailSwitchHeaders dontPrint"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['msgnum'] . '&amp;verbose=1&amp;display_images=' . $display_images . '">' . $html_view_header . '</a></td>';
-    else
-      echo '<tr><td>&nbsp;</td>';
-
-    // Next/prev message links
-    echo '<td class="right dontPrint">';
-    if (($content['prev'] != '') && ($content['prev'] != 0))
-      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['prev'] . '&amp;verbose=' . $verbose . '" title="' . $title_prev_msg . '" rel="prev">&laquo; ' . $alt_prev . '</a>';
-    echo "&nbsp;";
-    if (($content['next'] != '') && ($content['next'] != 0))
-      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['next'] . '&amp;verbose=' . $verbose . '" title="' . $title_next_msg . '" rel="next">' . $alt_next . ' &raquo;</a>';
-    echo "</td></tr>";
 
     if ($conf->use_verbose && $verbose == '0') { //If displaying "normal" header...
       echo '<tr><th class="mailHeaderLabel">' . $html_from_label . '</th><td class="mailHeaderData">' . htmlspecialchars($content['from'], ENT_COMPAT | ENT_SUBSTITUTE) . '</td></tr>';
@@ -63,9 +44,9 @@
           $priority = $html_lowest;
           break;
       }
-      if ($priority != '') {
-        echo '<tr><th class="mailHeaderLabel">' . $html_priority_label . '</th><td class="mailHeaderData">' . $priority . '</td></tr>';
-      }
+
+      if ($priority != '')  echo '<tr><th class="mailHeaderLabel">' . $html_priority_label . '</th><td class="mailHeaderData">' . $priority . '</td></tr>';
+
       echo '<tr><th class="mailHeaderLabel">' . $html_encoding_label . '</th><td class="mailHeaderData">';
       echo '<form id="encoding" action="action.php?' . NOCC_Session::getUrlGetSession() . '" method="post"><div>';
       echo '<input type="hidden" name="action" value="' . $_REQUEST['action'] . '"/>';
@@ -108,6 +89,28 @@
         echo $content['att'];
       }
     }
+    ?>
+  </table>
+
+  <table class="menu">
+    <?php
+    // Show/hide header link
+    if ($conf->use_verbose)
+      if ($verbose == '1')
+        echo '<tr><td class="mailSwitchHeaders dontPrint"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['msgnum'] . '&amp;verbose=0&amp;display_images=' . $display_images . '">' . $html_remove_header . '</a></td>';
+      else
+        echo '<tr><td class="mailSwitchHeaders dontPrint"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['msgnum'] . '&amp;verbose=1&amp;display_images=' . $display_images . '">' . $html_view_header . '</a></td>';
+    else
+      echo '<tr><td>&nbsp;</td>';
+
+    // Next/prev message links
+    echo '<td class="right dontPrint">';
+    if (($content['prev'] != '') && ($content['prev'] != 0))
+      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['prev'] . '&amp;verbose=' . $verbose . '" title="' . $title_prev_msg . '" rel="prev">&laquo; ' . $alt_prev . '</a>';
+    echo "&nbsp;";
+    if (($content['next'] != '') && ($content['next'] != 0))
+      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['next'] . '&amp;verbose=' . $verbose . '" title="' . $title_next_msg . '" rel="next">' . $alt_next . ' &raquo;</a>';
+    echo "</td></tr>";
     ?>
   </table>
 </div>

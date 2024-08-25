@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file just delete the selected message(s)
  *
@@ -22,8 +23,7 @@ require_once './classes/class_local.php';
 $ev = "";
 try {
     $pop = new nocc_imap();
-}
-catch (Exception $ex) {
+} catch (Exception $ex) {
     //TODO: Show error without NoccException!
     $ev = new NoccException($ex->getMessage());
     require './html/header.php';
@@ -33,7 +33,7 @@ catch (Exception $ex) {
 }
 
 $num_messages = $pop->num_msg();
-$url = "action.php?".NOCC_Session::getUrlGetSession();
+$url = "action.php?" . NOCC_Session::getUrlGetSession();
 $user_prefs = NOCC_Session::getUserPrefs();
 
 // Work out folder and target_folder
@@ -61,26 +61,27 @@ if (isset($_REQUEST['only_one'])) {
         // If messages are opened in a new windows, we will reload the opener window
         // i.e. the one with messages list
         $_SESSION['message_deleted'] = "true";
-        $target_folder = $_SESSION['imap_namespace'].$user_prefs->getTrashFolderName();
-        if ($pop->is_imap()
-                && $user_prefs->getUseTrashFolder()
-                && $_SESSION['nocc_folder'] != $target_folder ) {
+        $target_folder = $_SESSION['imap_namespace'] . $user_prefs->getTrashFolderName();
+        if (
+            $pop->is_imap()
+            && $user_prefs->getUseTrashFolder()
+            && $_SESSION['nocc_folder'] != $target_folder
+        ) {
             $pop->mail_move($mail, $target_folder);
         } else {
             $pop->delete($mail);
         }
         if ($mail - 1) {
-            $url = "action.php?".NOCC_Session::getUrlGetSession()."&action=aff_mail&mail=".--$mail."&verbose=0";
-        }
-        else {
-            $url = "action.php?".NOCC_Session::getUrlGetSession();
+            $url = "action.php?" . NOCC_Session::getUrlGetSession() . "&action=aff_mail&mail=" . --$mail . "&verbose=0";
+        } else {
+            $url = "action.php?" . NOCC_Session::getUrlGetSession();
         }
     }
 } else {
     $msg_to_forward = '';
-    for ($i = $num_messages; $i >= 1 ; $i--) {
+    for ($i = $num_messages; $i >= 1; $i--) {
 
-        if (isset($_REQUEST['msg-'.$i])) {
+        if (isset($_REQUEST['msg-' . $i])) {
             if (isset($_REQUEST['move_mode'])) {
                 if ($target_folder != $folder) {
                     $pop->mail_move($i, $target_folder);
@@ -102,38 +103,40 @@ if (isset($_REQUEST['only_one'])) {
                 }
             }
             if (isset($_REQUEST['forward_mode']) || isset($_REQUEST['bottom_forward_mode'])) {
-                $msg_to_forward .= '$'.$i;
+                $msg_to_forward .= '$' . $i;
             }
             if (isset($_REQUEST['delete_mode']) || isset($_REQUEST['bottom_delete_mode'])) {
                 // If messages are opened in a new windows, we will reload the opener window
                 // i.e. the one with messages list
                 $_SESSION['message_deleted'] = "true";
-                $target_folder = $_SESSION['imap_namespace'].$user_prefs->getTrashFolderName();
-                if ($pop->is_imap()
-                        && $user_prefs->getUseTrashFolder()
-                        && $_SESSION['nocc_folder'] != $target_folder ) {
+                $target_folder = $_SESSION['imap_namespace'] . $user_prefs->getTrashFolderName();
+                if (
+                    $pop->is_imap()
+                    && $user_prefs->getUseTrashFolder()
+                    && $_SESSION['nocc_folder'] != $target_folder
+                ) {
                     $pop->mail_move($i, $target_folder);
                 } else {
                     $pop->delete($i);
                 }
             }
-            if (isset($_REQUEST['mark_read_mode']) && $_REQUEST['mark_mode'] == 'read') {
+            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'read') {
                 $pop->mail_mark_read($i);
             }
-            if (isset($_REQUEST['bottom_mark_read_mode']) && $_REQUEST['bottom_mark_mode'] == 'read') {
+            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'read') {
                 $pop->mail_mark_read($i);
             }
-            if (isset($_REQUEST['mark_read_mode']) && $_REQUEST['mark_mode'] == 'unread') {
+            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'unread') {
                 $pop->mail_mark_unread($i);
             }
-            if (isset($_REQUEST['bottom_mark_read_mode']) && $_REQUEST['bottom_mark_mode'] == 'unread') {
+            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'unread') {
                 $pop->mail_mark_unread($i);
             }
         }
     }
     if ($msg_to_forward != '') {
-      $msg_to_forward = substr($msg_to_forward, 1);
-      $url = 'action.php?'.NOCC_Session::getUrlGetSession().'&action=forward&mail='.$msg_to_forward;
+        $msg_to_forward = substr($msg_to_forward, 1);
+        $url = 'action.php?' . NOCC_Session::getUrlGetSession() . '&action=forward&mail=' . $msg_to_forward;
     }
 }
 

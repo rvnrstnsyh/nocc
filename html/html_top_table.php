@@ -1,34 +1,33 @@
 <!-- start of $Id: html_top_table.php 2967 2021-12-10 14:24:34Z oheil $ -->
 <?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
+if (!isset($conf->loaded)) die('Hacking attempt');
 
 $arrow = ($_SESSION['nocc_sortdir'] == 0) ? 'up' : 'down';
 $new_sortdir = ($_SESSION['nocc_sortdir'] == 0) ? 1 : 0;
 $skip = (isset($_REQUEST['skip'])) ? $_REQUEST['skip'] : '0';
 
 $pages = $pop->get_page_count($num_msg);
-
 $page_line = '';
 
-if ($pages > 1) {
-  $page_line = get_page_nav($pages, $skip);
-}
+if ($pages > 1) $page_line = get_page_nav($pages, $skip);
 
-$fldr_line = "";
+$folder_line = "";
 $reapply_filters = '';
+
 if ($pop->is_imap()) {
   if ($pop->get_folder_count() > 1) {
-    $fldr_line = "<form method=\"post\" action=\"action.php?" . NOCC_Session::getUrlGetSession() . "\"><div><label for=\"folder\">$html_other_folders:</label>  \n";
-    //$fldr_line .= $pop->html_folder_select('folder', $_SESSION['nocc_folder']);
-    $fldr_line .= $pop->html_folder_select('folder', $_SESSION['goto_folder']);
-    $fldr_line .= "<input type=\"submit\" class=\"button\" name=\"submit\" value=\"$html_gotofolder\" />";
-    $fldr_line .= "</div></form>";
+    $folder_line = "<form method=\"post\" action=\"action.php?" . NOCC_Session::getUrlGetSession() . "\"><div><label for=\"folder\">$html_other_folders:</label>  \n";
+    //$folder_line .= $pop->html_folder_select('folder', $_SESSION['nocc_folder']);
+    $folder_line .= $pop->html_folder_select('folder', $_SESSION['goto_folder']);
+    $folder_line .= "<input type=\"submit\" class=\"button\" name=\"submit\" value=\"$html_gotofolder\" />";
+    $folder_line .= "</div></form>";
   }
+
   if ($_SESSION['nocc_folder'] == 'INBOX') {
-    $reapply_filters = '<form method="post" action="action.php?' . NOCC_Session::getUrlGetSession() . '"><div>' .
-      '<label for="reapply_filters"><input type="checkbox" name="reapply_filters" id="reapply_filters" value="1" /> ' .
-      $html_reapply_filters . '</label> <input class="button" type="submit" value="' . $html_submit . '" /></div></form>';
+    $reapply_filters = '<form method="post" action="action.php?' . NOCC_Session::getUrlGetSession() . '">
+      <input type="hidden" name="reapply_filters" value="1">
+      <input class="button" type="submit" value="' . $html_reapply_filters . '">
+    </form>';
   }
 }
 ?>
@@ -61,11 +60,10 @@ if ($pop->is_imap()) {
         ?>
       </td>
       <td class="titlew right">
-        <?php echo $num_msg ?> <?php if ($num_msg == 1) {
-                                  echo $html_msg;
-                                } else {
-                                  echo $html_msgs;
-                                } ?>
+        <?php
+        $message_text = ($num_msg == 1) ? $html_msg : $html_msgs;
+        echo $num_msg . ' ' . $message_text;
+        ?>
       </td>
     </tr>
   </table>
@@ -75,7 +73,7 @@ if ($pop->is_imap()) {
     <table>
       <tr>
         <td class="inbox left">
-          <?php echo $fldr_line ?>
+          <?php echo $folder_line ?>
         </td>
         <td class="inbox center">
           <?php echo $reapply_filters ?>
@@ -147,9 +145,9 @@ if ($pop->is_imap()) {
             if ($column == '8') { //If "Priority Text" column...
               echo $html_priority;
             } elseif ($column == '9') { //If "Priority Number" column...
-              echo '<span title="' . $html_priority . '">!</span>';
+              echo '<span title="' . $html_priority . '"></span>';
             } elseif ($column == '10') { //If "Flagged" column...
-              echo '<span title="' . $html_flagged . '">*</span>';
+              echo '<span title="' . $html_flagged . '"></span>';
             } elseif ($column == '11') { //If "SPAM" column...
               echo $html_spam;
             }
