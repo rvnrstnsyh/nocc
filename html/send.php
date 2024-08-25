@@ -26,6 +26,10 @@ if (isset($_REQUEST['display_images'])) {
 $mail_from = get_default_from_address();
 ?>
 <div class="send">
+  <br>
+  <fieldset>
+    <legend><?php echo strtoupper(convertLang2Html($html_new_msg)); ?></legend>
+  </fieldset>
   <!-- If 'file_uploads=Off', we must set formtype to "normal" otherwise it won't work -->
   <form id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" method="post" onsubmit="return(validate(this));" action="send.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&action=<?php echo $req_action; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>">
 

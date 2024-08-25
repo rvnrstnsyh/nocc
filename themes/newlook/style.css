@@ -318,6 +318,8 @@ table {
 .submenu ul li.selected a,
 .submenu ul li.selected span {
   font-weight: bold;
+  color: var(--dim-white-color);
+  text-decoration: underline;
 }
 
 .submenu a:link {
@@ -593,6 +595,10 @@ img.sort {
   background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
 }
 
+.send form {
+  margin: -11px 0 0 0;
+}
+
 .send table {
   width: 100%;
   padding: 0px;
@@ -856,6 +862,18 @@ hr.mailAttachSep {
 
 .prefsData {
   text-align: left;
+}
+
+.send fieldset {
+  border: 0;
+  border-top: 1px solid silver;
+}
+
+.send fieldset legend {
+  margin-left: 0; /* Menghapus margin kiri */
+  text-align: left; /* Mengatur teks agar rata kiri */
+  font-weight: bold;
+  font-size: larger;
 }
 
 .navigation {
