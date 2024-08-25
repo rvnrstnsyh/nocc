@@ -30,6 +30,8 @@ if (!isset($conf->loaded))
         <select class="button" name="bottom_mark_mode">
           <option value="read"><?php echo convertLang2Html($html_read); ?></option>
           <option value="unread"><?php echo convertLang2Html($html_unread); ?></option>
+          <option value="flag"><?php echo convertLang2Html($html_flag); ?></option>
+          <option value="unflag"><?php echo convertLang2Html($html_unflag); ?></option>
         </select>
       <?php
       }

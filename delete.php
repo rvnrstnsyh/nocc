@@ -120,18 +120,16 @@ if (isset($_REQUEST['only_one'])) {
                     $pop->delete($i);
                 }
             }
-            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'read') {
-                $pop->mail_mark_read($i);
-            }
-            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'read') {
-                $pop->mail_mark_read($i);
-            }
-            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'unread') {
-                $pop->mail_mark_unread($i);
-            }
-            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'unread') {
-                $pop->mail_mark_unread($i);
-            }
+
+            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'read') $pop->mail_mark_read($i);
+            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'unread') $pop->mail_mark_unread($i);
+            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'flag') $pop->mail_mark_flag($i);
+            if (isset($_REQUEST['set_flag']) && $_REQUEST['mark_mode'] == 'unflag') $pop->mail_mark_unflag($i);
+
+            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'read') $pop->mail_mark_read($i);
+            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'unread') $pop->mail_mark_unread($i);
+            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'flag') $pop->mail_mark_flag($i);
+            if (isset($_REQUEST['bottom_set_flag']) && $_REQUEST['bottom_mark_mode'] == 'unflag') $pop->mail_mark_unflag($i);
         }
     }
     if ($msg_to_forward != '') {

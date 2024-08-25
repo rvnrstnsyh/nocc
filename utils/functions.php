@@ -146,11 +146,11 @@ function inbox(&$pop, $skip = 0)
         $msgnum = $sorted[$i];
         $mail_reader = new NOCC_MailReader($msgnum, $pop, false);
 
-        $newmail = $mail_reader->isUnread();
+        $unread_mail = $mail_reader->isUnread();
         // Check "Status" line with UCB POP Server to see if this is a new message.
         // This is a non-RFC standard line header. Set this in conf.php
         if ($_SESSION['ucb_pop_server']) {
-            $newmail = $mail_reader->isUnreadUcb();
+            $unread_mail = $mail_reader->isUnreadUcb();
         }
 
         $timestamp = $mail_reader->getTimestamp();
@@ -158,7 +158,7 @@ function inbox(&$pop, $skip = 0)
         $time = format_time($timestamp, $lang);
         $msg_list[$i] =  array(
             'index' => $i,
-            'new' => $newmail,
+            'unread' => $unread_mail,
             'number' => $msgnum,
             'attach' => $mail_reader->hasAttachments(),
             'to' => $mail_reader->getToAddress(),
@@ -291,6 +291,7 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         'priority' => $mail_reader->getPriority(),
         'priority_text' => $mail_reader->getPriorityText(),
         'spam' => $mail_reader->isSpam(),
+        'flagged' => $mail_reader->isFlagged(),
         'att' => $link_att,
         'body' => graphicalsmilies($body),
         'body_mime' => convertLang2Html($body_mime),
@@ -433,9 +434,11 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
         $user_prefs = NOCC_Session::getUserPrefs();
         $body = htmlspecialchars($body, ENT_COMPAT | ENT_SUBSTITUTE, $charset);
         $body = NOCC_Body::prepareTextLinks($body);
+
         if ($user_prefs->getColoredQuotes()) {
             $body = NOCC_Body::addColoredQuotes($body);
         }
+
         if ($user_prefs->getDisplayStructuredText()) {
             $body = NOCC_Body::addStructuredText($body);
         }
@@ -451,7 +454,16 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
     $hp_config->set('Attr.DefaultImageAlt', '');
     $hp_config->set(
         'URI.AllowedSchemes',
-        array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true, 'tel' => true, 'cid' => true)
+        array(
+            'http' => true,
+            'https' => true,
+            'mailto' => true,
+            'ftp' => true,
+            'nntp' => true,
+            'news' => true,
+            'tel' => true,
+            'cid' => true
+        )
     );
     $hp_purifier = new HTMLPurifier($hp_config);
     $body = $hp_purifier->purify($body);

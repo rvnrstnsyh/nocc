@@ -1890,6 +1890,70 @@ class nocc_imap
 		}
 	}
 
+	/**
+	 * Mark mail as flagged
+	 * @param integer $msgnum Message number
+	 * @return boolean Successful?
+	 * @todo Rename to flagMail()?
+	 */
+	public function mail_mark_flag($msgnum)
+	{
+		if (!$this->is_horde()) {
+			return imap_setflag_full($this->conn, $msgnum, '\\Flagged');
+		} else {
+			//only works with uids
+			if (isset($_SESSION['horde_sequence2uid'][$msgnum]) && $_SESSION['horde_sequence2uid'][$msgnum] >= 0) {
+				try {
+					$uid = $_SESSION['horde_sequence2uid'][$msgnum];
+					$ids = new Horde_Imap_Client_Ids(array($uid), false);
+					$options = array(
+						"ids" => $ids,
+						"add" => array(Horde_Imap_Client::FLAG_FLAGGED),
+					);
+					$this->conn->store($this->folder, $options);
+				} catch (Horde_Imap_Client_Exception $e) {
+					$log_string = 'NOCC: flagging mail failed';
+					error_log($log_string);
+					if (isset($conf->syslog) && $conf->syslog) {
+						syslog(LOG_INFO, $log_string);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Mark mail as unflagged
+	 * @param integer $msgnum Message number
+	 * @return boolean Successful?
+	 * @todo Rename to unflagMail()?
+	 */
+	public function mail_mark_unflag($msgnum)
+	{
+		if (!$this->is_horde()) {
+			return imap_clearflag_full($this->conn, $msgnum, '\\Flagged');
+		} else {
+			//only works with uids
+			if (isset($_SESSION['horde_sequence2uid'][$msgnum]) && $_SESSION['horde_sequence2uid'][$msgnum] >= 0) {
+				try {
+					$uid = $_SESSION['horde_sequence2uid'][$msgnum];
+					$ids = new Horde_Imap_Client_Ids(array($uid), false);
+					$options = array(
+						"ids" => $ids,
+						"remove" => array(Horde_Imap_Client::FLAG_FLAGGED),
+					);
+					$this->conn->store($this->folder, $options);
+				} catch (Horde_Imap_Client_Exception $e) {
+					$log_string = 'NOCC: unflagging mail failed';
+					error_log($log_string);
+					if (isset($conf->syslog) && $conf->syslog) {
+						syslog(LOG_INFO, $log_string);
+					}
+				}
+			}
+		}
+	}
+
 	public function copytosentfolder($maildata, &$ev, $sent_folder_name)
 	{
 		if (! $this->is_horde()) {

@@ -533,8 +533,14 @@ img.sort {
   background-color: #d6d6d6;
 }
 
-#inboxTable .new {
+#inboxTable .unread {
   font-weight: bold;
+}
+
+#inboxTable .flagged {
+  color: #b91c1c;
+  font-weight: bold;
+  text-decoration: line-through;
 }
 
 #inboxTable .odd {

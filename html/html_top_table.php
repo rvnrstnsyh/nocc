@@ -88,7 +88,7 @@ if ($pop->is_imap()) {
 <div class="messageList">
   <!-- Message list bloc -->
   <form method="post" action="delete.php?<?php echo NOCC_Session::getUrlGetSession(); ?>" id="delete_form">
-    <?php include 'menu_inbox_opts.php'; ?>
+    <?php include 'menu_inbox_top_opts.php'; ?>
     <table id="inboxTable">
       <tr>
         <th class="column0"></th>

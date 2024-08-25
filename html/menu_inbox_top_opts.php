@@ -1,8 +1,5 @@
 <!-- start of $Id: menu_inbox_opts.php 1685 2009-01-10 00:10:33Z gerundt $ -->
-<?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
-?>
+<?php if (!isset($conf->loaded)) die('Hacking attempt'); ?>
 <table>
   <tr>
     <td class="menuOpts left">
@@ -30,6 +27,8 @@ if (!isset($conf->loaded))
         <select class="button" name="mark_mode">
           <option value="read"><?php echo convertLang2Html($html_read); ?></option>
           <option value="unread"><?php echo convertLang2Html($html_unread); ?></option>
+          <option value="flag"><?php echo convertLang2Html($html_flag); ?></option>
+          <option value="unflag"><?php echo convertLang2Html($html_unflag); ?></option>
         </select>
       <?php
       }

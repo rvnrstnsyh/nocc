@@ -4,11 +4,18 @@ if (!isset($conf->loaded)) die('Hacking attempt');
 
 $even_odd_class = ($tmp['index'] % 2) ? 'even' : 'odd';
 
-$new_class = '';
+$unread_class = '';
 if ($_SESSION['ucb_pop_server'] || $pop->is_imap()) {
-  if ($tmp['new'] == true) { //if unread...
-    $new_class = ' new';
+  if ($tmp['unread'] == true) { //if unread...
+    $unread_class = ' unread';
   }
+}
+
+// Merge flagged classes if the item is flagged.
+$row_class = $even_odd_class . $unread_class . $spam_class;
+
+if ($tmp['flagged']) { //if Flagged...
+  $row_class .= ' flagged';
 }
 
 $spam_class = '';
@@ -21,7 +28,7 @@ if (isset($user_prefs->seperate_msg_win) && $user_prefs->seperate_msg_win) {
   $target_blank = ' target="_blank"';
 }
 
-echo '<tr class="' . $even_odd_class . $new_class . $spam_class . '">';
+echo '<tr class="' . $row_class . '">';
 echo '<td class="column0">';
 echo '  <input type="checkbox" name="msg-' . $tmp['number'] . '" value="Y" />';
 echo '</td>';
@@ -51,7 +58,7 @@ foreach ($conf->column_order as $column) { //For all columns...
       echo $tmp['size'] . $html_kb;
       break;
     case '6': //Read/Unread...
-      if ($tmp['new'] == true) { //if unread...
+      if ($tmp['unread'] == true) { //if unread...
         if ($conf->use_icon) {
           echo '<img src="themes/' . $_SESSION['nocc_theme'] . '/img/svg/unread.svg" alt="" />';
         } else {
@@ -80,7 +87,7 @@ foreach ($conf->column_order as $column) { //For all columns...
       break;
     case '10': //Flagged...
       if ($tmp['flagged']) {
-        echo '+F';
+        echo '';
       }
       break;
     case '11': //SPAM...
