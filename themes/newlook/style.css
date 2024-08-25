@@ -423,7 +423,7 @@ div.topNavigation img {
 
 div.messageList {
   padding: 0.5em;
-  background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
+  background: var(--dim-white-color) url(./img/postagestamp02.png) top right no-repeat;
 }
 
 div.messageList table {
