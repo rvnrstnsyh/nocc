@@ -46,6 +46,7 @@ if (count($big_list) > 1) {
 ?>
 
 <div class="prefs">
+  <?php if (isset($_REQUEST['submit_prefs'])) echo '<p class="success-message-bg">' . convertLang2Html($html_prefs_updated) . '</p>'; ?>
   <br>
   <form method="POST" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
     <div>
@@ -197,7 +198,7 @@ if (count($big_list) > 1) {
         </table>
       </fieldset>
       <fieldset>
-        <legend><?php echo strtoupper(convertLang2Html($html_send)); ?></legend>
+        <legend><?php echo strtoupper(convertLang2Html($html_new_msg)); ?></legend>
         <table>
           <?php if (file_exists('ckeditor.php') && $conf->use_ckeditor) { ?>
             <tr>
@@ -373,14 +374,13 @@ if (count($big_list) > 1) {
           </table>
         </div>
       <?php
-      } else {
-        if (isset($_REQUEST['submit_prefs'])) echo '<p class="success-message-bg">' . convertLang2Html($html_prefs_updated) . '</p>';
-      }
-      ?>
-      <p class="sendButtons">
-        <input type="submit" class="button" value="<?php echo convertLang2Html($html_submit) ?>" />
+      } ?>
+      <p class="prefsSubmitButtons">
+        <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_cancel) ?></a>
+        <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+          <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
+        </a>
       </p>
     </div>
   </form>

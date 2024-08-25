@@ -601,8 +601,14 @@ img.sort {
 
 .sendButtons {
   margin: 0;
-  padding: 0.5em;
-  text-align: center;
+  padding: 0.5em 0 0.5em 0;
+  text-align: justify;
+}
+
+.prefsSubmitButtons {
+  margin: 0 10px 0 0;
+  padding: 0.5em 0 0.5em 0;
+  text-align: end;
 }
 
 .sendLabel {
@@ -615,25 +621,25 @@ img.sort {
 }
 
 #attachTable {
-  width: auto;
-  border: 1px solid silver;
+  max-width: 456px;
+  border: 1px solid var(--gray-color);
   border-collapse: collapse;
 }
 
 #attachTable th {
   text-align: left;
-  background-color: silver;
-  border-top: 1px solid silver;
-  border-bottom: 1px solid silver;
+  background-color: var(--gray-color);
+  border-top: 1px solid var(--gray-color);
+  border-bottom: 1px solid var(--gray-color);
 }
 
 #attachTable td {
-  border-top: 1px solid silver;
-  border-bottom: 1px solid silver;
+  border-top: 1px solid var(--gray-color);
+  border-bottom: 1px solid var(--gray-color);
 }
 
 #receipt {
-  margin-left: 2em;
+  margin-left: 8.5em;
 }
 
 /*

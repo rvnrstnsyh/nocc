@@ -48,12 +48,18 @@ $mail_from = get_default_from_address();
     }
     ?>
 
-    <p class="sendButtons">
-      <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_send ?>" />
-      &nbsp;&nbsp;
-      <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_cancel ?>" />
-    </p>
     <table>
+      <?php
+      $isForward = isset($_GET['action']) && $_GET['action'] == 'forward';
+      $hasAttachments = isset($_SESSION['nocc_attach_array']) && count($_SESSION['nocc_attach_array']) > 0;
+
+      if ($isForward || $hasAttachments):
+      ?>
+        <tr>
+          <td class="sendLabel">&nbsp;</td>
+          <td class="sendData"></td>
+        </tr>
+      <?php endif; ?>
       <tr>
         <td class="sendLabel"><label <?php echo $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change ? 'for="mail_from"' : '' ?>><?php echo $html_from_label ?></label></td>
         <td class="sendData">
@@ -105,13 +111,15 @@ $mail_from = get_default_from_address();
       </tr>
       <!-- If 'file_uploads=Off', we mustn't present the ability to do attachments -->
       <?php if (ini_get("file_uploads")) { ?>
-        <tr>
-          <td class="sendLabel"><label for="mail_att"><?php echo $html_att_label ?></label></td>
-          <td class="sendData">
-            <input class="button" type="file" name="mail_att" id="mail_att" size="40" value="" />
-            <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_attach ?>" />
-          </td>
-        </tr>
+        <?php if (isset($_GET['action']) && $_GET['action'] != 'forward') { ?>
+          <tr>
+            <td class="sendLabel"><label for="mail_att"><?php echo $html_att_label ?></label></td>
+            <td class="sendData">
+              <input class="button" type="file" name="mail_att" id="mail_att" size="40" value="" style="max-width:180px" />
+              <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_attach ?>" />
+            </td>
+          </tr>
+        <?php } ?>
       <?php } ?>
       <tr>
         <td class="sendLabel"><label for="priority"><?php echo $html_priority_label ?></label></td>
@@ -135,55 +143,58 @@ $mail_from = get_default_from_address();
           <label for="receipt"><?php echo $html_receipt ?></label>
         </td>
       </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="sendData">
-          <?php
-          if (isset($_SESSION['nocc_attach_array']) && count($_SESSION['nocc_attach_array']) > 0) {
-            $attach_array = $_SESSION['nocc_attach_array'];
-            $attach_array_serialized = base64_encode(serialize($attach_array));
-            echo '<div><input type="hidden" name="nocc_attach_array" value="' . $attach_array_serialized . '" /></div>';
-            echo '<table id="attachTable">';
+      <?php
+      if ($hasAttachments) {
+        echo '<tr>';
+        echo '<td>&nbsp;</td>';
+        echo '<td class="sendData">';
+        $attach_array = $_SESSION['nocc_attach_array'];
+        $attach_array_serialized = base64_encode(serialize($attach_array));
+        echo '<div><input type="hidden" name="nocc_attach_array" value="' . $attach_array_serialized . '" /></div>';
+        echo '<table id="attachTable">';
+        echo '<tr>';
+        echo '<th></th>';
+        echo '<th>' . $html_filename . '</th>';
+        echo '<th>' . $html_size . '</th>';
+        echo '</tr>';
+        $totalsize = 0;
+        for ($i = 0; $i < count($attach_array); $i++) {
+          $totalsize += $attach_array[$i]->getSize();
+          //$att_name = nocc_imap::utf8($attach_array[$i]->getName());
+          $att_name = $attach_array[$i]->getName();
+          echo '<tr>';
+          echo '<td>';
+          echo '<input type="checkbox" name="file-' . $i . '" id="file-' . $i . '" />';
+          echo '</td>';
+          echo '<td><label for="file-' . $i . '">' . htmlentities($att_name, ENT_COMPAT, 'UTF-8') . '</label></td>';
+          echo '<td>' . $attach_array[$i]->getSize() . ' ' . $html_kb . '</td>';
+          echo '</tr>';
+        }
+        echo '<tr>';
+        echo '<th colspan="2">';
+        echo '<input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="' . $html_attach_delete . '" />';
+        echo '</th>';
+        // FIXME: this should be in one message with $totalsize as a parameter
+        echo '<th>' . $totalsize . ' ' . $html_kb . '</th>';
+        echo '</tr>';
+        echo '</table>';
+        echo '</td>';
+        echo '</tr>';
+      } else {
+        if (isset($broken_forwarding) && !($broken_forwarding)) {
+          if ($isForward) {
             echo '<tr>';
-            echo '<th></th>';
-            echo '<th>' . $html_filename . '</th>';
-            echo '<th>' . $html_size . '</th>';
+            echo '<td>&nbsp;</td>';
+            echo '<td style="text-align:start;"><span class="inbox success-message-bg">' . $html_forward_info . '</span></td>';
             echo '</tr>';
-            $totalsize = 0;
-            for ($i = 0; $i < count($attach_array); $i++) {
-              $totalsize += $attach_array[$i]->getSize();
-              //$att_name = nocc_imap::utf8($attach_array[$i]->getName());
-              $att_name = $attach_array[$i]->getName();
-              echo '<tr>';
-              echo '<td>';
-              echo '<input type="checkbox" name="file-' . $i . '" id="file-' . $i . '" />';
-              echo '</td>';
-              echo '<td><label for="file-' . $i . '">' . htmlentities($att_name, ENT_COMPAT, 'UTF-8') . '</label></td>';
-              echo '<td>' . $attach_array[$i]->getSize() . ' ' . $html_kb . '</td>';
-              echo '</tr>';
-            }
-            echo '<tr>';
-            echo '<th colspan="2">';
-            echo '<input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="' . $html_attach_delete . '" />';
-            echo '</th>';
-            // FIXME: this should be in one message with $totalsize as a parameter
-            echo '<th>' . $totalsize . ' ' . $html_kb . '</th>';
-            echo '</tr>';
-            echo '</table>';
           } else {
-            if (isset($broken_forwarding) && !($broken_forwarding)) {
-              if (isset($_GET['action']) && $_GET['action'] == 'forward') {
-                echo '<span class="inbox">' . $html_forward_info . '</span>';
-              } else {
-                echo '&nbsp;';
-              }
-            } else {
-              echo '&nbsp;';
-            }
+            echo '&nbsp;';
           }
-          ?>
-        </td>
-      </tr>
+        } else {
+          echo '&nbsp;';
+        }
+      }
+      ?>
       <?php
       if ($has_images && $display_images != 1 && $html_mail) {
         echo ('<tr><td colspan="2"><div class="nopic">');
@@ -193,52 +204,57 @@ $mail_from = get_default_from_address();
         //echo('<a href="action.php?'.NOCC_Session::getUrlGetSession().'&action='.$action.'&mail='.$content['msgnum'].'&verbose='.$verbose.'&display_images=1">'.$html_images_display.'</a>');
         echo ('</td></tr></div>');
       }
+      echo '<tr>'
       ?>
-      <tr>
-        <td>&nbsp;</td>
-        <td class="sendData">
-          <?php
-          //if (!NOCC_Session::getSendHtmlMail() || !file_exists('ckeditor.php')) {
-          if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
-            // use ckeditor4
-            include 'ckeditor.php';
-            $oCKEditor = new CKEditor();
-            $oCKEditor->basePath = 'ckeditor/';
-            $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
-            $oCKEditor->editor('mail_body', isset($mail_body) ? $mail_body : '');
-          } else if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
-            // use ckeditor5
-            print('<textarea id="mail_body" name="mail_body" cols="59" rows="20">');
-            $ckeditor5_mb = '';
-            if (isset($mail_body)) {
-              //(isset($mail_body) ? htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE) : '');
-              //print( htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE) );
-              //$ckeditor5_mb=htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE);
-              $ckeditor5_mb = $mail_body;
-              $ckeditor5_mb = preg_replace("/<pre style=\"overflow:auto\">/", "<pre data-language=\"Plain text\" spellcheck=\"false\"><code class=\"language-plaintext\">", $ckeditor5_mb);
-              $ckeditor5_mb = preg_replace("/<\/pre>/", "</code></pre>", $ckeditor5_mb);
-              $ckeditor5_mb = str_replace("\r", "\\r", $ckeditor5_mb);
-              $ckeditor5_mb = str_replace("\n", "\\n", $ckeditor5_mb);
-              $ckeditor5_mb = str_replace("'", "\'", $ckeditor5_mb);
-              //$ckeditor5_mb=str_replace("\r","",$ckeditor5_mb);
-              //$ckeditor5_mb=str_replace("\n","<br />",$ckeditor5_mb);
-            }
-            print('</textarea>');
+      <td>&nbsp;</td>
+      <td class="sendData">
+        <?php
+        //if (!NOCC_Session::getSendHtmlMail() || !file_exists('ckeditor.php')) {
+        if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
+          // use ckeditor4
+          include 'ckeditor.php';
+          $oCKEditor = new CKEditor();
+          $oCKEditor->basePath = 'ckeditor/';
+          $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
+          $oCKEditor->editor('mail_body', isset($mail_body) ? $mail_body : '');
+        } else if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
+          // use ckeditor5
+          print('<textarea id="mail_body" name="mail_body" cols="59" rows="20">');
+          $ckeditor5_mb = '';
+          if (isset($mail_body)) {
+            //(isset($mail_body) ? htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE) : '');
+            //print( htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE) );
+            //$ckeditor5_mb=htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE);
+            $ckeditor5_mb = $mail_body;
+            $ckeditor5_mb = preg_replace("/<pre style=\"overflow:auto\">/", "<pre data-language=\"Plain text\" spellcheck=\"false\"><code class=\"language-plaintext\">", $ckeditor5_mb);
+            $ckeditor5_mb = preg_replace("/<\/pre>/", "</code></pre>", $ckeditor5_mb);
+            $ckeditor5_mb = str_replace("\r", "\\r", $ckeditor5_mb);
+            $ckeditor5_mb = str_replace("\n", "\\n", $ckeditor5_mb);
+            $ckeditor5_mb = str_replace("'", "\'", $ckeditor5_mb);
+            //$ckeditor5_mb=str_replace("\r","",$ckeditor5_mb);
+            //$ckeditor5_mb=str_replace("\n","<br />",$ckeditor5_mb);
+          }
+          print('</textarea>');
 
-            include "ckeditor5.php";
-          } else {
-            // simple textarea
-          ?>
-            <textarea name="mail_body" cols="59" rows="20"><?php echo (isset($mail_body) ? htmlspecialchars($mail_body, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?></textarea>
-          <?php } ?>
+          include "ckeditor5.php";
+        } else {
+          // simple textarea
+        ?>
+          <textarea name="mail_body" cols="59" rows="20" placeholder="..."><?php echo (isset($mail_body) ? htmlspecialchars($mail_body, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?></textarea>
+        <?php } ?>
+      </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <p class="sendButtons">
+            <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_send ?>" />
+            &nbsp;&nbsp;
+            <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_cancel ?>" />
+          </p>
         </td>
       </tr>
     </table>
-    <p class="sendButtons">
-      <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_send ?>" />
-      &nbsp;&nbsp;
-      <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_cancel ?>" />
-    </p>
   </form>
 </div>
 
