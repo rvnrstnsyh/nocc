@@ -618,13 +618,13 @@ img.sort {
   text-align: justify;
 }
 
-.prefsSubmitButtons {
+.prefsSubmitButtonsRight {
   margin: 0 10px 0 0;
   padding: 0.5em 0 0.5em 0;
   text-align: end;
 }
 
-.foldersSubmitButtons {
+.prefsSubmitButtonsLeft {
   margin: 0 0 0 10px;
   padding: 0.5em 0 0.5em 0;
   text-align: start;
@@ -876,6 +876,10 @@ hr.mailAttachSep {
 
 .prefsData {
   text-align: left;
+}
+
+.prefs form.managefilterLists {
+  margin: 6px 0 0 10px;
 }
 
 .send fieldset {

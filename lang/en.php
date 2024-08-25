@@ -75,6 +75,7 @@ $html_signature_label = 'Signature:';
 $html_reply_leadin_label = 'Reply Leadin:';
 $html_prefs_updated = 'Preferences updated';
 $html_manage_folders_link = 'Manage IMAP Folders';
+$html_manage_filters = 'Manage Email Filters';
 $html_manage_filters_link = 'Manage Email Filters';
 $html_use_graphical_smilies = 'Use graphical smilies';
 $html_sent_folder_label = 'Copy sent emails into a dedicated folder:';

@@ -375,7 +375,7 @@ if (count($big_list) > 1) {
         </div>
       <?php
       } ?>
-      <p class="prefsSubmitButtons">
+      <p class="prefsSubmitButtonsRight">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;
         <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
