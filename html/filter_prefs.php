@@ -9,7 +9,7 @@
   <?php if ($html_filter_select) { ?>
     <form class="managefilterLists" method="POST" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
       <div>
-        <input type="hidden" name="action" value="managefilters" />
+        <input type="hidden" name="action" value="filters" />
         <input type="hidden" name="do" value="delete" />
         <table>
           <tr>
@@ -30,7 +30,7 @@
 
   <form method="POST" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
     <div>
-      <input type="hidden" name="action" value="managefilters" />
+      <input type="hidden" name="action" value="filters" />
       <input type="hidden" name="do" value="create" />
       <table>
         <tr>

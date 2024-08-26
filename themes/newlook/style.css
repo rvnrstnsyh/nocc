@@ -195,7 +195,7 @@ table {
 
 #header h1 {
   float: left;
-  margin: -7px 0 0 -12px;
+  margin: 1px 0 0 -12px;
   padding: 0;
   width: 250px;
   height: 64px;
@@ -209,7 +209,7 @@ table {
 
 #header h2 {
   float: left;
-  margin: 9px 0 0 0;
+  margin: 17px 0 0 0;
   margin-left: 10px;
   padding: 5px;
 }

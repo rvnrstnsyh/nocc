@@ -14,9 +14,8 @@ if ($_SESSION['ucb_pop_server'] || $pop->is_imap()) {
 // Merge flagged classes if the item is flagged.
 $row_class = $even_odd_class . $unread_class . $spam_class;
 
-if ($tmp['flagged']) { //if Flagged...
-  $row_class .= ' flagged';
-}
+//if Flagged...
+if ($tmp['flagged']) $row_class .= ' flagged';
 
 $spam_class = '';
 if ($tmp['spam'] == true) { //if SPAM...
@@ -24,9 +23,7 @@ if ($tmp['spam'] == true) { //if SPAM...
 }
 
 $target_blank = '';
-if (isset($user_prefs->seperate_msg_win) && $user_prefs->seperate_msg_win) {
-  $target_blank = ' target="_blank"';
-}
+if (isset($user_prefs->seperate_msg_win) && $user_prefs->seperate_msg_win) $target_blank = ' target="_blank"';
 
 echo '<tr class="' . $row_class . '">';
 echo '<td class="column0">';
@@ -39,16 +36,16 @@ foreach ($conf->column_order as $column) { //For all columns...
   echo '">';
   switch ($column) {
     case '1': //From...
-      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=compose&amp;mail_to=' . convertMailData2Html($tmp['from']) . '" title="' . convertMailData2Html($tmp['from']) . '">' . convertMailData2Html(display_address($tmp['from']), 55) . '</a>&nbsp;';
+      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=compose&amp;mail_to=' . convertMailData2Html($tmp['from']) . '" title="' . convertMailData2Html($tmp['from']) . '">' . convertMailData2Html(display_address($tmp['from']), 64) . '</a>&nbsp;';
       break;
     case '2': //To...
-      echo convertMailData2Html(display_address($tmp['to']), 55);
+      echo convertMailData2Html(display_address($tmp['to']), 64);
       break;
     case '3': //Subject...
       echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $tmp['number'] . '&amp;verbose=' . $conf->use_verbose_by_default . '&amp;title=';
       echo $tmp['subject'] ? convertMailData2Html($tmp['subject']) : $html_nosubject;
       echo '"' . $target_blank . '>';
-      echo $tmp['subject'] ? convertMailData2Html($tmp['subject'], 55) : $html_nosubject;
+      echo $tmp['subject'] ? convertMailData2Html($tmp['subject'], 64) : $html_nosubject;
       echo '</a>';
       break;
     case '4': //Date...

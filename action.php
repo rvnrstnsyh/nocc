@@ -378,7 +378,7 @@ switch ($action) {
         //--------------------------------------------------------------------------------
         // Manage filters...
         //--------------------------------------------------------------------------------
-    case 'managefilters':
+    case 'filters':
         $user_key = NOCC_Session::getUserKey();
         $filterset = NOCCUserFilters::read($user_key, $ev);
 
@@ -446,6 +446,7 @@ switch ($action) {
                     break;
             }
         }
+
         $html_filter_select = $filterset->html_filter_select();
         $filter_move_to = $pop->html_folder_select('filter_move_box', '');
 

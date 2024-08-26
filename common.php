@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Stuff that is always checked or run or initialised for every hit
  *
@@ -20,23 +21,24 @@ if (NOCC_DEBUG_LEVEL > 0) {
 }
 
 if (version_compare(phpversion(), '5.4', '<')) {
-	if( ! defined('ENT_SUBSTITUTE') ) {
-		define('ENT_SUBSTITUTE',8);
-	}
+    if (!defined('ENT_SUBSTITUTE')) {
+        define('ENT_SUBSTITUTE', 8);
+    }
 }
 
 // Define variables
-if (!isset($from_rss)) { $from_rss=false; }
+if (!isset($from_rss)) {
+    $from_rss = false;
+}
 
 if (file_exists('./config/conf.php')) {
     require_once './config/conf.php';
-    
+
     // code extraction from conf.php, legacy code support
     if ((file_exists('./utils/config_check.php')) && (!function_exists('get_default_from_address'))) {
-    require_once './utils/config_check.php';
+        require_once './utils/config_check.php';
     }
-}
-else {
+} else {
     //TODO: Make error msg translateble and show nicer error...
     print("The main configuration file (./config/conf.php) couldn't be found! <p />Please rename the file './config/conf.php.dist' to './config/conf.php'. ");
     die();
@@ -65,14 +67,14 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'login') {
     $pwd_to_encrypt = true;
 }
 
-$persistent=0;
-if (isset($_REQUEST['remember']) && $_REQUEST['remember']==true ) {
-	$persistent=1;
+$persistent = 0;
+if (isset($_REQUEST['remember']) && $_REQUEST['remember'] == true) {
+    $persistent = 1;
 }
 
-$session_has_expired=0;
+$session_has_expired = 0;
 if ($from_rss == false) {
-    $session_has_expired=NOCC_Session::start($persistent);
+    $session_has_expired = NOCC_Session::start($persistent);
 }
 
 // Set defaults
@@ -82,9 +84,8 @@ if (isset($_REQUEST['folder'])) {
 if (!isset($_SESSION['nocc_folder'])) {
     $_SESSION['nocc_folder'] = $conf->default_folder;
 }
-if( isset($_POST['folder']) || ! isset($_SESSION['goto_folder']) )
-{ 
-	$_SESSION['goto_folder']=$_SESSION['nocc_folder'];
+if (isset($_POST['folder']) || ! isset($_SESSION['goto_folder'])) {
+    $_SESSION['goto_folder'] = $_SESSION['nocc_folder'];
 }
 
 // Have we changed sort order?
@@ -97,25 +98,25 @@ if (!isset($_SESSION['nocc_sortdir']))
 if (isset($_REQUEST['user']) && !isset($_SESSION['nocc_loggedin'])) {
     unset($_SESSION['nocc_login']);
     $_SESSION['nocc_user'] = NOCC_Request::getStringValue('user');
-	if( ! isset($conf->utf8_decode) || $conf->utf8_decode ) {
-		if( mb_detect_encoding($_SESSION['nocc_user'],'UTF-8',true) == "UTF-8" ) {
-			//deprecated in php8.2
-			//$_SESSION['nocc_user'] = utf8_decode($_SESSION['nocc_user']);
-			$_SESSION['nocc_user'] = iconv('UTF-8', 'ISO-8859-1', $_SESSION['nocc_user']);
-		}
-	}
+    if (! isset($conf->utf8_decode) || $conf->utf8_decode) {
+        if (mb_detect_encoding($_SESSION['nocc_user'], 'UTF-8', true) == "UTF-8") {
+            //deprecated in php8.2
+            //$_SESSION['nocc_user'] = utf8_decode($_SESSION['nocc_user']);
+            $_SESSION['nocc_user'] = iconv('UTF-8', 'ISO-8859-1', $_SESSION['nocc_user']);
+        }
+    }
 }
 
 if (isset($_REQUEST['passwd'])) {
-	$_SESSION['nocc_passwd'] = NOCC_Request::getStringValue('passwd');
-	if( ! isset($conf->utf8_decode) || $conf->utf8_decode ) {
-		if( mb_detect_encoding($_SESSION['nocc_passwd'],'UTF-8',true) == "UTF-8" ) {
-			//deprecated in php8.2
-			//$_SESSION['nocc_passwd'] = utf8_decode($_SESSION['nocc_passwd']);
-			$_SESSION['nocc_passwd'] = iconv('UTF-8', 'ISO-8859-1', $_SESSION['nocc_passwd']);
-		}
-	}
-	$pwd_to_encrypt = true;
+    $_SESSION['nocc_passwd'] = NOCC_Request::getStringValue('passwd');
+    if (! isset($conf->utf8_decode) || $conf->utf8_decode) {
+        if (mb_detect_encoding($_SESSION['nocc_passwd'], 'UTF-8', true) == "UTF-8") {
+            //deprecated in php8.2
+            //$_SESSION['nocc_passwd'] = utf8_decode($_SESSION['nocc_passwd']);
+            $_SESSION['nocc_passwd'] = iconv('UTF-8', 'ISO-8859-1', $_SESSION['nocc_passwd']);
+        }
+    }
+    $pwd_to_encrypt = true;
 }
 
 if ($pwd_to_encrypt == true) {
@@ -136,37 +137,34 @@ $languages = new NOCC_Languages('./lang/', $conf->default_lang);
 
 //TODO: Check $_REQUEST['lang'] also when force_default_lang?
 if (isset($_REQUEST['lang'])) { //if a language is requested...
-    if( $languages->setSelectedLangId($_REQUEST['lang']) || $_REQUEST['lang']=="default" ) { //if the language exists...
+    if ($languages->setSelectedLangId($_REQUEST['lang']) || $_REQUEST['lang'] == "default") { //if the language exists...
         $_SESSION['nocc_lang'] = $languages->getSelectedLangId();
     }
 }
-if( isset($_SESSION['nocc_lang']) && $_SESSION['nocc_lang'] != "default" ) { //if session language already set...
+if (isset($_SESSION['nocc_lang']) && $_SESSION['nocc_lang'] != "default") { //if session language already set...
     $languages->setSelectedLangId($_SESSION['nocc_lang']);
-}
-else { //if session language NOT already set...
+} else { //if session language NOT already set...
     if (!isset($conf->force_default_lang) || !$conf->force_default_lang) { //if NOT force default language...
         $languages->detectFromBrowser();
+    } else {
+        if (isset($conf->default_lang)) {
+            $languages->setSelectedLangId($conf->default_lang);
+        } else {
+            $languages->setSelectedLangId('en');
+        }
     }
-    else {
-	    if( isset($conf->default_lang) ) {
-		   $languages->setSelectedLangId($conf->default_lang);
-	    }
-	    else {
-		   $languages->setSelectedLangId('en');
-	    }
-    }
-    if( ! isset($_SESSION['nocc_lang']) || $_SESSION['nocc_lang'] != "default" ) {
-	    $_SESSION['nocc_lang'] = $languages->getSelectedLangId();
+    if (! isset($_SESSION['nocc_lang']) || $_SESSION['nocc_lang'] != "default") {
+        $_SESSION['nocc_lang'] = $languages->getSelectedLangId();
     }
 }
 $lang = $languages->getSelectedLangId();
 
-require './lang/en.php';
+require './languages/en.php';
 if ($lang != 'en') { //if NOT English...
-	$lang_file='./lang/'.basename($lang).'.php';
-	if( is_file($lang_file) ) {
-		require $lang_file;
-	}
+    $lang_file = './lang/' . basename($lang) . '.php';
+    if (is_file($lang_file)) {
+        require $lang_file;
+    }
 }
 
 //--------------------------------------------------------------------------------
@@ -178,39 +176,39 @@ if ($lang != 'en') { //if NOT English...
 $themes = new NOCC_Themes('./themes/', $conf->default_theme);
 
 //TODO: Check $_REQUEST['theme'] also when NOT use_theme?
-if( isset($_REQUEST['theme']) && isset($conf->use_theme) && $conf->use_theme ) {
-    if( $themes->setSelectedThemeName($_REQUEST['theme']) ) { //if the theme exists...
+if (isset($_REQUEST['theme']) && isset($conf->use_theme) && $conf->use_theme) {
+    if ($themes->setSelectedThemeName($_REQUEST['theme'])) { //if the theme exists...
         $_SESSION['nocc_theme'] = $themes->getSelectedThemeName();
     }
 }
 
-$default_theme_set=false;
-if( !isset($_SESSION['nocc_theme']) ) { //if session theme NOT already set...
-	$_SESSION['nocc_theme'] = $themes->getDefaultThemeName();
-	$default_theme_set=true;
+$default_theme_set = false;
+if (!isset($_SESSION['nocc_theme'])) { //if session theme NOT already set...
+    $_SESSION['nocc_theme'] = $themes->getDefaultThemeName();
+    $default_theme_set = true;
 }
 //--------------------------------------------------------------------------------
 
-if( isset($_SESSION['nocc_passwd']) && $_SESSION['nocc_passwd'] === false ) {
-	$ev = new NoccException($lang_strong_encryption_required.".");
-	require './html/header.php';
-	require './html/error.php';
-	require './html/footer.php';
-	exit;
+if (isset($_SESSION['nocc_passwd']) && $_SESSION['nocc_passwd'] === false) {
+    $ev = new NoccException($lang_strong_encryption_required . ".");
+    require './html/header.php';
+    require './html/error.php';
+    require './html/footer.php';
+    exit;
 }
 
-if( $session_has_expired > 0 ) {
-	$_SESSION['nocc_login']="";
-	if( $session_has_expired == 1 ) {
-		$ev = new NoccException($html_session_expired.".");
-	}
-	if( $session_has_expired == 2 ) {
-		$ev = new NoccException($html_session_expired." ".$html_session_ip_changed.".");
-	}
-	require './html/header.php';
-	require './html/error.php';
-	require './html/footer.php';
-	exit;
+if ($session_has_expired > 0) {
+    $_SESSION['nocc_login'] = "";
+    if ($session_has_expired == 1) {
+        $ev = new NoccException($html_session_expired . ".");
+    }
+    if ($session_has_expired == 2) {
+        $ev = new NoccException($html_session_expired . " " . $html_session_ip_changed . ".");
+    }
+    require './html/header.php';
+    require './html/error.php';
+    require './html/footer.php';
+    exit;
 }
 
 // Start with default smtp server/port, override later
@@ -224,9 +222,11 @@ if (isset($_SESSION['nocc_user']) && !isset($_SESSION['nocc_login']))
     $_SESSION['nocc_login'] = $_SESSION['nocc_user'];
 
 // Check allowed chars for login
-if (isset($_SESSION['nocc_login']) && $_SESSION['nocc_login'] != ''
-        && isset($conf->allowed_char) && $conf->allowed_char != ''
-        && !preg_match("|".$conf->allowed_char."|", $_SESSION['nocc_login'])) {
+if (
+    isset($_SESSION['nocc_login']) && $_SESSION['nocc_login'] != ''
+    && isset($conf->allowed_char) && $conf->allowed_char != ''
+    && !preg_match("|" . $conf->allowed_char . "|", $_SESSION['nocc_login'])
+) {
     $ev = new NoccException($html_wrong);
     require './html/header.php';
     require './html/error.php';
@@ -235,8 +235,8 @@ if (isset($_SESSION['nocc_login']) && $_SESSION['nocc_login'] != ''
 }
 
 // Were we provided with a fillindomain to use?
-if (isset($_REQUEST['fillindomain']) && isset( $conf->typed_domain_login )) {
-    for ($count=0; $count < count($conf->domains); $count++) {
+if (isset($_REQUEST['fillindomain']) && isset($conf->typed_domain_login)) {
+    for ($count = 0; $count < count($conf->domains); $count++) {
         if ($_REQUEST['fillindomain'] == $conf->domains[$count]->domain)
             $_REQUEST['domainnum'] = $count;
     }
@@ -252,9 +252,9 @@ if (isset($_REQUEST['domainnum']) && !(isset($_REQUEST['server']))) {
         require './html/footer.php';
         exit;
     }
-    
+
     $domain = new NOCC_Domain($conf->domains[$domainnum]);
-    
+
     $_SESSION['nocc_domainnum'] = $domainnum;
     $_SESSION['nocc_domain'] = $conf->domains[$domainnum]->domain;
     $_SESSION['nocc_servr'] = $conf->domains[$domainnum]->in;
@@ -268,13 +268,13 @@ if (isset($_REQUEST['domainnum']) && !(isset($_REQUEST['server']))) {
 
     // Check allowed logins
     if (!$domain->isAllowedLogin($_SESSION['nocc_login'])) {
-		//php.log,syslog message to be used against brute force attempts e.g. with fail2ban
-		//don't change text or rules may fail
-		$log_string='NOCC: failed login from rhost='.$_SERVER['REMOTE_ADDR'].' to server='.$_SESSION['nocc_servr'].' as user='.$_SESSION['nocc_login'].'';
-		error_log($log_string);
-		if( isset($conf->syslog) && $conf->syslog ) {
-			syslog(LOG_INFO,$log_string);
-		}
+        //php.log,syslog message to be used against brute force attempts e.g. with fail2ban
+        //don't change text or rules may fail
+        $log_string = 'NOCC: failed login from rhost=' . $_SERVER['REMOTE_ADDR'] . ' to server=' . $_SESSION['nocc_servr'] . ' as user=' . $_SESSION['nocc_login'] . '';
+        error_log($log_string);
+        if (isset($conf->syslog) && $conf->syslog) {
+            syslog(LOG_INFO, $log_string);
+        }
         $ev = new NoccException($html_login_not_allowed);
         require './html/header.php';
         require './html/error.php';
@@ -314,7 +314,7 @@ if (isset($_REQUEST['server'])) {
     $server = NOCC_Request::getStringValue('server');
     $servtype = strtolower($_REQUEST['servtype']);
     $port = NOCC_Request::getStringValue('port');
-    $servr = $server.'/'.$servtype.':'.$port;
+    $servr = $server . '/' . $servtype . ':' . $port;
 
     // Use as default domain for user's address
     $_SESSION['nocc_domain'] = $server;
@@ -324,14 +324,15 @@ if (isset($_REQUEST['server'])) {
 // Cache the user's preferences/filters
 if (isset($_SESSION['nocc_user']) && isset($_SESSION['nocc_domain'])) {
 
-	//is user in auto update list?
-	if( isset($conf->auto_update['user'][0]) ) {
-		if( 	$conf->auto_update['user'][0]=="all" ||
-			in_array($_SESSION['nocc_user'].'@'.$_SESSION['nocc_domain'],$conf->auto_update['user']) 
-		) {
-			$_SESSION['auto_update']=true;
-		}
-	}
+    //is user in auto update list?
+    if (isset($conf->auto_update['user'][0])) {
+        if (
+            $conf->auto_update['user'][0] == "all" ||
+            in_array($_SESSION['nocc_user'] . '@' . $_SESSION['nocc_domain'], $conf->auto_update['user'])
+        ) {
+            $_SESSION['auto_update'] = true;
+        }
+    }
 
     //TODO: Move to NOCC_Session::loadUserPrefs()?
     $ev = null;
@@ -341,30 +342,31 @@ if (isset($_SESSION['nocc_user']) && isset($_SESSION['nocc_domain'])) {
     if (!NOCC_Session::existsUserPrefs()) {
         //TODO: Move to NOCC_Session::loadUserPrefs()?
         NOCC_Session::setUserPrefs(NOCCUserPrefs::read($user_key, $ev));
-        if(NoccException::isException($ev)) {
-            echo "<p>User prefs error ($user_key): ".$ev->getMessage()."</p>";
+        if (NoccException::isException($ev)) {
+            echo "<p>User prefs error ($user_key): " . $ev->getMessage() . "</p>";
             exit(1);
         }
     }
+
     $user_prefs = NOCC_Session::getUserPrefs();
 
     //--------------------------------------------------------------------------------
     // Set and load the user prefs language...
     //--------------------------------------------------------------------------------
-    if( !isset($_SESSION['nocc_lang']) || (isset($_SESSION['nocc_lang']) && $_SESSION['nocc_lang']=='default') ) {
-	    if( isset($user_prefs->lang) && $user_prefs->lang != '' && $user_prefs->lang != 'default' ) {
-	        $userLang = $languages->getSelectedLangId();
-	        if ($languages->setSelectedLangId($user_prefs->lang)) { //if the language exists...
-	            $userLang = $languages->getSelectedLangId();
-	            //if (($userLang != 'en') && ($userLang != $lang)) { //if NOT English AND current language...
-	            if( $userLang != $lang ) { //if NOT current language...
-	                $_SESSION['nocc_lang'] = $languages->getSelectedLangId();
-	                $lang = $languages->getSelectedLangId();
-	                require './lang/'. $lang . '.php';
-	            }
-	        }
-	        unset($userLang);
-	    }
+    if (!isset($_SESSION['nocc_lang']) || (isset($_SESSION['nocc_lang']) && $_SESSION['nocc_lang'] == 'default')) {
+        if (isset($user_prefs->lang) && $user_prefs->lang != '' && $user_prefs->lang != 'default') {
+            $userLang = $languages->getSelectedLangId();
+            if ($languages->setSelectedLangId($user_prefs->lang)) { //if the language exists...
+                $userLang = $languages->getSelectedLangId();
+                //if (($userLang != 'en') && ($userLang != $lang)) { //if NOT English AND current language...
+                if ($userLang != $lang) { //if NOT current language...
+                    $_SESSION['nocc_lang'] = $languages->getSelectedLangId();
+                    $lang = $languages->getSelectedLangId();
+                    require './lang/' . $lang . '.php';
+                }
+            }
+            unset($userLang);
+        }
     }
     unset($languages);
     //--------------------------------------------------------------------------------
@@ -372,14 +374,14 @@ if (isset($_SESSION['nocc_user']) && isset($_SESSION['nocc_domain'])) {
     //--------------------------------------------------------------------------------
     // Set the user prefs theme...
     //--------------------------------------------------------------------------------
-    if( $default_theme_set || !isset($_SESSION['nocc_theme']) || (isset($_SESSION['nocc_theme']) && $_SESSION['nocc_theme']=='default') ) {
-	    if (isset($conf->use_theme) && ($conf->use_theme == true)) { //if allow theme changing...
-	        if( isset($user_prefs->theme) && $user_prefs->theme != '' && $user_prefs->theme != 'default' ) {
- 	           if ($themes->setSelectedThemeName($user_prefs->theme)) { //if the theme exists...
-	                $_SESSION['nocc_theme'] = $themes->getSelectedThemeName();
-	            }
-		}
-	    }
+    if ($default_theme_set || !isset($_SESSION['nocc_theme']) || (isset($_SESSION['nocc_theme']) && $_SESSION['nocc_theme'] == 'default')) {
+        if (isset($conf->use_theme) && ($conf->use_theme == true)) { //if allow theme changing...
+            if (isset($user_prefs->theme) && $user_prefs->theme != '' && $user_prefs->theme != 'default') {
+                if ($themes->setSelectedThemeName($user_prefs->theme)) { //if the theme exists...
+                    $_SESSION['nocc_theme'] = $themes->getSelectedThemeName();
+                }
+            }
+        }
     }
     unset($themes);
     //--------------------------------------------------------------------------------
@@ -389,7 +391,7 @@ if (isset($_SESSION['nocc_user']) && isset($_SESSION['nocc_domain'])) {
         if (!isset($_SESSION['nocc_user_filters'])) {
             $_SESSION['nocc_user_filters'] = NOCCUserFilters::read($user_key, $ev);
             if (NoccException::isException($ev)) {
-                echo "<p>User filters error ($user_key): ".$ev->getMessage()."</p>";
+                echo "<p>User filters error ($user_key): " . $ev->getMessage() . "</p>";
                 exit(1);
             }
         }

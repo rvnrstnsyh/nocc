@@ -1,6 +1,5 @@
 <?php
-if (!isset($conf->loaded))
-	die('Hacking attempt');
+if (!isset($conf->loaded)) die('Hacking attempt');
 
 if (file_exists('./utils/proxy.php'))
 	require_once './utils/proxy.php';
@@ -13,12 +12,11 @@ header("Content-type: text/html; Charset=UTF-8");
 // prefs.php to find it's prefs file.
 $header_display_address = get_default_from_address();
 $theme = new NOCC_Theme($_SESSION['nocc_theme']);
-
 $custom_header = $theme->getCustomHeader();
+
 if (file_exists($custom_header)) {
 	include $custom_header;
-} else {
-?>
+} else { ?>
 	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>">
 
@@ -28,16 +26,16 @@ if (file_exists($custom_header)) {
 		<link href="<?php echo $theme->getStylesheet(); ?>" rel="stylesheet" type="text/css" />
 		<link href="<?php echo $theme->getPrintStylesheet(); ?>" rel="stylesheet" media="print" type="text/css" />
 		<link href="<?php echo $theme->getFavicon(); ?>" rel="shortcut icon" type="image/x-icon" />
-		<script src="js/nocc.js" type="text/javascript"></script>
+		<script src="scripts/index.js" type="text/javascript"></script>
 		<?php
 		// if message is opened in another window, we reload the opener window
 		// (message list), in order to refresh the mail list after a successful 
 		// deletion. It does not works with Safari
 		if (isset($_SESSION['message_deleted']) && $_SESSION['message_deleted'] == "true") {
-			echo ("        <script type=\"text/javascript\">\n");
-			echo ("          if (window.opener != null)\n");
-			echo ("            window.opener.location.href = window.opener.location;\n");
-			echo ("        </script>\n");
+			echo ("<script type=\"text/javascript\">\n");
+			echo ("  if (window.opener != null)\n");
+			echo ("    window.opener.location.href = window.opener.location;\n");
+			echo ("</script>\n");
 			$_SESSION['message_deleted'] = "false";
 		}
 
@@ -67,10 +65,9 @@ if (file_exists($custom_header)) {
 				$rss_url .= '&amp;is_horde=' . base64_encode($_SESSION['is_horde']);
 			}
 		}
-		if (isset($rss_url)) {
-		?>
+		if (isset($rss_url)): ?>
 			<link rel="alternate" type="application/rss+xml" title="RSS - NOCC" href="<?php echo $rss_url ?>" />
-		<?php } ?>
+		<?php endif; ?>
 	</head>
 
 	<body dir="<?php echo convertLang2Html($lang_dir); ?>">
@@ -78,30 +75,34 @@ if (file_exists($custom_header)) {
 			<h1>NVLL</h1>
 			<?php
 			if (isset($_SESSION['nocc_loggedin'])) {
-				if ($header_display_address != '') {
-					echo "<h2>" . htmlspecialchars($header_display_address, ENT_COMPAT | ENT_SUBSTITUTE) . "</h2>\n";
-				}
-				echo "<ul>\n";
-				echo "<li><a href=\"index.php?" . NOCC_Session::get_next_session_name() . "\" target=\"_blank\">" . $html_new_session . "</a></li>";
+				if ($header_display_address != '') echo "<h2>" . htmlspecialchars($header_display_address, ENT_COMPAT | ENT_SUBSTITUTE) . "</h2>\n";
 
-				echo "  <li><a href=\"action.php?" . NOCC_Session::getUrlGetSession() . "&action=setprefs\">" . convertLang2Html($html_preferences) . "</a></li>\n";
+				echo "<ul>\n";
+				echo "<li>[<a href=\"index.php?" . NOCC_Session::get_next_session_name() . "\" target=\"_blank\">" . $html_new_session . "</a>]</li>";
+				echo "  <li>[<a href=\"action.php?" . NOCC_Session::getUrlGetSession() . "&action=setprefs\">" . convertLang2Html($html_preferences) . "</a>]</li>\n";
+
 				if ($conf->enable_logout) {
 					$title = "";
+
 					if (isset($_SESSION['creation_time'])) {
-						$max_session_age = 60 * 60 * 6;  //6 hours
+						$max_session_age = 60 * 60 * 12;  //6 hours
+
 						if (isset($conf->min_session_lifetime)) {
 							$max_session_age = $conf->min_session_lifetime;
 						}
+
 						if (isset($_SESSION['persistent']) && $_SESSION['persistent'] == 1) {
-							$max_session_age = 4 * 7 * 24 * 60 * 60;  //4 weeks
+							$max_session_age = 60 * 60 * 24 * 7 * 4;  //4 weeks
+
 							if (isset($conf->max_session_lifetime)) {
 								$max_session_age = $conf->max_session_lifetime;
 							}
 						}
+
 						$expire_time = $_SESSION['creation_time'] + $max_session_age;
 						$title = convertLang2Html($html_session_expire_time) . ' ' . format_date($expire_time, $lang) . ' ' . format_time($expire_time, $lang);
 					}
-					echo '  <li><span title="' . $title . '"><a href="logout.php?' . NOCC_Session::getUrlGetSession() . '">' . convertLang2Html($html_logout) . '</a></span></li>';
+					echo '  <li>[<span title="' . $title . '"><a href="logout.php?' . NOCC_Session::getUrlGetSession() . '">' . convertLang2Html($html_logout) . '</a></span>]</li>';
 				}
 
 				// echo "<li>";
@@ -116,13 +117,9 @@ if (file_exists($custom_header)) {
 				// 	echo '<span class="new-version" title="' . convertLang2Html($html_version_message3) . ': ' . $v . '"><a href="update.php?' . NOCC_Session::getUrlGetSession() . '">NOCC v' . $conf->nocc_version . '</a></span>';
 				// }
 				// echo "</li>\n";
-
 				echo "</ul>\n";
-			}
-			?>
+			} ?>
 		</div>
 		<div id="main">
-		<?php
-	}
-		?>
+		<?php } ?>
 		<!-- end of $Id: header.php 2981 2021-12-22 08:53:00Z oheil $ -->
