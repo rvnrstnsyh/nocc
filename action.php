@@ -18,6 +18,7 @@
  */
 
 require_once './common.php';
+require_once './utils/captcha.php';
 
 // Remove any attachments from disk and from our session
 clear_attachments();
@@ -560,6 +561,14 @@ switch ($action) {
         //--------------------------------------------------------------------------------
     default:
         if ($action == 'login') {
+            if ($conf->use_captcha && !verify_captcha($_REQUEST['challenge'], $_REQUEST['captcha'])) {
+                $ev = new NoccException('Invalid Captcha');
+                require './html/header.php';
+                require './html/error.php';
+                require './html/footer.php';
+                break;
+            }
+
             // Subscribe to INBOX, usefull if it's not already done.
             if ($pop->is_imap()) {
                 $pop->subscribe($_SESSION['nocc_folder'], false);

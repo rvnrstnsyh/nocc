@@ -309,6 +309,31 @@ $conf->domains[$i]->use_icon = false;
 //$conf->domains[$i]->from_part = '';
 //$conf->domains[$i]->allow_rss = false;
 
+$conf->database_hostname = 'localhost';
+$conf->database_user = 'root';
+$conf->database_password = '';
+$conf->database_name = 'nvll';
+$conf->database_version = 1;
+$conf->database_persistent = true;
+
+// -- Create the database
+// CREATE DATABASE IF NOT EXISTS nvll;
+
+// -- Use the created database
+// USE nvll;
+
+// -- Create the captcha table
+// CREATE TABLE IF NOT EXISTS captchas (
+//     id INT UNSIGNED NOT NULL,
+//     time INT UNSIGNED NOT NULL,
+//     code VARCHAR(5) NOT NULL,
+//     PRIMARY KEY (id),
+//     INDEX idx_captcha_time (time)
+// );
+$conf->use_captcha = true;
+$conf->captcha_difficulty = 2; // 1 - 3 default is 2.
+$conf->captcha_characters = '0123456789ABCDEF';
+
 // $conf->utf8_decode = true;
 //  if you have login problems because of special or language specific characters
 //  you may try to set this to false.
@@ -372,7 +397,7 @@ $conf->min_session_lifetime = 60 * 60 * 12;   // = 12 hours (default)
 //  if "remember me" on login screen IS checked the session expires
 //    - after this time in seconds or
 //    - user clicks on logoff
-$conf->max_session_lifetime = 60 * 60 * 24 * 7 * 1;   // = 1 weeks (default)
+$conf->max_session_lifetime = 60 * 60 * 24 * 7 * 4;   // = 4 weeks (default)
 
 // close session if client IP has changed
 //  if the clients IP changes during a valid session the server
@@ -416,7 +441,7 @@ $conf->syslog = false;
 // Allow more memory than default setting in order to handle correctly
 // large mails attachments. Try to find correct setting (about 2.5x total
 // attachment size)
-$conf->memory_limit = "20M";
+$conf->memory_limit = "25M";
 
 // Use Horde/Imap_Client Library instead of PHP's imap (c-client) extension.
 // https://dev.horde.org/imap_client/
@@ -529,7 +554,6 @@ $conf->use_theme = false;
 //   this is an experimental feature
 $conf->use_ckeditor = false;
 $conf->ckeditor5 = false;
-
 $conf->use_graphical_smilies = false;
 
 // Allow RSS feeds globally if set to true, default is false
@@ -544,7 +568,7 @@ $conf->allow_rss = true;
 // This message is added to every message, the user cannot delete it
 // Be careful if you modify this, do not forget to write '\r\n' to switch
 // to the next line !
-$conf->ad = "___________________________________\r\nRETRMail, https://nvll.me";
+$conf->ad = "___________________________________\r\nNVLL, https://nvll.me";
 
 // Use old-style forwarding (quote original message, and attach original
 // attachments).
@@ -605,7 +629,7 @@ $conf->contact_ldap_options['port'] = '';
 $conf->contact_ldap_options['alphanum'] = true;
 
 // LDAP DN (Distinguished Name)
-$conf->contact_ldap_options['dn'] = 'dc=nocc, dc=sourceforge, dc=net';
+$conf->contact_ldap_options['dn'] = 'dc=mail, dc=nvll, dc=me';
 
 // LDAP search filter
 $conf->contact_ldap_options['filter'] = '(|(uid=%s))';
@@ -624,7 +648,7 @@ $conf->contact_ldap_options['search_options'] = array('uid' => 'Nickname', 'cn' 
 $conf->contact_ldap_options['search_sortby'] = 'uid';
 
 // LDAP 'group contacts' title
-$conf->contact_ldap_options['group_title'] = 'NOCC';
+$conf->contact_ldap_options['group_title'] = 'NVLL';
 
 // LDAP mail suffix for contacts, if needed, otherwise it will take the default domain
 $conf->contact_ldap_options['suffix'] = '';

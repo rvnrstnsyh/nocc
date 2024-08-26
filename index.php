@@ -20,6 +20,7 @@
 //window.
 
 require_once './common.php';
+require_once './utils/captcha.php';
 
 if (isset($_REQUEST['_nvkey']) && $_REQUEST['_nvkey'] == "RSS") {
   header("Location: " . $conf->base_url);
@@ -57,8 +58,7 @@ require './html/header.php';
         <th><label for="user"><?php echo $html_user_label; ?></label></th>
         <td>
           <input class="button" type="text" name="user" id="user" size="25" placeholder="e.g. chernobyl, chernobyl@nvll.me" value="<?php if (isset($REMOTE_USER)) echo $REMOTE_USER; ?>" />
-          <?php
-          if (count($conf->domains) > 1) {
+          <?php if (count($conf->domains) > 1) {
             //Add fill-in domain
             if (isset($conf->typed_domain_login))
               echo '<label for="fillindomain">@</label> <input class="button" type="text" name="fillindomain" id="fillindomain">';
@@ -98,8 +98,7 @@ require './html/header.php';
           <input class="button" type="password" name="passwd" id="passwd" size="25" />
         </td>
       </tr>
-      <?php
-      if ($conf->domains[0]->in == '') {
+      <?php if ($conf->domains[0]->in == '') {
         echo '<tr>';
         echo '<th><label for="server">' . $html_server_label . '</label></th>';
         echo '<td>';
@@ -117,14 +116,12 @@ require './html/header.php';
         echo '</td>';
         echo '</tr>';
       }
-      if ($conf->hide_lang_select_from_login_page == false) {
-      ?>
+      if ($conf->hide_lang_select_from_login_page == false) { ?>
         <tr>
           <th><label for="lang"><?php echo $html_lang_label ?></label></th>
           <td>
             <select class="button" name="lang" id="lang" onchange="updateLoginPage('<?php echo NOCC_Session::getUrlGetSession(); ?>')">
               <?php
-
               echo '<option value="default"';
               if (! isset($_REQUEST['lang']) || $_REQUEST['lang'] == "default") {
                 echo ' selected="selected"';
@@ -143,11 +140,9 @@ require './html/header.php';
             </select>
           </td>
         </tr>
-      <?php
-      }
+      <?php }
 
-      if ($conf->use_theme == true && $conf->hide_theme_select_from_login_page == false) {
-      ?>
+      if ($conf->use_theme == true && $conf->hide_theme_select_from_login_page == false) { ?>
         <tr>
           <th><label for="theme"><?php echo $html_theme_label ?></label></th>
           <td>
@@ -172,11 +167,9 @@ require './html/header.php';
             </select>
           </td>
         </tr>
-      <?php
-      }
+      <?php }
 
-      if (isset($conf->prefs_dir) && $conf->prefs_dir != '') {
-      ?>
+      if (isset($conf->prefs_dir) && $conf->prefs_dir != '') { ?>
         <tr>
           <th></th>
           <td class="remember">
@@ -185,9 +178,14 @@ require './html/header.php';
           </td>
         </tr>
 
-        <?php
-        if (isset($_SESSION['send_backup'])) {
-        ?>
+        <?php if ($conf->use_captcha): ?>
+          <tr>
+            <td><?php echo send_captcha(); ?></td>
+          </tr>
+        <?php endif; ?>
+
+
+        <?php if (isset($_SESSION['send_backup'])): ?>
           <tr>
             <td colspan="2">
               <br />
@@ -199,18 +197,17 @@ require './html/header.php';
               <br />
             </td>
           </tr>
-        <?php
-        }
-        ?>
-
+        <?php endif; ?>
       <?php } ?>
     </table>
     <p><input name="enter" class="button" type="submit" value="<?php echo $html_login ?>" /></p>
   </div>
 </form>
+
 <script type="text/javascript">
   document.getElementById("nocc_webmail_login").user.focus();
   document.getElementById("nocc_webmail_login").passwd.value = '';
 </script>
 <?php
+
 require './html/footer.php';
