@@ -215,14 +215,13 @@ $conf->loaded = true;
 //  See global setting $conf->allow_rss
 //
 
-
 $i = 0;
 
 $conf->domains[$i] = new stdClass();
-$conf->domains[$i]->show_as = '';
-$conf->domains[$i]->domain = '';
-$conf->domains[$i]->in = '';
-$conf->domains[$i]->smtp = '';
+$conf->domains[$i]->show_as = 'localhost';
+$conf->domains[$i]->domain = 'localhost';
+$conf->domains[$i]->in = 'localhost:143';
+$conf->domains[$i]->smtp = 'localhost';
 $conf->domains[$i]->smtp_port = 25;
 $conf->domains[$i]->login_with_domain = false;
 $conf->domains[$i]->login_with_domain_character = '@';
@@ -231,7 +230,7 @@ $conf->domains[$i]->login_suffix = '';
 $conf->domains[$i]->login_aliases = array();
 $conf->domains[$i]->login_allowed = array();
 $conf->domains[$i]->smtp_auth_method = '';
-$conf->domains[$i]->imap_namespace = 'INBOX.';
+$conf->domains[$i]->imap_namespace = '';
 $conf->domains[$i]->have_ucb_pop_server = false;
 $conf->domains[$i]->quota_enable = false;
 $conf->domains[$i]->quota_type = 'STORAGE';
@@ -244,9 +243,10 @@ $conf->domains[$i]->smtp_user = '';
 $conf->domains[$i]->smtp_password = '';
 $conf->domains[$i]->smtp_user_without_domain = false;
 $conf->domains[$i]->horde_imap_client = false;
-$conf->domains[$i]->allow_address_change = true;
+$conf->domains[$i]->allow_address_change = false;
 $conf->domains[$i]->from_part = '';
-$conf->domains[$i]->allow_rss = false;
+$conf->domains[$i]->allow_rss = true;
+$conf->domains[$i]->use_icon = false;
 
 // If you want to add more domains, uncomment the following
 // lines and fill them in
@@ -326,11 +326,11 @@ $conf->utf8_decode = true;
 //  9 = Priority Number
 // 10 = Flagged
 // 11 = SPAM
-$conf->column_order = array('6', '1', '7', '2', '3', '4', '5');
+$conf->column_order = array('10', '9', '7', '11',  '6', '1', '3', '4', '5');
 
 // Master key for session password encryption. Longer is better.
 // It must not be left empty.
-$conf->master_key = '';
+$conf->master_key = 'Lxzne&=EW)6MR^_{pw,X5kH;QZP[(+hT';
 
 // Preferences, sessions and contacts data directory
 // IMPORTANT: This directory must exist and be writable by the user
@@ -366,13 +366,13 @@ $conf->tmpdir = '';
 //    - user clicks on logoff or
 //    - user closes the browser
 //    - the max_session_lifetime is reached
-$conf->min_session_lifetime = 60 * 60 * 6;   // = 6 hours (default)
+$conf->min_session_lifetime = 60 * 60 * 12;   // = 12 hours (default)
 
 // maximum session lifetime in seconds
 //  if "remember me" on login screen IS checked the session expires
 //    - after this time in seconds or
 //    - user clicks on logoff
-$conf->max_session_lifetime = 60 * 60 * 24 * 7 * 4;   // = 4 weeks (default)
+$conf->max_session_lifetime = 60 * 60 * 24 * 7 * 1;   // = 1 weeks (default)
 
 // close session if client IP has changed
 //  if the clients IP changes during a valid session the server
@@ -383,7 +383,7 @@ $conf->check_client_ip = true;
 // time in seconds to check the inbox for new or changed number of messages
 //  don't poll too frequently, the mail server may block
 //  set to 0 to switch off
-$conf->check_inbox_timer = 600;
+$conf->check_inbox_timer = 120;
 
 // ###
 // ### Optional parameters ###
@@ -399,7 +399,7 @@ $conf->check_inbox_timer = 600;
 // Error reporting
 // Display all errors (including IMAP connection errors, such as
 // 'host not found' or 'invalid login')
-$conf->debug_level = E_ALL & ~E_NOTICE;
+$conf->debug_level = E_ALL & ~E_NOTICE; // Set to 0 to disable.
 
 // PHP error reporting for this application
 error_reporting($conf->debug_level);
@@ -407,10 +407,11 @@ error_reporting($conf->debug_level);
 // write messages to syslog (e.g. for fail2ban analysis)
 $conf->syslog = false;
 
-if (version_compare(PHP_VERSION, '5.3.0', '<')) { //if older as PHP 5.3.0...
-  // Prevent mangling of uploaded attachments
-  set_magic_quotes_runtime(0);
-}
+//if older as PHP 5.3.0...
+// if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+//   // Prevent mangling of uploaded attachments
+//   set_magic_quotes_runtime(0);
+// }
 
 // Allow more memory than default setting in order to handle correctly
 // large mails attachments. Try to find correct setting (about 2.5x total
@@ -433,7 +434,7 @@ $conf->horde_imap_client = false;
 // Base URL where NOCC is hosted (only needed for Xitami servers, see #463390)
 // (NOTE: should end in a slash). Leave blank to detect it automagically.
 //$conf->base_url = 'http://www.yoursite.com/webmail/';
-$conf->base_url = '';
+$conf->base_url = 'http://localhost/retrmail/';
 
 // Select the CRLF to use.
 // According to rfc-822 CRLF is "\r\n"
@@ -445,7 +446,7 @@ $conf->crlf = "\r\n";
 // If a domain has no smtp server, this one will be used
 // If no smtp server is provided, Nocc will default to the mail() function,
 // and try to use Sendmail or any other MTA (Postfix)
-$conf->default_smtp_server = '';
+$conf->default_smtp_server = 'localhost';
 $conf->default_smtp_port = 25;
 
 //Uncomment this to allow secure typed domain logins
@@ -481,6 +482,7 @@ $conf->default_folder = 'INBOX';
 // if browser has no preferred language, we use the default language
 // This is only needed for browsers that don't send any preferred
 // language such as W3 Amaya
+$conf->use_language = false;
 $conf->default_lang = 'en';
 
 // By default the messages are sorted by date 
@@ -491,7 +493,7 @@ $conf->default_sort = '4';
 $conf->default_sortdir = '1';
 
 // Default theme
-$conf->default_theme = 'standard';
+$conf->default_theme = 'newlook';
 
 // If you don't want to display images (GIF, JPEG and PNG) sent as attachements
 // set it to 'false'
@@ -504,10 +506,10 @@ $conf->display_text_attach = false;
 $conf->force_default_lang = false;
 
 // hide the language selection from the login page
-$conf->hide_lang_select_from_login_page = false;
+$conf->hide_lang_select_from_login_page = true;
 
 // hide the theme selection from the login page
-$conf->hide_theme_select_from_login_page = false;
+$conf->hide_theme_select_from_login_page = true;
 
 // How many messages to display in the inbox (devel only)
 $conf->max_msg_num = 1;
@@ -520,17 +522,20 @@ $conf->msg_per_page = '25';
 // set $conf->use_theme to false and fill in the $conf->default_theme to 
 // the theme name you want to use
 // Theme handling: allows users to choose a theme on the login page
-$conf->use_theme = true;
+$conf->use_theme = false;
 
 // Use ckeditor5 for composing html mail if set to true
 // otherwise use ckeditor4
 //   this is an experimental feature
+$conf->use_ckeditor = false;
 $conf->ckeditor5 = false;
+
+$conf->use_graphical_smilies = false;
 
 // Allow RSS feeds globally if set to true, default is false
 //  if set to false, it overwrites an optional domain specific setting
 //  if set to true, an optional domain specific setting overwrites this global setting
-$conf->allow_rss = false;
+$conf->allow_rss = true;
 
 // ##
 // ## Message management options
@@ -539,7 +544,7 @@ $conf->allow_rss = false;
 // This message is added to every message, the user cannot delete it
 // Be careful if you modify this, do not forget to write '\r\n' to switch
 // to the next line !
-$conf->ad = "___________________________________\r\nNOCC, https://nocc.sourceforge.net";
+$conf->ad = "___________________________________\r\nRETRMail, https://nvll.me";
 
 // Use old-style forwarding (quote original message, and attach original
 // attachments).
@@ -557,13 +562,16 @@ $conf->send_delay = 30;
 // ##
 
 // Is the user allowed to change his "From:" address? (true/false)
-$conf->allow_address_change = true;
+$conf->allow_address_change = false;
 
 // the user can change their 'reply leadin' string
 $conf->enable_reply_leadin = false;
 
 // let user see the header of a message
 $conf->use_verbose = true;
+
+// let users see message headers by default
+$conf->use_verbose_by_default = true;
 
 // Number of contacts per user, 0 to disable contacts list
 $conf->contact_number_max = 10;
