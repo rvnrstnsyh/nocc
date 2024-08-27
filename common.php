@@ -82,7 +82,7 @@ if (isset($_REQUEST['folder'])) {
     $_SESSION['nocc_folder'] = $_REQUEST['folder'];
 }
 if (!isset($_SESSION['nocc_folder'])) {
-    $_SESSION['nocc_folder'] = $conf->default_folder;
+    $_SESSION['nocc_folder'] = $conf->default_inbox_folder;
 }
 if (isset($_POST['folder']) || ! isset($_SESSION['goto_folder'])) {
     $_SESSION['goto_folder'] = $_SESSION['nocc_folder'];
@@ -133,7 +133,7 @@ if (isset($_REQUEST['sortdir']))
 //--------------------------------------------------------------------------------
 // Set and load the language...
 //--------------------------------------------------------------------------------
-$languages = new NOCC_Languages('./lang/', $conf->default_lang);
+$languages = new NOCC_Languages('./languages/', $conf->default_lang);
 
 //TODO: Check $_REQUEST['lang'] also when force_default_lang?
 if (isset($_REQUEST['lang'])) { //if a language is requested...
@@ -157,11 +157,12 @@ if (isset($_SESSION['nocc_lang']) && $_SESSION['nocc_lang'] != "default") { //if
         $_SESSION['nocc_lang'] = $languages->getSelectedLangId();
     }
 }
+
 $lang = $languages->getSelectedLangId();
 
 require './languages/en.php';
 if ($lang != 'en') { //if NOT English...
-    $lang_file = './lang/' . basename($lang) . '.php';
+    $lang_file = './languages/' . basename($lang) . '.php';
     if (is_file($lang_file)) {
         require $lang_file;
     }
@@ -362,7 +363,7 @@ if (isset($_SESSION['nocc_user']) && isset($_SESSION['nocc_domain'])) {
                 if ($userLang != $lang) { //if NOT current language...
                     $_SESSION['nocc_lang'] = $languages->getSelectedLangId();
                     $lang = $languages->getSelectedLangId();
-                    require './lang/' . $lang . '.php';
+                    require './languages/' . $lang . '.php';
                 }
             }
             unset($userLang);

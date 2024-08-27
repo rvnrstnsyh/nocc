@@ -365,8 +365,7 @@ switch ($action) {
 
         require './html/header.php';
         require './html/menu_inbox.php';
-        if ($pop->is_imap())
-            require './html/folders.php';
+        if ($pop->is_imap()) require './html/folders.php';
         require './html/menu_inbox.php';
         require './html/script.php';
         require './html/footer.php';
@@ -570,8 +569,21 @@ switch ($action) {
                 break;
             }
 
-            // Subscribe to INBOX, usefull if it's not already done.
-            if ($pop->is_imap()) {
+            // Subscribe to INBOX, Sent and Trash. This is useful if it's not already done.
+            if ($pop->is_imap() && $conf->use_default_folders) {
+                $folders_to_check = array($conf->default_inbox_folder, $conf->default_sent_folder, $conf->default_trash_folder);
+                $existing_folders = $pop->getsubscribednames();
+
+                foreach ($folders_to_check as $folder) {
+                    if (!in_array($folder, $existing_folders)) {
+                        if ($pop->createmailbox($folder)) {
+                            $pop->subscribe($folder, true);
+                        } else {
+                            error_log("NOCC: Error creating folder '$folder': " . $pop->last_error());
+                        }
+                    }
+                }
+            } else {
                 $pop->subscribe($_SESSION['nocc_folder'], false);
             }
         }
@@ -589,7 +601,7 @@ switch ($action) {
                             $ev = null;
                         }
 
-                        $small_search = 'unseen ';
+                        $small_search = 'unread ';
                         if (NOCC_Request::getBoolValue('reapply_filters')) {
                             $small_search = '';
                         }
@@ -689,6 +701,7 @@ switch ($action) {
                 require './html/html_inbox.php';
             }
         }
+
         $list_of_folders = '';
 
         // If we show it twice, the bottom folder select is sent, and might be
@@ -700,7 +713,6 @@ switch ($action) {
                 try {
                     // gather list of folders for menu_inbox_status
                     $subscribed = $pop->getsubscribed();
-
                     $_SESSION['subscribed'] = $subscribed;
                 } catch (Exception $ex) {
                     //TODO: Show error without NoccException!
@@ -711,7 +723,6 @@ switch ($action) {
                     break;
                 }
             }
-
             $list_of_folders = set_list_of_folders($pop, $subscribed);
         }
 
@@ -1054,14 +1065,14 @@ function set_list_of_folders($pop, $subscribed)
     foreach ($subscribed as $folder) {
         $folder_name = substr(strstr($folder->name, '}'), 1);
         $status = $pop->status($folder->name);
-        $unseen = 0;
-        if (isset($status['unseen']) && $status['unseen'] > 0) {
-            $unseen = $status['unseen'];
+        $unread = 0;
+        if (isset($status['unread']) && $status['unread'] > 0) {
+            $unread = $status['unread'];
         }
-        if ($unseen > 0) {
+        if ($unread > 0) {
             if (!in_array($folder_name, $new_folders)) {
                 $list_of_folders .= ' <a href="action.php?' . NOCC_Session::getUrlGetSession() . '&amp;folder=' . $folder_name
-                    . '">' . $folder_name . " ($unseen)" . '</a>';
+                    . '">' . $folder_name . " ($unread)" . '</a>';
                 $_SESSION['list_of_folders'] = $list_of_folders;
                 array_push($new_folders, $folder_name);
             }

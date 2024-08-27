@@ -1,7 +1,6 @@
 <!-- start of $Id: prefs.php 3016 2022-08-25 11:00:42Z oheil $ -->
 <?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
+if (!isset($conf->loaded)) die('Hacking attempt');
 
 $big_list = $pop->getmailboxesnames();
 
@@ -80,7 +79,7 @@ if (count($big_list) > 1) {
             <tr>
               <td class="prefsLabel"><label><?php echo convertLang2Html($html_email_address_label) ?></label></td>
               <td class="prefsData">
-                <?php if (preg_match('/<(.+?)>/', get_default_from_address(), $matches)) echo htmlspecialchars($matches[1], ENT_COMPAT | ENT_SUBSTITUTE); ?>
+                <?php echo htmlspecialchars($user_prefs->key, ENT_COMPAT | ENT_SUBSTITUTE); ?>
               </td>
             </tr>
           <?php } ?>

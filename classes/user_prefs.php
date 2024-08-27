@@ -174,10 +174,12 @@ class NOCCUserPrefs
      */
     function __construct($key)
     {
+        global $conf;
+
         $this->key = preg_replace("/(\\\|\/)/", "_", $key);
         $this->key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
         $this->_fullName = '';
-        $this->_emailAddress = '';
+        $this->_emailAddress = $this->key;
         $this->_bccSelf = false;
         $this->_hideAddresses = false;
         $this->_showAlert = true;
@@ -189,12 +191,12 @@ class NOCCUserPrefs
         $this->_useSignatureSeparator = false;
         $this->_sendHtmlMail = false;
         $this->_useGraphicalSmilies = false;
-        $this->_useSentFolder = false;
-        $this->_sentFolderName = '';
-        $this->_useTrashFolder = false;
-        $this->_trashFolderName = '';
-        $this->_useInboxFolder = true;
-        $this->_inboxFolderName = 'INBOX';
+        $this->_useSentFolder = $conf->use_default_folders;
+        $this->_sentFolderName = $conf->default_sent_folder;
+        $this->_useTrashFolder = $conf->use_default_folders;
+        $this->_trashFolderName = $conf->default_trash_folder;
+        $this->_useInboxFolder = $conf->use_default_folders;
+        $this->_inboxFolderName = $conf->default_inbox_folder;
         $this->_collect = 0;
         $this->dirty_flag = 1;
     }

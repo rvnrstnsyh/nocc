@@ -502,7 +502,10 @@ $conf->vhost_domain_login = false;
 // ##
 
 // Default folder to go first
-$conf->default_folder = 'INBOX';
+$conf->use_default_folders = true;
+$conf->default_inbox_folder = 'INBOX';
+$conf->default_sent_folder = 'Sent';
+$conf->default_trash_folder = 'Trash';
 
 // if browser has no preferred language, we use the default language
 // This is only needed for browsers that don't send any preferred
