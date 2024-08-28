@@ -1,40 +1,37 @@
 <?php
+
 /**
  * Class for wrapping a $conf->domains entry
  *
  * Copyright 2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_domain.php 2459 2011-06-03 10:43:40Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 /**
  * Wrapping a $conf->domains entry
- *
- * @package    NOCC
  */
-class NOCC_Domain {
-    
+class NVLL_Domain
+{
+
     /**
      * $conf->domains entry
      * @var stdClass
      */
     private $entry;
-    
+
     /**
      * Initialize the wrapper
      * @param stdClass $entry $conf->domains entry
      */
-    public function __construct($entry) {
+    public function __construct($entry)
+    {
         if ($entry instanceof stdClass) {
             $this->entry = $entry;
-        }
-        else {
+        } else {
             $this->entry = new stdClass();
         }
     }
@@ -43,30 +40,33 @@ class NOCC_Domain {
      * ...
      * @return bool Has allowed logins?
      */
-    public function hasAllowedLogins() {
+    public function hasAllowedLogins()
+    {
         if (isset($this->entry->login_allowed) && !empty($this->entry->login_allowed)) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * ...
      * @return bool Has allowed logins array?
      */
-    private function hasAllowedLoginsArray() {
+    private function hasAllowedLoginsArray()
+    {
         if ($this->hasAllowedLogins() && is_array($this->entry->login_allowed)) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * ...
      * @param string $login Login
      * @return bool Is allowed login?
      */
-    private function isLoginFromAllowedArray($login) {
+    private function isLoginFromAllowedArray($login)
+    {
         if ($this->hasAllowedLoginsArray()) {
             return array_key_exists($login, $this->entry->login_allowed);
         }
@@ -77,19 +77,21 @@ class NOCC_Domain {
      * ...
      * @return bool Has allowed logins file?
      */
-    private function hasAllowedLoginsFile() {
+    private function hasAllowedLoginsFile()
+    {
         if ($this->hasAllowedLogins() && is_string($this->entry->login_allowed)) {
             return file_exists(substr($this->entry->login_allowed, 1));
         }
         return false;
     }
-    
+
     /**
      * ...
      * @param string $login Login
      * @return bool Is allowed login?
      */
-    private function isLoginFromAllowedFile($login) {
+    private function isLoginFromAllowedFile($login)
+    {
         if ($this->hasAllowedLoginsFile()) {
             include substr($this->entry->login_allowed, 1);
 
@@ -105,11 +107,11 @@ class NOCC_Domain {
      * @param string $login Login
      * @return bool Is allowed login?
      */
-    public function isAllowedLogin($login) {
+    public function isAllowedLogin($login)
+    {
         if ($this->hasAllowedLoginsArray()) {
             return $this->isLoginFromAllowedArray($login);
-        }
-        elseif ($this->hasAllowedLoginsFile()) {
+        } elseif ($this->hasAllowedLoginsFile()) {
             return $this->isLoginFromAllowedFile($login);
         }
         return true;
@@ -119,7 +121,8 @@ class NOCC_Domain {
      * ...
      * @return bool Has login aliases?
      */
-    public function hasLoginAliases() {
+    public function hasLoginAliases()
+    {
         if (isset($this->entry->login_aliases) && !empty($this->entry->login_aliases)) {
             return true;
         }
@@ -130,23 +133,25 @@ class NOCC_Domain {
      * ...
      * @return bool Has login aliases array?
      */
-    private function hasLoginAliasesArray() {
+    private function hasLoginAliasesArray()
+    {
         if ($this->hasLoginAliases() && is_array($this->entry->login_aliases)) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * ...
      * @param string $login Alias login
      * @return string Real login
      */
-    private function replaceLoginFromAliasesArray($login) {
+    private function replaceLoginFromAliasesArray($login)
+    {
         if ($this->hasLoginAliasesArray()) {
             $aliasLogins = array_keys($this->entry->login_aliases);
             $realLogins = array_values($this->entry->login_aliases);
-            
+
             return str_replace($aliasLogins, $realLogins, $login);
         }
         return $login;
@@ -156,19 +161,21 @@ class NOCC_Domain {
      * ...
      * @return bool Has login aliases file?
      */
-    private function hasLoginAliasesFile() {
+    private function hasLoginAliasesFile()
+    {
         if ($this->hasLoginAliases() && is_string($this->entry->login_aliases)) {
             return file_exists(substr($this->entry->login_aliases, 1));
         }
         return false;
     }
-    
+
     /**
      * ...
      * @param string $login Alias login
      * @return string Real login
      */
-    private function replaceLoginFromAliasesFile($login) {
+    private function replaceLoginFromAliasesFile($login)
+    {
         if ($this->hasLoginAliasesFile()) {
             include substr($this->entry->login_aliases, 1);
 
@@ -187,11 +194,11 @@ class NOCC_Domain {
      * @param string $login Alias login
      * @return string Real login
      */
-    public function replaceLoginAlias($login) {
+    public function replaceLoginAlias($login)
+    {
         if ($this->hasLoginAliasesArray()) {
             return $this->replaceLoginFromAliasesArray($login);
-        }
-        elseif ($this->hasLoginAliasesFile()) {
+        } elseif ($this->hasLoginAliasesFile()) {
             return $this->replaceLoginFromAliasesFile($login);
         }
         return $login;
@@ -201,97 +208,106 @@ class NOCC_Domain {
      * ...
      * @return bool Login with domain?
      */
-    public function useLoginWithDomain() {
+    public function useLoginWithDomain()
+    {
         if (isset($this->entry->login_with_domain) && $this->entry->login_with_domain == true) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * ...
      * @return bool Has login with domain character?
      */
-    public function hasLoginWithDomainCharacter() {
+    public function hasLoginWithDomainCharacter()
+    {
         if (isset($this->entry->login_with_domain_character) && !empty($this->entry->login_with_domain_character)) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * ...
      * @return string Login with domain character
      */
-    public function getLoginWithDomainCharacter() {
+    public function getLoginWithDomainCharacter()
+    {
         if ($this->hasLoginWithDomainCharacter() && is_string($this->entry->login_with_domain_character)) {
             return $this->entry->login_with_domain_character;
         }
         return '@';
     }
-    
+
     /**
      * ...
      * @return bool Has login prefix?
      */
-    public function hasLoginPrefix() {
+    public function hasLoginPrefix()
+    {
         if (isset($this->entry->login_prefix) && !empty($this->entry->login_prefix)) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * ...
      * @return string Login prefix
      */
-    public function getLoginPrefix() {
+    public function getLoginPrefix()
+    {
         if ($this->hasLoginPrefix() && is_string($this->entry->login_prefix)) {
             return $this->entry->login_prefix;
         }
         return '';
     }
-    
+
     /**
      * ...
      * @param string $login Login
      * @return string Login with prefix
      */
-    public function addLoginPrefix($login) {
+    public function addLoginPrefix($login)
+    {
         return $this->getLoginPrefix() . $login;
     }
-    
+
     /**
      * ...
      * @return bool Has login suffix?
      */
-    public function hasLoginSuffix() {
+    public function hasLoginSuffix()
+    {
         if (isset($this->entry->login_suffix) && !empty($this->entry->login_suffix)) {
             return true;
         }
         return false;
     }
-    
+
     /**
      * ...
      * @return string Login suffix
      */
-    public function getLoginSuffix() {
+    public function getLoginSuffix()
+    {
         if ($this->hasLoginSuffix() && is_string($this->entry->login_suffix)) {
             return $this->entry->login_suffix;
         }
         return '';
     }
-    
+
     /**
      * ...
      * @param string $login Login
      * @return string Login with suffix
      */
-    public function addLoginSuffix($login) {
+    public function addLoginSuffix($login)
+    {
         return $login . $this->getLoginSuffix();
     }
-    
+
     /*
     domain = 'sourceforge.net';
     in = 'mail.sourceforge.net:110/pop3';
@@ -310,4 +326,3 @@ class NOCC_Domain {
     quota_type = 'STORAGE';
     */
 }
-?>
