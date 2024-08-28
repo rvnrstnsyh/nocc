@@ -1,54 +1,50 @@
 <?php
+
 /**
- * Test cases for NOCC_Languages.
+ * Test cases for NVLL_Languages.
  *
  * Copyright 2009-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @subpackage Tests
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: NOCC_LanguagesTest.php 2373 2011-01-04 15:06:58Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'PHPUnit/Framework.php';
-
-require_once dirname(__FILE__).'/../../classes/nocc_languages.php';
+require_once dirname(__FILE__) . '/../../classes/NVLL_Languages.php';
 
 /**
- * Test class for NOCC_Languages.
+ * Test class for NVLL_Languages.
  */
-class NOCC_LanguagesTest extends PHPUnit_Framework_TestCase {
+class NVLL_LanguagesTest extends PHPUnit\Framework\TestCase
+{
     /**
      * @var string
      */
     protected $rootPath;
 
     /**
-     * @var NOCC_Languages
+     * @var NVLL_Languages
      */
     protected $languages1;
 
     /**
-     * @var NOCC_Languages
+     * @var NVLL_Languages
      */
     protected $languages2;
 
     /**
-     * @var NOCC_Languages
+     * @var NVLL_Languages
      */
     protected $languages3;
 
     /**
-     * @var NOCC_Languages
+     * @var NVLL_Languages
      */
     protected $languages4;
 
     /**
-     * @var NOCC_Languages
+     * @var NVLL_Languages
      */
     protected $languages5;
 
@@ -56,34 +52,46 @@ class NOCC_LanguagesTest extends PHPUnit_Framework_TestCase {
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp() {
-        $this->rootPath = dirname(__FILE__) . '/../';
+    protected function setUp(): void
+    {
+        $this->rootPath = dirname(__FILE__) . '/../../';
 
-        $this->languages1 = new NOCC_Languages('');
-        $this->languages2 = new NOCC_Languages($this->rootPath . './lang', 'de');
-        $this->languages3 = new NOCC_Languages($this->rootPath . './lang/', 'DE');
-        $this->languages4 = new NOCC_Languages(array('bug'));
-        $this->languages5 = new NOCC_Languages($this->rootPath . './lang/', array('bug'));
+        $this->languages1 = new NVLL_Languages('');
+        $this->languages2 = new NVLL_Languages($this->rootPath . './languages', 'de', ['de']);
+        $this->languages3 = new NVLL_Languages($this->rootPath . './languages/', 'DE', ['de', 'en', 'fr']);
+        $this->languages4 = new NVLL_Languages(array('bug'));
+        $this->languages5 = new NVLL_Languages($this->rootPath . './languages/', array('bug'));
+
+        // Add this line to create a test language file
+        file_put_contents($this->rootPath . './languages/se.php', '<?php return array();');
+    }
+
+    protected function tearDown(): void
+    {
+        // Remove the test language file
+        @unlink($this->rootPath . './languages/se.php');
     }
 
     /**
      * Test case for count().
      */
-    public function testCount() {
+    public function testCount()
+    {
         $this->assertEquals(0, $this->languages1->count());
-        $this->assertEquals(3, $this->languages2->count(), './lang, de');
-        $this->assertEquals(3, $this->languages3->count(), './lang/, DE');
+        $this->assertEquals(2, $this->languages2->count(), './languages, de');
+        $this->assertEquals(4, $this->languages3->count(), './languages/, DE');
         $this->assertEquals(0, $this->languages4->count(), 'array(bug)');
-        $this->assertEquals(3, $this->languages5->count(), './lang/, array(bug)');
+        $this->assertEquals(68, $this->languages5->count(), './languages/, array(bug)');
     }
 
     /**
      * Test case for exists().
      */
-    public function testExists() {
-        $languages = new NOCC_Languages($this->rootPath . './lang');
+    public function testExists()
+    {
+        $languages = new NVLL_Languages($this->rootPath . './languages');
 
-        $this->assertFalse(@$languages->exists(), 'exists()');
+        $this->assertFalse(@$languages->exists(''), 'exists()');
         $this->assertFalse($languages->exists(array('bug')), 'exists(array("bug"))');
         $this->assertFalse($languages->exists(''), 'exists("")');
         $this->assertFalse($languages->exists('notexists'), 'exists("notexists")');
@@ -94,31 +102,32 @@ class NOCC_LanguagesTest extends PHPUnit_Framework_TestCase {
     /**
      * @todo Implement testDetectFromBrowser().
      */
-    public function testDetectFromBrowser() {
+    public function testDetectFromBrowser()
+    {
         // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->markTestIncomplete('This test has not been implemented yet.');
     }
 
     /**
      * Test case for getDefaultLangId().
      */
-    public function testGetDefaultLangId() {
+    public function testGetDefaultLangId()
+    {
         $this->assertEquals('en', $this->languages1->getDefaultLangId());
-        $this->assertEquals('de', $this->languages2->getDefaultLangId(), './lang, de');
-        $this->assertEquals('de', $this->languages3->getDefaultLangId(), './lang/, DE');
+        $this->assertEquals('de', $this->languages2->getDefaultLangId(), './languages, de');
+        $this->assertEquals('de', $this->languages3->getDefaultLangId(), './languages/, DE');
         $this->assertEquals('en', $this->languages4->getDefaultLangId(), 'array(bug)');
-        $this->assertEquals('en', $this->languages5->getDefaultLangId(), './lang/, array(bug)');
+        $this->assertEquals('en', $this->languages5->getDefaultLangId(), './languages/, array(bug)');
     }
 
     /**
      * Test case for setDefaultLangId().
      */
-    public function testSetDefaultLangId() {
-        $languages = new NOCC_Languages($this->rootPath . './lang');
+    public function testSetDefaultLangId()
+    {
+        $languages = new NVLL_Languages($this->rootPath . './languages');
 
-        $this->assertFalse(@$languages->setDefaultLangId(), 'setDefaultLangId()');
+        $this->assertFalse(@$languages->setDefaultLangId(''), 'setDefaultLangId()');
         $this->assertEquals('en', $languages->getDefaultLangId(), 'getDefaultLangId()');
         $this->assertFalse($languages->setDefaultLangId(array('bug')), 'setDefaultLangId(array("bug"))');
         $this->assertEquals('en', $languages->getDefaultLangId(), 'getDefaultLangId()');
@@ -139,21 +148,23 @@ class NOCC_LanguagesTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getSelectedLangId().
      */
-    public function testGetSelectedLangId() {
+    public function testGetSelectedLangId()
+    {
         $this->assertEquals('en', $this->languages1->getSelectedLangId());
-        $this->assertEquals('de', $this->languages2->getSelectedLangId(), './lang, de');
-        $this->assertEquals('de', $this->languages3->getSelectedLangId(), './lang/, DE');
+        $this->assertEquals('de', $this->languages2->getSelectedLangId(), './languages, de');
+        $this->assertEquals('de', $this->languages3->getSelectedLangId(), './languages/, DE');
         $this->assertEquals('en', $this->languages4->getSelectedLangId(), 'array(bug)');
-        $this->assertEquals('en', $this->languages5->getSelectedLangId(), './lang/, array(bug)');
+        $this->assertEquals('en', $this->languages5->getSelectedLangId(), './languages/, array(bug)');
     }
 
     /**
      * Test case for setSelectedLangId().
      */
-    public function testSetSelectedLangId() {
-        $languages = new NOCC_Languages($this->rootPath . './lang');
+    public function testSetSelectedLangId()
+    {
+        $languages = new NVLL_Languages($this->rootPath . './languages');
 
-        $this->assertFalse(@$languages->setSelectedLangId(), 'setSelectedLangId()');
+        $this->assertFalse(@$languages->setSelectedLangId(''), 'setSelectedLangId()');
         $this->assertEquals('en', $languages->getSelectedLangId(), 'getSelectedLangId()');
         $this->assertFalse($languages->setSelectedLangId(array('bug')), 'setSelectedLangId(array("bug"))');
         $this->assertEquals('en', $languages->getSelectedLangId(), 'getSelectedLangId()');
@@ -174,18 +185,18 @@ class NOCC_LanguagesTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for parseAcceptLanguageHeader().
      */
-    public function testParseAcceptLanguageHeader() {
-        $this->assertEquals(0, count(@NOCC_Languages::parseAcceptLanguageHeader()), 'parseHttpAcceptLanguage()');
-        $this->assertEquals(0, count(NOCC_Languages::parseAcceptLanguageHeader(array('bug'))), 'parseHttpAcceptLanguage(array("bug"))');
-        $this->assertEquals(0, count(NOCC_Languages::parseAcceptLanguageHeader('')), 'parseHttpAcceptLanguage("")');
-        $this->assertEquals(1, count(NOCC_Languages::parseAcceptLanguageHeader('de')), 'parseHttpAcceptLanguage("de")');
-        $this->assertEquals(1, count(NOCC_Languages::parseAcceptLanguageHeader('de-de')), 'parseHttpAcceptLanguage("de-de")');
-        $this->assertEquals(2, count(NOCC_Languages::parseAcceptLanguageHeader('de,de-de')), 'parseHttpAcceptLanguage("de,de-de")');
-        $this->assertEquals(1, count(NOCC_Languages::parseAcceptLanguageHeader('de-de;q=0.5')), 'parseHttpAcceptLanguage("de-de;q=0.5")');
-        $this->assertEquals(4, count(NOCC_Languages::parseAcceptLanguageHeader('de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')), 'parseHttpAcceptLanguage("de-de,de;q=0.8,en-us;q=0.5,en;q=0.3")');
-        $this->assertEquals(1, count(NOCC_Languages::parseAcceptLanguageHeader('De-De ; Q = 0.5')), 'parseHttpAcceptLanguage("de-de;q=0.5")');
-        $this->assertEquals(4, count(NOCC_Languages::parseAcceptLanguageHeader('   de-de , de; q=0.8, en-us;q=0.5, en;q=0.3')), 'parseHttpAcceptLanguage("   de-de , de; q=0.8, en-us;q=0.5, en;q=0.3")');
-        $this->assertEquals(0, count(NOCC_Languages::parseAcceptLanguageHeader(',,,;;;')), 'parseHttpAcceptLanguage(",,,;;;")');
+    public function testParseAcceptLanguageHeader()
+    {
+        $this->assertEquals(0, count(@NVLL_Languages::parseAcceptLanguageHeader('')), 'parseHttpAcceptLanguage()');
+        $this->assertEquals(0, count(NVLL_Languages::parseAcceptLanguageHeader(array('bug'))), 'parseHttpAcceptLanguage(array("bug"))');
+        $this->assertEquals(0, count(NVLL_Languages::parseAcceptLanguageHeader('')), 'parseHttpAcceptLanguage("")');
+        $this->assertEquals(1, count(NVLL_Languages::parseAcceptLanguageHeader('de')), 'parseHttpAcceptLanguage("de")');
+        $this->assertEquals(1, count(NVLL_Languages::parseAcceptLanguageHeader('de-de')), 'parseHttpAcceptLanguage("de-de")');
+        $this->assertEquals(2, count(NVLL_Languages::parseAcceptLanguageHeader('de,de-de')), 'parseHttpAcceptLanguage("de,de-de")');
+        $this->assertEquals(1, count(NVLL_Languages::parseAcceptLanguageHeader('de-de;q=0.5')), 'parseHttpAcceptLanguage("de-de;q=0.5")');
+        $this->assertEquals(4, count(NVLL_Languages::parseAcceptLanguageHeader('de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')), 'parseHttpAcceptLanguage("de-de,de;q=0.8,en-us;q=0.5,en;q=0.3")');
+        $this->assertEquals(1, count(NVLL_Languages::parseAcceptLanguageHeader('De-De ; Q = 0.5')), 'parseHttpAcceptLanguage("de-de;q=0.5")');
+        $this->assertEquals(4, count(NVLL_Languages::parseAcceptLanguageHeader('   de-de , de; q=0.8, en-us;q=0.5, en;q=0.3')), 'parseHttpAcceptLanguage("   de-de , de; q=0.8, en-us;q=0.5, en;q=0.3")');
+        $this->assertEquals(0, count(NVLL_Languages::parseAcceptLanguageHeader(',,,;;;')), 'parseHttpAcceptLanguage(",,,;;;")');
     }
 }
-?>
