@@ -1,5 +1,9 @@
 /*
  * This file overwrites the default config from CKEditor.
+ * 
+ * This file is part of NVLL. NVLL is free software under the terms of the
+ * GNU General Public License. You should have received a copy of the license
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 CKEDITOR.editorConfig = function( config )

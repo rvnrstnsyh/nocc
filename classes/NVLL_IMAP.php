@@ -5,13 +5,7 @@
  *
  * Moved all imap_* PHP calls into one, which should make it easier to write
  * our own IMAP/POP3 classes in the future.
- *
- * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
- * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
- * Copyright 2002 Mike Rylander <mrylander@mail.com>
- * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
- * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
- *
+ * 
  * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
@@ -21,10 +15,11 @@ require_once 'NVLL_MailStructure.php';
 require_once 'NVLL_HeaderInfo.php';
 require_once 'NVLL_Header.php';
 require_once 'NVLL_Exception.php';
+
 require_once './utils/detect_cyr_charset.php';
 require_once './utils/crypt.php';
 
-require_once 'Horde_Autoloader.php';
+require_once 'Horde_AutoLoader.php';
 
 class result
 {

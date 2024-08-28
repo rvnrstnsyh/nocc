@@ -2,16 +2,13 @@
 
 /**
  * Class for wrapping the $_SESSION array
- *
- * Copyright 2009-2011 Tim Gerundt <tim@gerundt.de>
- * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
- *
+ * 
  * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'horde_autoloader.php';
+require_once 'Horde_AutoLoader.php';
 require_once 'NVLL_UserPrefs.php';
 
 /**
@@ -102,7 +99,7 @@ class NVLL_Session
 				$found_session = true;
 			} else {
 				NVLL_Session::destroy();
-				if (preg_match("/^NVLL_/", $_nvkey)) {
+				if (preg_match("/^IM_/", $_nvkey)) {
 					$session_has_expired = 1;
 				}
 			}
@@ -123,7 +120,7 @@ class NVLL_Session
 			}
 		} else {
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
-				if (preg_match("/^NVLL_/", $cookie_key)) {
+				if (preg_match("/^IM_/", $cookie_key)) {
 					$_nvkey = $cookie_key;
 					session_name($_nvkey);
 					session_set_cookie_params($cookie_lifetime, '/', '', false);
@@ -225,7 +222,7 @@ class NVLL_Session
 		}
 		if (! isset($conf->prune_sessions) || ! $conf->prune_sessions == 0) {
 			if (!empty($conf->prefs_dir)) {
-				$old_session_files = glob($conf->prefs_dir . '/' . "NVLL_*");
+				$old_session_files = glob($conf->prefs_dir . '/' . "IM_*");
 				if (is_array($old_session_files) && count($old_session_files) > 0) {
 					foreach ($old_session_files as $filename) {
 						$last_mod = filemtime($filename);
@@ -261,7 +258,7 @@ class NVLL_Session
 			}
 		}
 		if (!empty($conf->tmpdir)) {
-			$old_session_files = glob($conf->tmpdir . '/' . "NVLL_*");
+			$old_session_files = glob($conf->tmpdir . '/' . "IM_*");
 			if (is_array($old_session_files) && count($old_session_files) > 0) {
 				foreach ($old_session_files as $filename) {
 					$last_mod = filemtime($filename);
@@ -296,7 +293,7 @@ class NVLL_Session
 		$set_next = false;
 		$next_name = "";
 		foreach ($_COOKIE as $cookie_key => $cookie_value) {
-			if (preg_match("/^NVLL_/", $cookie_key)) {
+			if (preg_match("/^IM_/", $cookie_key)) {
 				if ($set_next) {
 					$next_name = $cookie_key;
 					break;
@@ -321,7 +318,7 @@ class NVLL_Session
 	{
 		$old_nvkey = session_name();
 		if (preg_match("/^NVLL_/", $old_nvkey)) {
-			$_nvkey = 'NVLL_' . md5(uniqid(rand(), true));
+			$_nvkey = 'IM_' . md5(uniqid(rand(), true));
 			//session_name($_nvkey);
 			session_regenerate_id(true);
 			$_nvvalue = session_id();

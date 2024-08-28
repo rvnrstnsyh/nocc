@@ -2,8 +2,8 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
-$arrow = ($_SESSION['nocc_sortdir'] == 0) ? 'up' : 'down';
-$new_sortdir = ($_SESSION['nocc_sortdir'] == 0) ? 1 : 0;
+$arrow = ($_SESSION['nvll_sortdir'] == 0) ? 'up' : 'down';
+$new_sortdir = ($_SESSION['nvll_sortdir'] == 0) ? 1 : 0;
 $skip = (isset($_REQUEST['skip'])) ? $_REQUEST['skip'] : '0';
 
 $pages = $pop->get_page_count($num_msg);
@@ -16,15 +16,15 @@ $reapply_filters = '';
 
 if ($pop->is_imap()) {
   if ($pop->get_folder_count() > 1) {
-    $folder_line = "<form method=\"post\" action=\"action.php?" . NOCC_Session::getUrlGetSession() . "\"><div><label for=\"folder\">$html_other_folders:</label>  \n";
-    //$folder_line .= $pop->html_folder_select('folder', $_SESSION['nocc_folder']);
+    $folder_line = "<form method=\"post\" action=\"action.php?" . NVLL_Session::getUrlGetSession() . "\"><div><label for=\"folder\">$html_other_folders:</label>  \n";
+    //$folder_line .= $pop->html_folder_select('folder', $_SESSION['nvll_folder']);
     $folder_line .= $pop->html_folder_select('folder', $_SESSION['goto_folder']);
     $folder_line .= "<input type=\"submit\" class=\"button\" name=\"submit\" value=\"$html_gotofolder\" />";
     $folder_line .= "</div></form>";
   }
 
-  if ($_SESSION['nocc_folder'] == 'INBOX') {
-    $reapply_filters = '<form method="post" action="action.php?' . NOCC_Session::getUrlGetSession() . '">
+  if ($_SESSION['nvll_folder'] == 'INBOX') {
+    $reapply_filters = '<form method="post" action="action.php?' . NVLL_Session::getUrlGetSession() . '">
       <input type="hidden" name="reapply_filters" value="1">
       <input class="button" type="submit" value="' . $html_reapply_filters . '">
     </form>';
@@ -40,15 +40,15 @@ if ($pop->is_imap()) {
         <?php } ?>
 
         <?php if ($pop->is_imap()) { ?>
-          <span class="currentInbox"><?php buildfolderlink($_SESSION['nocc_folder']); ?></span>
+          <span class="currentInbox"><?php buildfolderlink($_SESSION['nvll_folder']); ?></span>
         <?php } else { ?>
           <span class="currentInbox"><?php echo $html_inbox; ?></span>
         <?php } ?>
 
         <?php
-        if (NOCC_Session::getQuotaEnable() == true) {
+        if (NVLL_Session::getQuotaEnable() == true) {
           //TODO: Move quota to a other place? Separate more from message number!
-          $quotausage = new NOCC_QuotaUsage($_SESSION['quota']);
+          $quotausage = new NVLL_QuotaUsage($_SESSION['quota']);
           if ($quotausage->isSupported()) { //if quota usage is supported...
             if ($_SESSION['quota_type'] == 'STORAGE') {
               echo '<span class="currentQuota">' . $quotausage->getFormattedStorageUsage() . '</span><span class="maxQuota"> / ' . $quotausage->getFormattedStorageLimit() . '</span>';
@@ -87,7 +87,7 @@ if ($pop->is_imap()) {
 <?php } ?>
 <div class="messageList">
   <!-- Message list bloc -->
-  <form method="post" action="delete.php?<?php echo NOCC_Session::getUrlGetSession(); ?>" id="delete_form">
+  <form method="post" action="delete.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" id="delete_form">
     <?php include 'menu_inbox_top_opts.php'; ?>
     <table id="inboxTable">
       <tr>
@@ -131,14 +131,14 @@ if ($pop->is_imap()) {
               break;
           }
           echo '<th class="column' . $column;
-          if ($_SESSION['nocc_sort'] == $column) echo ' sorted';
+          if ($_SESSION['nvll_sort'] == $column) echo ' sorted';
           echo '">';
           if ($column_title != '') { //If we have a column title...
-            echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">' . $column_title . '</a>';
-            if ($_SESSION['nocc_sort'] == $column) {
+            echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">' . $column_title . '</a>';
+            if ($_SESSION['nvll_sort'] == $column) {
               echo '&nbsp;';
-              echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">';
-              echo '  <img src="themes/' . $_SESSION['nocc_theme'] . '/img/' . $arrow . '.png" class="sort" alt="' . $html_sort . '" title="' . $html_sort_by . ' ' . $column_title . '" />';
+              echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">';
+              echo '  <img src="themes/' . $_SESSION['nvll_theme'] . '/img/' . $arrow . '.png" class="sort" alt="' . $html_sort . '" title="' . $html_sort_by . ' ' . $column_title . '" />';
               echo '</a>';
             }
           } else { //If we NOT have a column title...

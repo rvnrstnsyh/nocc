@@ -2,18 +2,10 @@
 
 /**
  * Login
- *
- * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
- * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
- * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
- *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * 
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: index.php 3016 2022-08-25 11:00:42Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 //If a previous authentification cookie was set, we use it to bypass login
@@ -28,7 +20,7 @@ if (isset($_REQUEST['_nvkey']) && $_REQUEST['_nvkey'] == "RSS") {
 }
 
 if (isset($_SESSION['restart_session']) && $_SESSION['restart_session'] == true) {
-  header("Location: " . $conf->base_url . "action.php?" . NOCC_Session::getUrlGetSession());
+  header("Location: " . $conf->base_url . "action.php?" . NVLL_Session::getUrlGetSession());
   exit();
 }
 
@@ -36,9 +28,9 @@ require_once './utils/check.php';
 require './html/header.php';
 
 ?>
-<form action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>" method="POST" id="nocc_webmail_login" accept-charset="UTF-8">
+<form action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" method="POST" id="nvll_webmail_login" accept-charset="UTF-8">
   <div id="loginBox">
-    <h2><?php echo i18n_message($html_welcome, $conf->nocc_name); ?></h2>
+    <h2><?php echo i18n_message($html_welcome, $conf->nvll_name); ?></h2>
     <input type="hidden" name="folder" value="INBOX" />
     <input type="hidden" name="action" value="login" />
     <table>
@@ -74,11 +66,11 @@ require './html/header.php';
               $i = 0;
               while (!empty($conf->domains[$i]->in)) {
                 if (isset($conf->domains[$i]->show_as) && strlen($conf->domains[$i]->show_as) > 0) {
-                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nocc_domainnum'] == $i) {
+                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domains'] == $i) {
                     echo "<option value=\"$i\">" . $conf->domains[$i]->show_as . '</option>';
                   }
                 } else {
-                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nocc_domainnum'] == $i) {
+                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domains'] == $i) {
                     echo "<option value=\"$i\">" . $conf->domains[$i]->domain . '</option>';
                   }
                 }
@@ -120,7 +112,7 @@ require './html/header.php';
         <tr>
           <th><label for="lang"><?php echo $html_lang_label ?></label></th>
           <td>
-            <select class="button" name="lang" id="lang" onchange="updateLoginPage('<?php echo NOCC_Session::getUrlGetSession(); ?>')">
+            <select class="button" name="lang" id="lang" onchange="updateLoginPage('<?php echo NVLL_Session::getUrlGetSession(); ?>')">
               <?php
               echo '<option value="default"';
               if (! isset($_REQUEST['lang']) || $_REQUEST['lang'] == "default") {
@@ -130,7 +122,7 @@ require './html/header.php';
               foreach ($lang_array as $_lang_key => $_lang_var) {
                 if (file_exists('lang/' . $_lang_var->filename . '.php')) {
                   echo '<option value="' . $_lang_var->filename . '"';
-                  if (isset($_REQUEST['lang']) && $_REQUEST['lang'] != "default" && $_SESSION['nocc_lang'] == $_lang_var->filename) {
+                  if (isset($_REQUEST['lang']) && $_REQUEST['lang'] != "default" && $_SESSION['nvll_lang'] == $_lang_var->filename) {
                     echo ' selected="selected"';
                   }
                   echo '>' . convertLang2Html($_lang_var->label) . '</option>';
@@ -146,17 +138,17 @@ require './html/header.php';
         <tr>
           <th><label for="theme"><?php echo $html_theme_label ?></label></th>
           <td>
-            <select class="button" name="theme" id="theme" onchange="updateLoginPage('<?php echo NOCC_Session::getUrlGetSession(); ?>')">
+            <select class="button" name="theme" id="theme" onchange="updateLoginPage('<?php echo NVLL_Session::getUrlGetSession(); ?>')">
               <?php
               echo '<option value="default"';
               if (! isset($_REQUEST['lang']) || $_REQUEST['lang'] == "default") {
                 echo ' selected="selected"';
               }
               echo '>' . convertLang2Html($html_default) . '</option>';
-              $themes = new NOCC_Themes('./themes/', $_SESSION['nocc_theme']);
+              $themes = new NVLL_Themes('./themes/', $_SESSION['nvll_theme']);
               foreach ($themes->getThemeNames() as $themeName) { //for all theme names...
                 echo '<option value="' . $themeName . '"';
-                if (isset($_REQUEST['theme']) && $_REQUEST['theme'] != "default" && $themeName == $_SESSION['nocc_theme']) {
+                if (isset($_REQUEST['theme']) && $_REQUEST['theme'] != "default" && $themeName == $_SESSION['nvll_theme']) {
                   echo ' selected="selected"';
                 }
                 echo '>' . $themeName . '</option>';
@@ -191,7 +183,7 @@ require './html/header.php';
               <br />
               <?php echo "<span style=\"color:red\">" . $html_send_recover . "</span>"; ?>
               <br />
-              <a href="index.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&discard=1">
+              <a href="index.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&discard=1">
                 <?php echo $html_send_discard; ?>
               </a>
               <br />
@@ -205,8 +197,8 @@ require './html/header.php';
 </form>
 
 <script type="text/javascript">
-  document.getElementById("nocc_webmail_login").user.focus();
-  document.getElementById("nocc_webmail_login").passwd.value = '';
+  document.getElementById("nvll_webmail_login").user.focus();
+  document.getElementById("nvll_webmail_login").passwd.value = '';
 </script>
 <?php
 

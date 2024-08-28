@@ -1,24 +1,14 @@
 <?php
 
 /**
- * Main configuration for NOCC
- *
- * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
- * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
- * Copyright 2002 Mike Rylander <mrylander@mail.com>
- * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
- *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * Main configuration for NVLL
+ * 
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @subpackage Configuration
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: conf.php.dist 3098 2023-09-09 16:45:42Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-// ################### This is the main configuration for NOCC ########## //
+// ################### This is the main configuration for NVLL ########## //
 
 // ###
 // ### Required parameters
@@ -89,7 +79,7 @@ $conf->loaded = true;
 // style logins and without setting domain into conf.php file is to
 // set 'login_with_domain' to true, 'login_with_domain_character' to ''
 // and 'domains[$i]->domain' to ''. Then, user and domain will be automatically
-// set. This setting is ideal when NOCC webmail serves many domains and if you
+// set. This setting is ideal when NVLL webmail serves many domains and if you
 // don't want to set each domain into this file.
 //
 //
@@ -166,7 +156,7 @@ $conf->loaded = true;
 //
 // $conf->domains[$i]->smtp_user = '';
 //  the user name, if your smtp server is configured to have a fixed, user independent, user/password authentication
-//  if empty, the login credentials of the NOCC user are used
+//  if empty, the login credentials of the NVLL user are used
 //
 // $conf->domains[$i]->smtp_password = '';
 //  the password, if your smtp server is configured to have a fixed, user independent, user/password authentication
@@ -364,18 +354,18 @@ $conf->master_key = 'Lxzne&=EW)6MR^_{pw,X5kH;QZP[(+hT';
 // See README for more about this.
 // This should be something like 'profiles/' on Unix System
 // or 'prefs\\' on Win32 (note that we must escape "\").
-// You should not use a subfolder within your Nocc installation, as it will
+// You should not use a subfolder within your NVLL installation, as it will
 // be readable by everybody, and will contain sensible information as email
 // addresses and names.
 // If left empty, preferences, contacts and session saving will be disabled.
 $conf->prefs_dir = '';
 
 // Prune session files
-// NOCC removes session files which are older than 4 weeks automatically.
+// NVLL removes session files which are older than 4 weeks automatically.
 // On large systems this can be time consuming and harm the user experience
-// when using NOCC. If you disable this, you should prune the
+// when using NVLL. If you disable this, you should prune the
 // directory specified with $conf->prefs_dir on your own by removing all
-// files named NOCCLI_* and which are older than 4 weeks.
+// files named IM_* and which are older than 4 weeks.
 // The default value is 1
 // Switch automatic pruning off by setting the value 0
 $conf->prune_sessions = 1;
@@ -414,7 +404,7 @@ $conf->check_inbox_timer = 120;
 // ### Optional parameters ###
 // ###
 // ### The following parameters can be changed but it's not necessary to
-// ### get a working version of nocc
+// ### get a working version of NVLL
 // ###
 
 // ##
@@ -456,7 +446,7 @@ $conf->horde_imap_client = false;
 // ## Server options
 // ##
 
-// Base URL where NOCC is hosted (only needed for Xitami servers, see #463390)
+// Base URL where NVLL is hosted (only needed for Xitami servers, see #463390)
 // (NOTE: should end in a slash). Leave blank to detect it automagically.
 //$conf->base_url = 'http://www.yoursite.com/webmail/';
 $conf->base_url = 'http://localhost/retrmail/';
@@ -469,7 +459,7 @@ $conf->crlf = "\r\n";
 
 // Default smtp server and smtp_port (default is 25)
 // If a domain has no smtp server, this one will be used
-// If no smtp server is provided, Nocc will default to the mail() function,
+// If no smtp server is provided, NVLL will default to the mail() function,
 // and try to use Sendmail or any other MTA (Postfix)
 $conf->default_smtp_server = 'localhost';
 $conf->default_smtp_port = 25;
@@ -488,7 +478,7 @@ $conf->default_smtp_port = 25;
 // Set to '' to disable
 $conf->allowed_char = '';
 
-// the user can logout or not (if nocc is used within your website
+// the user can logout or not (if NVLL is used within your website
 // enter 'false' here else leave 'true')
 $conf->enable_logout = true;
 
@@ -667,7 +657,7 @@ $conf->contact_ldap_options['suffix'] = '';
 //   conf->domains[$i]->domain = 'domain.de';
 //
 //   $conf->auto_update['user'] = array('user1@domain.de','user2@domain.de');
-//     user1 and user2 will be informed about new NOCC version and can trigger the server update
+//     user1 and user2 will be informed about new NVLL version and can trigger the server update
 //   $conf->auto_update['user'] = array();
 //     empty list => no autoupdate, no information about new version
 //   $conf->auto_update['user'] = array('all');

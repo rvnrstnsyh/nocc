@@ -2,32 +2,22 @@
 
 /**
  * Miscellaneous functions
- *
- * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
- * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
- * Copyright 2002 Mike Rylander <mrylander@mail.com>
- * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
- *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * 
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @subpackage Utilities
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: functions.php 3060 2023-03-05 19:06:00Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 require_once './vendor/autoload.php';
 
-require_once './classes/class_local.php';
-require_once './classes/class_htmlpurifier.php';
+require_once './classes/NVLL_IMAP.php';
+require_once './classes/NVLL_HTMLPurifier_URIScheme_cid.php';
 
-require_once './classes/nocc_theme.php';
-require_once './classes/nocc_mailreader.php';
-require_once './classes/nocc_quotausage.php';
-require_once './classes/nocc_mailaddress.php';
-require_once './classes/nocc_attachedfile.php';
+require_once './classes/NVLL_Theme.php';
+require_once './classes/NVLL_MailReader.php';
+require_once './classes/NVLL_QuotaUsage.php';
+require_once './classes/NVLL_MailAddress.php';
+require_once './classes/NVLL_AttachedFile.php';
 
 /**
  * recursivle traverse a directory and return an array of all files and directories
@@ -48,7 +38,7 @@ function recursive_directory($dir = "", $regExpression = "/.*/")
 }
 
 /**
- * handle NOCC version
+ * handle NVLL version
  * @return 0,1,2 or new version string
  */
 function version()
@@ -59,14 +49,14 @@ function version()
             return $_SESSION['auto_update_new'];
         } else {
             if (ini_get("allow_url_fopen") == 1) {
-                $news = file_get_contents('http://nocc.sourceforge.net/docs/NEWS?v=' . $conf->nocc_version);
+                $news = file_get_contents('http://nvll.sourceforge.net/docs/NEWS?v=' . $conf->nvll_version);
                 $matches[] = array();
                 if (preg_match("/Latest version is (.*)\R/", $news, $matches)) {
                     $new_version = str_ireplace("-dev", "", trim($matches[1]));
                     $new_v = explode('.', $new_version);
-                    $old_v = explode('.', str_ireplace("-dev", "", $conf->nocc_version));
+                    $old_v = explode('.', str_ireplace("-dev", "", $conf->nvll_version));
                     $old_dev_version = false;
-                    if (preg_match("/-dev/", $conf->nocc_version)) {
+                    if (preg_match("/-dev/", $conf->nvll_version)) {
                         $old_dev_version = true;
                     }
                     if (
@@ -116,7 +106,7 @@ function utf8_substr($string, $start, $length = 0)
 
 /**
  * ...
- * @param nocc_imap $pop
+ * @param NVLL_IMAP $pop
  * @param int $skip
  * @return array
  * @todo Rename!
@@ -125,9 +115,9 @@ function inbox(&$pop, $skip = 0)
 {
     $msg_list = array();
 
-    $lang = $_SESSION['nocc_lang'];
-    $sort = $_SESSION['nocc_sort'];
-    $sortdir = $_SESSION['nocc_sortdir'];
+    $lang = $_SESSION['nvll_lang'];
+    $sort = $_SESSION['nvll_sort'];
+    $sortdir = $_SESSION['nvll_sortdir'];
 
     $num_msg = $pop->num_msg();
     $per_page = get_per_page();
@@ -144,7 +134,7 @@ function inbox(&$pop, $skip = 0)
 
     for ($i = $start_msg; $i < $end_msg; $i++) {
         $msgnum = $sorted[$i];
-        $mail_reader = new NOCC_MailReader($msgnum, $pop, false);
+        $mail_reader = new NVLL_MailReader($msgnum, $pop, false);
 
         $unread_mail = $mail_reader->isUnread();
         // Check "Status" line with UCB POP Server to see if this is a new message.
@@ -182,7 +172,7 @@ function inbox(&$pop, $skip = 0)
  * @global string $html_att_label
  * @global string $html_atts_label
  * @global string $lang_invalid_msg_num
- * @param nocc_imap $pop
+ * @param NVLL_IMAP $pop
  * @param int $mail
  * @param bool $verbose
  * @param array $attachmentParts
@@ -194,9 +184,9 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
     global $conf;
     global $lang_invalid_msg_num;
 
-    $sort = $_SESSION['nocc_sort'];
-    $sortdir = $_SESSION['nocc_sortdir'];
-    $lang = $_SESSION['nocc_lang'];
+    $sort = $_SESSION['nvll_sort'];
+    $sortdir = $_SESSION['nvll_sortdir'];
+    $lang = $_SESSION['nvll_lang'];
 
     // Clear variables
     $body = $body_charset = $to = $cc = '';
@@ -222,7 +212,7 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         throw new Exception($lang_invalid_msg_num);
     }
 
-    $mail_reader = new NOCC_MailReader($mail, $pop, true);
+    $mail_reader = new NVLL_MailReader($mail, $pop, true);
 
     // If we are showing all headers, gather them into a header array
     $header = '';
@@ -241,7 +231,7 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         $body_transfer = $bodyPart->getEncoding()->__toString();
         $body = $pop->fetchbody($mail, $bodyPart->getPartNumber(), $bodyPart->getMimeId(), false);
 
-        $body = nocc_imap::decode($body, $bodyPart->getEncoding()->__toString());
+        $body = NVLL_IMAP::decode($body, $bodyPart->getEncoding()->__toString());
 
         $body_charset = detect_body_charset($body, $bodyPartStructure->getCharset());
         // If user has selected another charset, we'll use it
@@ -336,7 +326,7 @@ function detect_body_charset($body, $suspectedCharset)
 
 /**
  * ...
- * @param NOCC_MailReader $mail_reader Mail reader
+ * @param NVLL_MailReader $mail_reader Mail reader
  * @param array $attach_tab Attachments
  * @todo Only temporary needed!
  */
@@ -365,7 +355,7 @@ function fillAttachTabFromMailReader($mail_reader, &$attach_tab)
 
 /**
  * ...
- * @param NOCC_MailReader $mail_reader Mail reader
+ * @param NVLL_MailReader $mail_reader Mail reader
  * @todo Only temporary needed!
  */
 function GetAttachmentsTableRow($mail_reader, $is_horde = false)
@@ -420,34 +410,34 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
         }
 
         //replaced by htmlpurifier, see below, it's applied always
-        //        $body = NOCC_Security::cleanHtmlBody($body);
-        //        $body = NOCC_Security::removeJsEventHandler($body);
-        //        $body = NOCC_Security::purifyHtml($body);
+        //        $body = NVLL_Security::cleanHtmlBody($body);
+        //        $body = NVLL_Security::removeJsEventHandler($body);
+        //        $body = NVLL_Security::purifyHtml($body);
 
-        //TODO: Move to NOCC_Security::cleanHtmlBody() too?
-        //        $body = preg_replace("|href=\"(.*)script:|i", 'href="nocc_removed_script:', $body);
-        //        $body = preg_replace("|<([^>]*)java|i", '<nocc_removed_java_tag', $body);
+        //TODO: Move to NVLL_Security::cleanHtmlBody() too?
+        //        $body = preg_replace("|href=\"(.*)script:|i", 'href="nvll_removed_script:', $body);
+        //        $body = preg_replace("|<([^>]*)java|i", '<nvll_removed_java_tag', $body);
         //        $body = preg_replace("|<([^>]*)&{.*}([^>]*)>|i", "<&{;}\\3>", $body);
 
-        $body = NOCC_Body::prepareHtmlLinks($body);
+        $body = NVLL_Body::prepareHtmlLinks($body);
     } elseif (preg_match('|plain|i', $mime)) {
-        $user_prefs = NOCC_Session::getUserPrefs();
+        $user_prefs = NVLL_Session::getUserPrefs();
         $body = htmlspecialchars($body, ENT_COMPAT | ENT_SUBSTITUTE, $charset);
-        $body = NOCC_Body::prepareTextLinks($body);
+        $body = NVLL_Body::prepareTextLinks($body);
 
         if ($user_prefs->getColoredQuotes()) {
-            $body = NOCC_Body::addColoredQuotes($body);
+            $body = NVLL_Body::addColoredQuotes($body);
         }
 
         if ($user_prefs->getDisplayStructuredText()) {
-            $body = NOCC_Body::addStructuredText($body);
+            $body = NVLL_Body::addStructuredText($body);
         }
 
         $body = trim($body);
         $body = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $body . '</span>';
     }
 
-    HTMLPurifier_URISchemeRegistry::instance()->register("cid", new HTMLPurifier_URIScheme_cid());
+    HTMLPurifier_URISchemeRegistry::instance()->register("cid", new NVLL_HTMLPurifier_URIScheme_cid());
 
     $hp_config = HTMLPurifier_Config::createDefault();
     $hp_config->set('Core.Encoding', $charset);
@@ -477,7 +467,7 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
  * @param int $mail
  * @param array $attach_tab
  * @return string
- * @todo Rewrite to use direct a NOCC_MailReader object!
+ * @todo Rewrite to use direct a NVLL_MailReader object!
  */
 function link_att($mail, $attach_tab, $is_horde = false)
 {
@@ -488,7 +478,7 @@ function link_att($mail, $attach_tab, $is_horde = false)
         if (!empty($tmp['name'])) {
             $mime = str_replace('/', '-', $tmp['mime']);
             $decode = $is_horde ? false : true;
-            $att_name = nocc_imap::mime_header_decode($tmp['name'], $decode, $is_horde);
+            $att_name = NVLL_IMAP::mime_header_decode($tmp['name'], $decode, $is_horde);
             $att_name = htmlentities($att_name, ENT_COMPAT, 'UTF-8');
             $att_name_dl = $att_name;
 
@@ -501,7 +491,7 @@ function link_att($mail, $attach_tab, $is_horde = false)
 
             $html .= '<li><a href="download.php?' .
                 http_build_query([
-                    'session' => NOCC_Session::getUrlGetSession(),
+                    'session' => NVLL_Session::getUrlGetSession(),
                     'mail' => $mail,
                     'part' => $tmp['number'],
                     'transfer' => $tmp['transfer'],
@@ -583,9 +573,9 @@ function format_time(&$time, &$lang)
  */
 function graphicalsmilies($body)
 {
-    $user_prefs = NOCC_Session::getUserPrefs();
+    $user_prefs = NVLL_Session::getUserPrefs();
     if ($user_prefs->getUseGraphicalSmilies()) {
-        $theme = new NOCC_Theme($_SESSION['nocc_theme']);
+        $theme = new NVLL_Theme($_SESSION['nvll_theme']);
         $body = $theme->replaceTextSmilies($body);
     }
     return $body;
@@ -765,8 +755,8 @@ function reformat_address_list($adresses, $remove = array(), $sep = ',')
  */
 function get_reply_all(&$from, &$to, &$cc)
 {
-    $login = $_SESSION['nocc_login'];
-    $domain = $_SESSION['nocc_domain'];
+    $login = $_SESSION['nvll_login'];
+    $domain = $_SESSION['nvll_domain'];
     $my1 = $login . '@' . $domain;
     $my2 = reformat_address_list(get_default_from_address());
     $my2 = preg_replace("/^.*<(\S+)>.*$/", "$1", $my2);
@@ -783,7 +773,7 @@ function get_reply_all(&$from, &$to, &$cc)
  * @param string $addr
  * @param string $charset
  * @return array
- * TODO: Move to NOCC_MailAddress as static function and rename?
+ * TODO: Move to NVLL_MailAddress as static function and rename?
  */
 function cut_address($addr, $charset)
 {
@@ -851,7 +841,7 @@ function pkcs7_attachment_view(&$pop, $mail, $part_no, &$content_type, &$charset
     $body = '';
     if (extension_loaded("openssl") && function_exists("openssl_pkcs7_verify")) {
         $body = $pop->fetchbody($mail, $part_no, $part_no, false);
-        $ciphertext_file = tempnam('', 'nocc');
+        $ciphertext_file = tempnam('', 'nvll');
         $head = 'MIME-Version: 1.0' . "\n" .
             'Content-Disposition: attachment; filename="smime.p7m"' . "\n" .
             'Content-Type: application/pkcs7-mime; smime-type=signed-data; name="smime.p7m"' . "\n" .
@@ -896,7 +886,7 @@ function pkcs7_attachment_view(&$pop, $mail, $part_no, &$content_type, &$charset
  */
 function view_part(&$pop, &$mail, $part_no, $transfer, $msg_charset)
 {
-    if (isset($ev) && NoccException::isException($ev)) {
+    if (isset($ev) && NVLL_Exception::isException($ev)) {
         return '<p class="error">' . $ev->getMessage . '</p>';
     }
     $text = $pop->fetchbody($mail, $part_no, $part_no, false);
@@ -904,7 +894,7 @@ function view_part(&$pop, &$mail, $part_no, $transfer, $msg_charset)
     if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
         $charset = $_REQUEST['user_charset'];
     }
-    $text = nl2br(htmlspecialchars(nocc_imap::decode($text, $transfer), ENT_COMPAT | ENT_SUBSTITUTE, $charset));
+    $text = nl2br(htmlspecialchars(NVLL_IMAP::decode($text, $transfer), ENT_COMPAT | ENT_SUBSTITUTE, $charset));
     $text = os_iconv($charset, 'UTF-8', $text);
 
     return $text;
@@ -916,11 +906,11 @@ function view_part(&$pop, &$mail, $part_no, $transfer, $msg_charset)
  */
 function clear_attachments()
 {
-    if (!isset($_SESSION['send_backup']) && isset($_SESSION['nocc_attach_array']) && is_array($_SESSION['nocc_attach_array'])) {
-        while ($tmp = array_shift($_SESSION['nocc_attach_array'])) {
+    if (!isset($_SESSION['send_backup']) && isset($_SESSION['nvll_attach_array']) && is_array($_SESSION['nvll_attach_array'])) {
+        while ($tmp = array_shift($_SESSION['nvll_attach_array'])) {
             $tmp->delete();
         }
-        unset($_SESSION['nocc_attach_array']);
+        unset($_SESSION['nvll_attach_array']);
     }
 }
 
@@ -931,7 +921,7 @@ function clear_attachments()
  * @global object $html_unknown
  * @param string $address
  * @return string
- * TODO: Move to NOCC_MailAddress as static function and rename?
+ * TODO: Move to NVLL_MailAddress as static function and rename?
  */
 function display_address($address)
 {
@@ -945,13 +935,13 @@ function display_address($address)
     $address = reformat_address_list($address, $remove, ";");
 
     // Get preference
-    $user_prefs = NOCC_Session::getUserPrefs();
+    $user_prefs = NVLL_Session::getUserPrefs();
 
     // If not set, return full address.
     if (!$user_prefs->getHideAddresses())
         return $address;
 
-    return NOCC_MailAddress::chopAddress($address);
+    return NVLL_MailAddress::chopAddress($address);
 }
 
 /**
@@ -963,7 +953,7 @@ function display_address($address)
  */
 function mailquote(&$body, $from = '', $html_wrote = '', $mime = 'text/html')
 {
-    $user_prefs = NOCC_Session::getUserPrefs();
+    $user_prefs = NVLL_Session::getUserPrefs();
     $rewrap_pre = false;
     $crlf = "\r\n";
     if ($user_prefs->getSendHtmlMail()) {
@@ -1065,7 +1055,7 @@ function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = ""
     $txt = str_replace("\r", "\n", $txt);
     $txt = str_replace("\n", $crlf, $txt);
 
-    $user_prefs = NOCC_Session::getUserPrefs();
+    $user_prefs = NVLL_Session::getUserPrefs();
     $br = "";
     if ($user_prefs->getSendHtmlMail()) {
         $br = "<br />";
@@ -1139,11 +1129,11 @@ function escape_dots($txt)
  */
 function strip_tags2(&$string, $allow)
 {
-    $string = preg_replace('|<<|', '<nocc_less_than_tag><', $string);
-    $string = preg_replace('|>>|', '><nocc_greater_than_tag>;', $string);
-    $string = strip_tags($string, $allow . '<nocc_less_than_tag><nocc_greater_than_tag>');
-    $string = preg_replace('|<nocc_less_than_tag>|', '<', $string);
-    return preg_replace('|<nocc_greater_than_tag>|', '>', $string);
+    $string = preg_replace('|<<|', '<nvll_less_than_tag><', $string);
+    $string = preg_replace('|>>|', '><nvll_greater_than_tag>;', $string);
+    $string = strip_tags($string, $allow . '<nvll_less_than_tag><nvll_greater_than_tag>');
+    $string = preg_replace('|<nvll_less_than_tag>|', '<', $string);
+    return preg_replace('|<nvll_greater_than_tag>|', '>', $string);
 }
 
 /**
@@ -1155,7 +1145,7 @@ function get_per_page()
 {
     global $conf;
 
-    $user_prefs = NOCC_Session::getUserPrefs();
+    $user_prefs = NVLL_Session::getUserPrefs();
     $msg_per_page = 0;
     if (isset($conf->msg_per_page))
         $msg_per_page = $conf->msg_per_page;
@@ -1255,7 +1245,7 @@ function buildfolderlink($folder)
             echo ".";
         }
         $folderpath = $folderpath . $elements[$i];
-        echo "<a href=\"action.php?" . NOCC_Session::getUrlGetSession() . "&folder=" . $folderpath . "\">" . $elements[$i] . "</a>";
+        echo "<a href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&folder=" . $folderpath . "\">" . $elements[$i] . "</a>";
     }
     echo "\n";
 }
@@ -1312,15 +1302,15 @@ function get_page_nav($pages, $skip)
             $end_page = $pages;
         }
 
-        $html = '<form method="post" action="action.php?' . NOCC_Session::getUrlGetSession() . '">';
+        $html = '<form method="post" action="action.php?' . NVLL_Session::getUrlGetSession() . '">';
         $html .= '<div class="pagenav"><ul>';
         $html .= '<li class="pagexofy"><span>' . $html_page . ' ' . $form_select . ' ' . $html_of . ' ' . $pages . '</span></li>';
         if ($pskip > -1) // if NOT first page...
-            $html .= '<li class="prev"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . $pskip . '" title="' . $title_prev_page . '" rel="prev">&laquo; ' . $alt_prev . '</a></li>';
+            $html .= '<li class="prev"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&skip=' . $pskip . '" title="' . $title_prev_page . '" rel="prev">&laquo; ' . $alt_prev . '</a></li>';
         else // if first page...
             $html .= '<li class="prev"><span> &laquo; ' . $alt_prev . '</span></li>';
         if ($start_page > 1) {
-            $html .= '<li class="page"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=0" title="' . $html_page . ' 1" rel="first">1</a></li>';
+            $html .= '<li class="page"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&skip=0" title="' . $html_page . ' 1" rel="first">1</a></li>';
             if ($start_page > 2) {
                 $html .= '<li class="extend"><span>&hellip;</span></li>';
             }
@@ -1330,16 +1320,16 @@ function get_page_nav($pages, $skip)
             if ($xpage == $page) // if current page...
                 $html .= '<li class="current"><span>' . $xpage . '</span></li>';
             else // if NOT current page...
-                $html .= '<li class="page"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . $xskip . '" title="' . $html_page . ' ' . $xpage . '">' . $xpage . '</a></li>';
+                $html .= '<li class="page"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&skip=' . $xskip . '" title="' . $html_page . ' ' . $xpage . '">' . $xpage . '</a></li>';
         }
         if ($end_page < $pages) {
             if ($end_page < $pages - 1) {
                 $html .= '<li class="extend"><span>&hellip;</span></li>';
             }
-            $html .= '<li class="page"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . ($pages - 1) . '" title="' . $html_page . ' ' . $pages . '" rel="last">' . $pages . '</a></li>';
+            $html .= '<li class="page"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&skip=' . ($pages - 1) . '" title="' . $html_page . ' ' . $pages . '" rel="last">' . $pages . '</a></li>';
         }
         if ($nskip < $pages) // if NOT last page...
-            $html .= '<li class="next"><a href="action.php?' . NOCC_Session::getUrlGetSession() . '&skip=' . $nskip . '" title="' . $title_next_page . '" rel="next">' . $alt_next . ' &raquo;</a></li>';
+            $html .= '<li class="next"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&skip=' . $nskip . '" title="' . $title_next_page . '" rel="next">' . $alt_next . ' &raquo;</a></li>';
         else // if last page...
             $html .= '<li class="next"><span>' . $alt_next . ' &raquo;</span></li>';
         $html .= '</ul></div>';
@@ -1382,12 +1372,12 @@ function isRssAllowed()
     }
     $is_domain_allowed = false;
     if (
-        isset($_SESSION['nocc_domainnum']) &&
-        isset($conf->domains[$_SESSION['nocc_domainnum']]) &&
-        isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_rss) &&
+        isset($_SESSION['nvll_domains']) &&
+        isset($conf->domains[$_SESSION['nvll_domains']]) &&
+        isset($conf->domains[$_SESSION['nvll_domains']]->allow_rss) &&
         true
     ) {
-        $is_domain_allowed = $conf->domains[$_SESSION['nocc_domainnum']]->allow_rss;
+        $is_domain_allowed = $conf->domains[$_SESSION['nvll_domains']]->allow_rss;
     } else {
         $is_domain_allowed = true;
     }

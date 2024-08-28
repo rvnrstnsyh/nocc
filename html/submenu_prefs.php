@@ -2,7 +2,7 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 if ($pop->is_imap() && $conf->prefs_dir) {
-  $action = NOCC_Request::getStringValue('action');
+  $action = NVLL_Request::getStringValue('action');
   $selected = 0;
 
   switch ($action) {
@@ -19,11 +19,11 @@ if ($pop->is_imap() && $conf->prefs_dir) {
     <ul>
       <?php if ($selected == 1) echo '<li class="selected">';
       else echo '<li>'; ?>
-      <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&action=setprefs"><?php echo convertLang2Html($html_preferences) ?></a>
+      <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=setprefs"><?php echo convertLang2Html($html_preferences) ?></a>
       </li>
       <?php if ($selected == 2) echo '<li class="selected">';
       else echo '<li>'; ?>
-      <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&action=filters"><?php echo convertLang2Html($html_manage_filters_link) ?></a>
+      <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=filters"><?php echo convertLang2Html($html_manage_filters_link) ?></a>
       </li>
     </ul>
   </div>

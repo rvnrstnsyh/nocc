@@ -47,7 +47,7 @@ if (count($big_list) > 1) {
 <div class="prefs">
   <?php if (isset($_REQUEST['submit_prefs'])) echo '<p class="success-message-bg">' . convertLang2Html($html_prefs_updated) . '</p>'; ?>
   <br>
-  <form method="POST" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+  <form method="POST" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
     <div>
       <input type="hidden" name="action" value="setprefs" />
       <input type="hidden" name="submit_prefs" value="set" />
@@ -62,8 +62,8 @@ if (count($big_list) > 1) {
           </tr>
           <?php
           $allow_address_change = (
-            (isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change)
-            || (! isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->allow_address_change)
+            (isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domains']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->allow_address_change)
           );
           if ($allow_address_change) {
             //$from_email_show=($user_prefs->getEmailAddress() != '') ? $user_prefs->getEmailAddress() : get_default_from_address();
@@ -91,13 +91,13 @@ if (count($big_list) > 1) {
           <tr>
             <td class="prefsLabel"><label for="signature"><?php echo convertLang2Html($html_signature_label) ?></label></td>
             <td class="prefsData">
-              <?php if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
+              <?php if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
                 include 'ckeditor.php';
                 $oCKEditor = new CKEditor();
                 $oCKEditor->basePath = 'ckeditor/';
                 $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
                 $oCKEditor->editor('signature', $user_prefs->getSignature());
-              } else if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
+              } else if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
                 // use ckeditor5
                 print('<textarea id="mail_body" name="mail_body" cols="82" rows="20">');
                 $ckeditor5_mb = $user_prefs->getSignature();
@@ -264,15 +264,15 @@ if (count($big_list) > 1) {
         <table>
           <tr>
             <td class="prefsLabel"><label>SMTP:</label></td>
-            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nocc_domainnum']]->smtp . ':' . $conf->domains[$_SESSION['nocc_domainnum']]->smtp_port; ?></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domains']]->smtp . ':' . $conf->domains[$_SESSION['nvll_domains']]->smtp_port; ?></td>
           </tr>
           <tr>
             <td class="prefsLabel"><label><?php echo $pop->is_imap() ? 'IMAP:' : 'POP3'; ?></label></td>
-            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nocc_domainnum']]->in; ?></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domains']]->in; ?></td>
           </tr>
           <tr>
             <td class="prefsLabel"><label>Authentication:</label></td>
-            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nocc_domainnum']]->smtp_auth_method ? $conf->domains[$_SESSION['nocc_domainnum']]->smtp_auth_method : 'PLAIN'; ?></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domains']]->smtp_auth_method ? $conf->domains[$_SESSION['nvll_domains']]->smtp_auth_method : 'PLAIN'; ?></td>
           </tr>
         </table>
       </fieldset>
@@ -292,7 +292,7 @@ if (count($big_list) > 1) {
                         if ($user_prefs->lang == $lang_array[$i]->filename) {
                           echo ' selected="selected"';
                         }
-                      } else if ($_SESSION['nocc_lang'] == $lang_array[$i]->filename) {
+                      } else if ($_SESSION['nvll_lang'] == $lang_array[$i]->filename) {
                         echo ' selected="selected"';
                       }
                       echo '>' . $lang_array[$i]->label . '</option>';
@@ -358,7 +358,7 @@ if (count($big_list) > 1) {
         </table>
       </fieldset>
       <?php
-      if (NoccException::isException($ev)) {
+      if (NVLL_Exception::isException($ev)) {
       ?>
         <div class="error">
           <table class="errorTable">
@@ -377,7 +377,7 @@ if (count($big_list) > 1) {
       <p class="prefsSubmitButtonsRight">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+        <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
         </a>
       </p>

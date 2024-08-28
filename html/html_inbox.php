@@ -32,17 +32,17 @@ echo '</td>';
 
 foreach ($conf->column_order as $column) { //For all columns...
   echo '<td class="column' . $column;
-  if ($_SESSION['nocc_sort'] == $column) echo ' sorted';
+  if ($_SESSION['nvll_sort'] == $column) echo ' sorted';
   echo '">';
   switch ($column) {
     case '1': //From...
-      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=compose&amp;mail_to=' . convertMailData2Html($tmp['from']) . '" title="' . convertMailData2Html($tmp['from']) . '">' . convertMailData2Html(display_address($tmp['from']), 64) . '</a>&nbsp;';
+      echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=compose&amp;mail_to=' . convertMailData2Html($tmp['from']) . '" title="' . convertMailData2Html($tmp['from']) . '">' . convertMailData2Html(display_address($tmp['from']), 64) . '</a>&nbsp;';
       break;
     case '2': //To...
       echo convertMailData2Html(display_address($tmp['to']), 64);
       break;
     case '3': //Subject...
-      echo '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $tmp['number'] . '&amp;verbose=' . $conf->use_verbose_by_default . '&amp;title=';
+      echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $tmp['number'] . '&amp;verbose=' . $conf->use_verbose_by_default . '&amp;title=';
       echo $tmp['subject'] ? convertMailData2Html($tmp['subject']) : $html_nosubject;
       echo '"' . $target_blank . '>';
       echo $tmp['subject'] ? convertMailData2Html($tmp['subject'], 64) : $html_nosubject;
@@ -57,7 +57,7 @@ foreach ($conf->column_order as $column) { //For all columns...
     case '6': //Read/Unread...
       if ($tmp['unread'] == true) { //if unread...
         if ($conf->use_icon) {
-          echo '<img src="themes/' . $_SESSION['nocc_theme'] . '/img/svg/unread.svg" alt="" />';
+          echo '<img src="themes/' . $_SESSION['nvll_theme'] . '/img/svg/unread.svg" alt="" />';
         } else {
           echo '+U';
         }
@@ -68,7 +68,7 @@ foreach ($conf->column_order as $column) { //For all columns...
     case '7': //Attachment...
       if ($tmp['attach'] == true) { //if has attachments...
         if ($conf->use_icon) {
-          echo '<img src="themes/' . $_SESSION['nocc_theme'] . '/img/svg/has-attachment.svg" alt="" />';
+          echo '<img src="themes/' . $_SESSION['nvll_theme'] . '/img/svg/has-attachment.svg" alt="" />';
         } else {
           echo '+A';
         }

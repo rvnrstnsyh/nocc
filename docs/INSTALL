@@ -1,5 +1,5 @@
 =======================
-NOCC Installation guide
+NVLL Installation guide
 =======================
 
 Copyright 2003 Nicolas Chalanset <nicocha at free.fr>
@@ -41,22 +41,22 @@ Notes on PHP
    * You'll find information on IMAP support for PHP at
      'http://www.php.net/manual/ref.imap.php'.
 
-Installing NOCC
+Installing NVLL
 ===============
 
 If you upgrade from a previous installation, you should read UPGRADE file.
 
-Installation of NOCC
+Installation of NVLL
 --------------------
        
-       1) Download nocc-x.y.tar.gz (where x and y are version numbers)
-          (or nocc-x.y.zip for Windows' users).
-          http://nocc.sourceforge.net/
+       1) Download nvll-x.y.tar.gz (where x and y are version numbers)
+          (or nvll-x.y.zip for Windows' users).
+          http://nvll.sourceforge.net/
 
-       2) untar/unzip nocc into the directory you want.
-          Default directory is nocc.
+       2) untar/unzip nvll into the directory you want.
+          Default directory is nvll.
    
-       3) Change into the 'nocc/config' directory, make changes to the 
+       3) Change into the 'nvll/config' directory, make changes to the 
           config file (conf.php.dist) and save the new one to conf.php
           (remove .dist in the file name)
 

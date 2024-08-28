@@ -2,7 +2,7 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
-$url_session = NOCC_Session::getUrlGetSession();
+$url_session = NVLL_Session::getUrlGetSession();
 $display_images = (!empty($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
 $msgnum = $content['msgnum'];
 ?>

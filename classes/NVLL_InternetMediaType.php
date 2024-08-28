@@ -2,10 +2,7 @@
 
 /**
  * Class for wrapping the internet media type (MIME type) from a imap_fetchstructure() object
- *
- * Copyright 2010-2011 Tim Gerundt <tim@gerundt.de>
- * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
- *
+ * 
  * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.

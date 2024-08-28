@@ -1,8 +1,12 @@
 /**
  * Update "Port" textbox at login page.
+ * 
+ * This file is part of NVLL. NVLL is free software under the terms of the
+ * GNU General Public License. You should have received a copy of the license
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 function updateLoginPort() {
-  var form = document.getElementById("nocc_webmail_login");
+  var form = document.getElementById("nvll_webmail_login");
   if (form.servtype.options[form.servtype.selectedIndex].value == "imap") {
     form.port.value = 143;
   } else if (
@@ -43,7 +47,7 @@ function updateLoginPort() {
  */
 function updateLoginPage(id) {
   if (!id) id = "";
-  var form = document.getElementById("nocc_webmail_login");
+  var form = document.getElementById("nvll_webmail_login");
   if (form.user.value == "" && form.passwd.value == "") {
     if (form.theme && form.lang) {
       var lang_page = "index.php?" + id + "&theme=" +
@@ -186,22 +190,22 @@ function InvertCheckedMsgs() {
 /**
  * handle marker for changes in inbox
  */
-var nocc_cur_num_msg = 0;
-var nocc_session = "";
-var nocc_inbox = "";
-var nocc_timer = 600; //default 10minutes
-var nocc_message =
+var nvll_cur_num_msg = 0;
+var nvll_session = "";
+var nvll_inbox = "";
+var nvll_timer = 600; //default 10minutes
+var nvll_message =
   "Your inbox content has changed, please refresh the page to see the update.";
-var nocc_alert = true;
+var nvll_alert = true;
 function ShowInboxChangedMarker() {
   els = document.getElementsByClassName("inbox_changed");
   var i;
   for (i = 0; i < els.length; i++) {
     els[i].style.display = "inline";
   }
-  if (nocc_alert) {
-    alert(nocc_message);
-    nocc_alert = false;
+  if (nvll_alert) {
+    alert(nvll_message);
+    nvll_alert = false;
   }
   return true;
 }
@@ -209,7 +213,7 @@ var xhttp = new XMLHttpRequest();
 xhttp.onreadystatechange = function () {
   if (this.readyState == 4 && this.status == 200) {
     cur_num_msg = parseInt(this.responseText);
-    if (cur_num_msg != -1 && cur_num_msg != nocc_cur_num_msg) {
+    if (cur_num_msg != -1 && cur_num_msg != nvll_cur_num_msg) {
       ShowInboxChangedMarker();
     }
   }
@@ -218,8 +222,8 @@ xhttp.onreadystatechange = function () {
 function GetInboxChangedHandler() {
   xhttp.open(
     "GET",
-    "action.php?" + nocc_session + "&action=inbox_changed&num_msg=" +
-      nocc_cur_num_msg,
+    "action.php?" + nvll_session + "&action=inbox_changed&num_msg=" +
+      nvll_cur_num_msg,
   );
   xhttp.send();
   return true;
@@ -231,11 +235,11 @@ function InitInboxChangedHandler(
   message,
   show_alert,
 ) {
-  nocc_session = session;
-  nocc_timer = timer;
-  nocc_message = message;
-  nocc_alert = show_alert;
-  nocc_cur_num_msg = cur_num_msg;
+  nvll_session = session;
+  nvll_timer = timer;
+  nvll_message = message;
+  nvll_alert = show_alert;
+  nvll_cur_num_msg = cur_num_msg;
   //GetInboxChangedHandler();
   if (timer > 0) {
     setInterval(GetInboxChangedHandler, timer * 1000); //default: every 600 seconds = 10 minutes

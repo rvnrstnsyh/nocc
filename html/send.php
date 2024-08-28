@@ -5,7 +5,7 @@ if (!isset($conf->loaded)) die('Hacking attempt');
 $html_mail = $user_prefs->getSendHtmlMail();
 $has_images = false;
 if (isset($content['body'])) {
-  $has_images = NOCC_Security::hasDisabledHtmlImages($content['body']);
+  $has_images = NVLL_Security::hasDisabledHtmlImages($content['body']);
 }
 $display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
 // out-commented: dont allow display_image in edit mode, all user input would be lost
@@ -31,7 +31,7 @@ $mail_from = get_default_from_address();
     <legend><?php echo strtoupper(convertLang2Html($html_new_msg)); ?></legend>
   </fieldset>
   <!-- If 'file_uploads=Off', we must set formtype to "normal" otherwise it won't work -->
-  <form id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" method="post" onsubmit="return(validate(this));" action="send.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&action=<?php echo $req_action; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>">
+  <form id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" method="post" onsubmit="return(validate(this));" action="send.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=<?php echo $req_action; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>">
 
     <?php
     if (isset($broken_forwarding) && !($broken_forwarding)) {
@@ -47,15 +47,15 @@ $mail_from = get_default_from_address();
     if (!empty($mail_messageid)) {
       print('<div><input type="hidden" name="mail_messageid" value="' . $mail_messageid . '" /></div>');
     }
-    if (isset($_SESSION['nocc_domainnum']) && $_SESSION['nocc_domainnum'] >= 0) {
-      print('<div><input type="hidden" name="saved_domainnum" value="' . $_SESSION['nocc_domainnum'] . '" /></div>');
+    if (isset($_SESSION['nvll_domains']) && $_SESSION['nvll_domains'] >= 0) {
+      print('<div><input type="hidden" name="saved_domainnum" value="' . $_SESSION['nvll_domains'] . '" /></div>');
     }
     ?>
 
     <table>
       <?php
       $isForward = isset($_GET['action']) && $_GET['action'] == 'forward';
-      $hasAttachments = isset($_SESSION['nocc_attach_array']) && count($_SESSION['nocc_attach_array']) > 0;
+      $hasAttachments = isset($_SESSION['nvll_attach_array']) && count($_SESSION['nvll_attach_array']) > 0;
 
       if ($isForward || $hasAttachments):
       ?>
@@ -65,12 +65,12 @@ $mail_from = get_default_from_address();
         </tr>
       <?php endif; ?>
       <tr>
-        <td class="sendLabel"><label <?php echo $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change ? 'for="mail_from"' : '' ?>><?php echo $html_from_label ?></label></td>
+        <td class="sendLabel"><label <?php echo $conf->domains[$_SESSION['nvll_domains']]->allow_address_change ? 'for="mail_from"' : '' ?>><?php echo $html_from_label ?></label></td>
         <td class="sendData">
           <?php
           $prefs_show_email = (
-            (isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change)
-            || (! isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->allow_address_change)
+            (isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domains']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->allow_address_change)
           );
           if ($prefs_show_email) {
           ?>
@@ -85,7 +85,7 @@ $mail_from = get_default_from_address();
         <td class="sendData">
           <input class="button" type="text" name="mail_to" id="mail_to" size="60" value="<?php echo (isset($mail_to) ? stripslashes(htmlspecialchars($mail_to, ENT_COMPAT | ENT_SUBSTITUTE)) : ''); ?>" />
           <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
-            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&field=mail_to&amp;<?php echo NOCC_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
+            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_to&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
           <?php } ?>
         </td>
       </tr>
@@ -94,7 +94,7 @@ $mail_from = get_default_from_address();
         <td class="sendData">
           <input class="button" type="text" name="mail_cc" id="mail_cc" size="60" value="<?php echo (isset($mail_cc) ? htmlspecialchars($mail_cc, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?>" />
           <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
-            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&field=mail_cc&amp;<?php echo NOCC_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
+            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_cc&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
           <?php } ?>
         </td>
       </tr>
@@ -103,7 +103,7 @@ $mail_from = get_default_from_address();
         <td class="sendData">
           <input class="button" type="text" name="mail_bcc" id="mail_bcc" size="60" value="<?php echo (isset($mail_bcc) ? htmlspecialchars($mail_bcc, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?>" />
           <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
-            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&field=mail_bcc&amp;<?php echo NOCC_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
+            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_bcc&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
           <?php } ?>
         </td>
       </tr>
@@ -152,9 +152,9 @@ $mail_from = get_default_from_address();
         echo '<tr>';
         echo '<td>&nbsp;</td>';
         echo '<td class="sendData">';
-        $attach_array = $_SESSION['nocc_attach_array'];
+        $attach_array = $_SESSION['nvll_attach_array'];
         $attach_array_serialized = base64_encode(serialize($attach_array));
-        echo '<div><input type="hidden" name="nocc_attach_array" value="' . $attach_array_serialized . '" /></div>';
+        echo '<div><input type="hidden" name="nvll_attach_array" value="' . $attach_array_serialized . '" /></div>';
         echo '<table id="attachTable">';
         echo '<tr>';
         echo '<th></th>';
@@ -164,7 +164,7 @@ $mail_from = get_default_from_address();
         $totalsize = 0;
         for ($i = 0; $i < count($attach_array); $i++) {
           $totalsize += $attach_array[$i]->getSize();
-          //$att_name = nocc_imap::utf8($attach_array[$i]->getName());
+          //$att_name = NVLL_IMAP::utf8($attach_array[$i]->getName());
           $att_name = $attach_array[$i]->getName();
           echo '<tr>';
           echo '<td>';
@@ -205,7 +205,7 @@ $mail_from = get_default_from_address();
         echo ($html_images_warning);
         echo ('<br/>');
         // out-commented: dont allow display_image in edit mode, all user input would be lost
-        //echo('<a href="action.php?'.NOCC_Session::getUrlGetSession().'&action='.$action.'&mail='.$content['msgnum'].'&verbose='.$verbose.'&display_images=1">'.$html_images_display.'</a>');
+        //echo('<a href="action.php?'.NVLL_Session::getUrlGetSession().'&action='.$action.'&mail='.$content['msgnum'].'&verbose='.$verbose.'&display_images=1">'.$html_images_display.'</a>');
         echo ('</td></tr></div>');
       }
       echo '<tr>'
@@ -213,15 +213,15 @@ $mail_from = get_default_from_address();
       <td>&nbsp;</td>
       <td class="sendData">
         <?php
-        //if (!NOCC_Session::getSendHtmlMail() || !file_exists('ckeditor.php')) {
-        if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
+        //if (!NVLL_Session::getSendHtmlMail() || !file_exists('ckeditor.php')) {
+        if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
           // use ckeditor4
           include 'ckeditor.php';
           $oCKEditor = new CKEditor();
           $oCKEditor->basePath = 'ckeditor/';
           $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
           $oCKEditor->editor('mail_body', isset($mail_body) ? $mail_body : '');
-        } else if (NOCC_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
+        } else if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
           // use ckeditor5
           print('<textarea id="mail_body" name="mail_body" cols="59" rows="20">');
           $ckeditor5_mb = '';

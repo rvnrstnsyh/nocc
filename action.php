@@ -1,20 +1,11 @@
 <?php
 
 /**
- * This file is the main file of NOCC; each function starts from here
- *
- * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
- * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
- * Copyright 2002 Mike Rylander <mrylander@mail.com>
- * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
- *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is the main file of NVLL; each function starts from here
+ * 
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: action.php 3016 2022-08-25 11:00:42Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 require_once './common.php';
@@ -26,32 +17,32 @@ clear_attachments();
 // Reset exception vector
 $ev = null;
 
-$remember = NOCC_Request::getStringValue('remember');
+$remember = NVLL_Request::getStringValue('remember');
 
 // Refresh quota usage
 if (!isset($_REQUEST['sort'])) {
-    if (NOCC_Session::getQuotaEnable() == true) {
+    if (NVLL_Session::getQuotaEnable() == true) {
         try {
-            $pop = new nocc_imap();
+            $pop = new NVLL_IMAP();
         } catch (Exception $ex) {
-            //TODO: Show error without NoccException!
-            $ev = new NoccException($ex->getMessage());
+            //TODO: Show error without NVLL_Exception!
+            $ev = new NVLL_Exception($ex->getMessage());
             require './html/header.php';
             require './html/error.php';
             require './html/footer.php';
             exit;
         }
-        $quota = $pop->get_quota_usage($_SESSION['nocc_folder']);
+        $quota = $pop->get_quota_usage($_SESSION['nvll_folder']);
         $_SESSION['quota'] = $quota;
     }
 }
 
 // Act on 'action'
-$action = NOCC_Request::getStringValue('action');
+$action = NVLL_Request::getStringValue('action');
 
 if ($action == 'logout') {
     require_once './utils/proxy.php';
-    header('Location: ' . $conf->base_url . 'logout.php?' . NOCC_Session::getUrlGetSession());
+    header('Location: ' . $conf->base_url . 'logout.php?' . NVLL_Session::getUrlGetSession());
     exit;
 }
 
@@ -66,15 +57,15 @@ if ($action == 'inbox_changed') {
 }
 
 try {
-    $pop = new nocc_imap();
+    $pop = new NVLL_IMAP();
 } catch (Exception $ex) {
     if ($action == 'inbox_changed') {
         echo -1;
         unset($_SESSION['ajxfolder']);
         return;
     }
-    //TODO: Show error without NoccException!
-    $ev = new NoccException($ex->getMessage());
+    //TODO: Show error without NVLL_Exception!
+    $ev = new NVLL_Exception($ex->getMessage());
 
     require './html/header.php';
     require './html/error.php';
@@ -82,7 +73,7 @@ try {
     exit;
 }
 
-NOCC_Session::setSendHtmlMail($user_prefs->getSendHtmlMail());
+NVLL_Session::setSendHtmlMail($user_prefs->getSendHtmlMail());
 
 switch ($action) {
         //--------------------------------------------------------------------------------
@@ -91,13 +82,13 @@ switch ($action) {
     case 'aff_mail':
         try {
             $attachmentParts = array();
-            $content = aff_mail($pop, $_REQUEST['mail'], NOCC_Request::getBoolValue('verbose'), $attachmentParts);
+            $content = aff_mail($pop, $_REQUEST['mail'], NVLL_Request::getBoolValue('verbose'), $attachmentParts);
 
             if ($user_prefs->getCollect() == 2 || $user_prefs->getCollect() == 3) {
-                require_once './classes/nocc_contacts.php';
-                $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NOCC_Session::getUserKey()) . '.contacts';
+                require_once './classes/nvll_contacts.php';
+                $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
 
-                $contacts_object = new NOCC_Contacts();
+                $contacts_object = new NVLL_Contacts();
                 $all_to = trim($content['from']) . "; " . trim($content['to']) . "; " . trim($content['cc']) . "; " . trim($content['reply_to']);
                 $contacts = $contacts_object->add_contact($path, $all_to);
                 if (count($contacts) <= $conf->contact_number_max) {
@@ -107,13 +98,13 @@ switch ($action) {
             }
 
             // Display or hide distant HTML images
-            if (!NOCC_Request::getBoolValue('display_images')) {
-                $content['body'] = NOCC_Security::disableHtmlImages($content['body']);
+            if (!NVLL_Request::getBoolValue('display_images')) {
+                $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
             }
             display_embedded_html_images($content, $attachmentParts);
         } catch (Exception $ex) {
-            //TODO: Show error without NoccException!
-            $ev = new NoccException($ex->getMessage());
+            //TODO: Show error without NVLL_Exception!
+            $ev = new NVLL_Exception($ex->getMessage());
             require './html/header.php';
             require './html/error.php';
             require './html/footer.php';
@@ -141,7 +132,7 @@ switch ($action) {
         //--------------------------------------------------------------------------------
     case 'compose':
 
-        if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) {
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
             if (isset($_SESSION['send_backup']['mail_to'])) {
                 $mail_to = $_SESSION['send_backup']['mail_to'];
             }
@@ -158,7 +149,7 @@ switch ($action) {
                 $mail_body = $_SESSION['send_backup']['mail_body'];
             }
             if (isset($_SESSION['send_backup']['mail_att'])) {
-                $_SESSION['nocc_attach_array'] = $_SESSION['send_backup']['mail_att'];
+                $_SESSION['nvll_attach_array'] = $_SESSION['send_backup']['mail_att'];
             }
             if (isset($_SESSION['send_backup']['mail_receipt'])) {
                 $mail_receipt = $_SESSION['send_backup']['mail_receipt'];
@@ -190,20 +181,20 @@ switch ($action) {
         //--------------------------------------------------------------------------------
     case 'reply':
     case 'reply_all':
-        if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) {
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
             unset($_SESSION['send_backup']);
         }
         clear_attachments();
         $attachmentParts = array();
         try {
-            $content = aff_mail($pop, $_REQUEST['mail'], NOCC_Request::getBoolValue('verbose'), $attachmentParts);
-            if (!NOCC_Request::getBoolValue('display_images')) {
-                $content['body'] = NOCC_Security::disableHtmlImages($content['body']);
+            $content = aff_mail($pop, $_REQUEST['mail'], NVLL_Request::getBoolValue('verbose'), $attachmentParts);
+            if (!NVLL_Request::getBoolValue('display_images')) {
+                $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
             }
             display_embedded_html_images($content, $attachmentParts);
         } catch (Exception $ex) {
-            //TODO: Show error without NoccException!
-            $ev = new NoccException($ex->getMessage());
+            //TODO: Show error without NVLL_Exception!
+            $ev = new NVLL_Exception($ex->getMessage());
             require './html/header.php';
             require './html/error.php';
             require './html/footer.php';
@@ -246,7 +237,7 @@ switch ($action) {
         // Forward a mail...
         //--------------------------------------------------------------------------------
     case 'forward':
-        if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) unset($_SESSION['send_backup']);
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) unset($_SESSION['send_backup']);
 
         clear_attachments();
 
@@ -255,10 +246,10 @@ switch ($action) {
 
         for ($mail_num = 0; $mail_num < count($mail_list); $mail_num++) {
             try {
-                $content = aff_mail($pop, $mail_list[$mail_num], NOCC_Request::getBoolValue('verbose'));
+                $content = aff_mail($pop, $mail_list[$mail_num], NVLL_Request::getBoolValue('verbose'));
             } catch (Exception $ex) {
-                //TODO: Show error without NoccException!
-                $ev = new NoccException($ex->getMessage());
+                //TODO: Show error without NVLL_Exception!
+                $ev = new NVLL_Exception($ex->getMessage());
                 require './html/header.php';
                 require './html/error.php';
                 require './html/footer.php';
@@ -309,7 +300,7 @@ switch ($action) {
         // Manage folders...
         //--------------------------------------------------------------------------------
     case 'managefolders':
-        $do = NOCC_Request::getStringValue('do');
+        $do = NVLL_Request::getStringValue('do');
         $dl = convertLang2Html($html_down_mail);
         switch ($do) {
             case 'create_folder':
@@ -330,7 +321,7 @@ switch ($action) {
                 if ($_REQUEST['removeoldbox']) {
                     // Don't want to remove, just unsubscribe.
                     //$pop->deletemailbox($removeoldbox, $ev);
-                    //if(NoccException::isException($ev)) break ;
+                    //if(NVLL_Exception::isException($ev)) break ;
                     $pop->unsubscribe($_REQUEST['removeoldbox']);
                 }
                 break;
@@ -347,12 +338,12 @@ switch ($action) {
             case 'download_folder':
                 if ($_REQUEST['downloadbox']) {
                     $pop->downloadmailbox($_REQUEST['downloadbox'], $ev);
-                    if (NoccException::isException($ev)) break;
+                    if (NVLL_Exception::isException($ev)) break;
                 }
                 break;
             case $dl:
                 $pop->downloadtmpfile($ev);
-                if (NoccException::isException($ev)) break;
+                if (NVLL_Exception::isException($ev)) break;
                 break;
 
             case 'delete_folder':
@@ -378,10 +369,10 @@ switch ($action) {
         // Manage filters...
         //--------------------------------------------------------------------------------
     case 'filters':
-        $user_key = NOCC_Session::getUserKey();
-        $filterset = NOCCUserFilters::read($user_key, $ev);
+        $user_key = NVLL_Session::getUserKey();
+        $filterset = NVLL_UserFilters::read($user_key, $ev);
 
-        if (NoccException::isException($ev)) {
+        if (NVLL_Exception::isException($ev)) {
             require './html/header.php';
             require './html/error.php';
             require './html/footer.php';
@@ -395,7 +386,7 @@ switch ($action) {
                         unset($filterset->filterset[$_REQUEST['filter']]);
                         $filterset->dirty_flag = 1;
                         $filterset->commit($ev);
-                        if (NoccException::isException($ev)) {
+                        if (NVLL_Exception::isException($ev)) {
                             require './html/header.php';
                             require './html/error.php';
                             require './html/footer.php';
@@ -436,7 +427,7 @@ switch ($action) {
 
                     $filterset->dirty_flag = 1;
                     $filterset->commit($ev);
-                    if (NoccException::isException($ev)) {
+                    if (NVLL_Exception::isException($ev)) {
                         require './html/header.php';
                         require './html/error.php';
                         require './html/footer.php';
@@ -469,11 +460,11 @@ switch ($action) {
         //TODO: Move all isset() to if()!
         if (isset($_REQUEST['submit_prefs'])) {
             if (isset($_REQUEST['full_name']))
-                $user_prefs->setFullName(NOCC_Request::getStringValue('full_name'));
+                $user_prefs->setFullName(NVLL_Request::getStringValue('full_name'));
             if (isset($_REQUEST['msg_per_page']))
                 $user_prefs->msg_per_page = $_REQUEST['msg_per_page'];
             if (isset($_REQUEST['email_address']))
-                $user_prefs->setEmailAddress(NOCC_Request::getStringValue('email_address'));
+                $user_prefs->setEmailAddress(NVLL_Request::getStringValue('email_address'));
             $user_prefs->setBccSelf(isset($_REQUEST['cc_self']));
             $user_prefs->setHideAddresses(isset($_REQUEST['hide_addresses']));
             $user_prefs->setShowAlert(isset($_REQUEST['show_alert']));
@@ -482,12 +473,12 @@ switch ($action) {
             $user_prefs->setDisplayStructuredText(isset($_REQUEST['display_struct']));
             $user_prefs->seperate_msg_win = isset($_REQUEST['seperate_msg_win']);
             if (isset($_REQUEST['reply_leadin']))
-                $user_prefs->reply_leadin = NOCC_Request::getStringValue('reply_leadin');
+                $user_prefs->reply_leadin = NVLL_Request::getStringValue('reply_leadin');
             if (isset($_REQUEST['signature']))
-                if (NOCC_Request::getBoolValue('html_mail_send')) {
+                if (NVLL_Request::getBoolValue('html_mail_send')) {
                     $user_prefs->setSignature($_REQUEST['signature']);
                 } else {
-                    $user_prefs->setSignature(NOCC_Request::getStringValue('signature'));
+                    $user_prefs->setSignature(NVLL_Request::getStringValue('signature'));
                 }
             if (isset($_REQUEST['wrap_msg']))
                 $user_prefs->setWrapMessages($_REQUEST['wrap_msg']);
@@ -520,9 +511,9 @@ switch ($action) {
             if (isset($_REQUEST['theme'])) {
                 $user_prefs->theme = $_REQUEST['theme'];
                 if ($_REQUEST['theme'] == "default") {
-                    $_SESSION['nocc_theme'] = $conf->default_theme;
+                    $_SESSION['nvll_theme'] = $conf->default_theme;
                 } else {
-                    $_SESSION['nocc_theme'] = $_REQUEST['theme'];
+                    $_SESSION['nvll_theme'] = $_REQUEST['theme'];
                 }
             }
 
@@ -533,14 +524,14 @@ switch ($action) {
                 // Validate preferences
                 $user_prefs->validate($ev);
             }
-            if (NoccException::isException($ev)) {
+            if (NVLL_Exception::isException($ev)) {
                 require './html/header.php';
                 require './html/error.php';
                 require './html/footer.php';
                 break;
             }
 
-            NOCC_Session::setUserPrefs($user_prefs);
+            NVLL_Session::setUserPrefs($user_prefs);
         }
 
         require './html/header.php';
@@ -562,7 +553,7 @@ switch ($action) {
     default:
         if ($action == 'login') {
             if ($conf->use_captcha && !verify_captcha($_REQUEST['challenge'], $_REQUEST['captcha'])) {
-                $ev = new NoccException('Invalid Captcha');
+                $ev = new NVLL_Exception('Invalid Captcha');
                 require './html/header.php';
                 require './html/error.php';
                 require './html/footer.php';
@@ -579,30 +570,30 @@ switch ($action) {
                         if ($pop->createmailbox($folder)) {
                             $pop->subscribe($folder, true);
                         } else {
-                            error_log("NOCC: Error creating folder '$folder': " . $pop->last_error());
+                            error_log("NVLL: Error creating folder '$folder': " . $pop->last_error());
                         }
                     }
                 }
             } else {
-                $pop->subscribe($_SESSION['nocc_folder'], false);
+                $pop->subscribe($_SESSION['nvll_folder'], false);
             }
         }
 
         // We may need to apply some filters to the INBOX...  this is still a work in progress.
         if (!isset($_REQUEST['sort'])) {
             if ($pop->is_imap()) {
-                if ($_SESSION['nocc_folder'] == 'INBOX') {
-                    $user_key = NOCC_Session::getUserKey();
+                if ($_SESSION['nvll_folder'] == 'INBOX') {
+                    $user_key = NVLL_Session::getUserKey();
                     if (!empty($conf->prefs_dir)) {
-                        $filters = NOCCUserFilters::read($user_key, $ev);
-                        if (NoccException::isException($ev)) {
-                            error_log("NOCC: Error reading filters for user '$user_key': " . $ev->getMessage());
+                        $filters = NVLL_UserFilters::read($user_key, $ev);
+                        if (NVLL_Exception::isException($ev)) {
+                            error_log("NVLL: Error reading filters for user '$user_key': " . $ev->getMessage());
                             $filters = null;
                             $ev = null;
                         }
 
                         $small_search = 'unread ';
-                        if (NOCC_Request::getBoolValue('reapply_filters')) {
+                        if (NVLL_Request::getBoolValue('reapply_filters')) {
                             $small_search = '';
                         }
                         if ($filters != null) {
@@ -621,30 +612,30 @@ switch ($action) {
                         }
                     }
                     if (!$pop->expunge()) {
-                        error_log("NOCC: Error expunging mail for user '$user_key': " . $pop->last_error());
+                        error_log("NVLL: Error expunging mail for user '$user_key': " . $pop->last_error());
                     }
                 }
             }
         }
 
         // If we get this far, consider ourselves logged in
-        $_SESSION['nocc_loggedin'] = 1;
-        //if( NOCC_Session::rename_session() ) {
-        $new_session_name = NOCC_Session::rename_session();
+        $_SESSION['nvll_loggedin'] = 1;
+        //if( NVLL_Session::rename_session() ) {
+        $new_session_name = NVLL_Session::rename_session();
         if (strlen($new_session_name) > 0) {
-            NOCC_Session::save_session();
-            if (NoccException::isException($ev)) {
+            NVLL_Session::save_session();
+            if (NVLL_Exception::isException($ev)) {
                 require './html/header.php';
                 require './html/error.php';
                 require './html/footer.php';
                 break;
             }
-            NOCC_Session::createCookie($remember);
-            if (isset($_SESSION['send_backup']) && $_SESSION['nocc_domainnum'] == $_SESSION['send_backup']['nocc_domainnum']) {
-                //header("Location: ".$conf->base_url."action.php?".NOCC_Session::getUrlGetSession().'&action=compose');
+            NVLL_Session::createCookie($remember);
+            if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
+                //header("Location: ".$conf->base_url."action.php?".NVLL_Session::getUrlGetSession().'&action=compose');
                 header("Location: " . $conf->base_url . "action.php?_nvkey=" . $new_session_name . '&action=compose');
             } else {
-                //header("Location: ".$conf->base_url."action.php?".NOCC_Session::getUrlGetSession());
+                //header("Location: ".$conf->base_url."action.php?".NVLL_Session::getUrlGetSession());
                 header("Location: " . $conf->base_url . "action.php?_nvkey=" . $new_session_name);
             }
             exit();
@@ -669,7 +660,7 @@ switch ($action) {
             return;
         }
 
-        if ($_SESSION['nocc_folder'] == 'INBOX') {
+        if ($_SESSION['nvll_folder'] == 'INBOX') {
             $_SESSION['inbox_num_msg'] = $num_msg;
             $_SESSION['inbox_alert'] = true;
         }
@@ -681,7 +672,7 @@ switch ($action) {
             try {
                 $tab_mail = inbox($pop, $skip);
             } catch (Exception $ex) {
-                $ev = new NoccException($ex->getMessage());
+                $ev = new NVLL_Exception($ex->getMessage());
                 require './html/header.php';
                 require './html/error.php';
                 require './html/footer.php';
@@ -715,8 +706,8 @@ switch ($action) {
                     $subscribed = $pop->getsubscribed();
                     $_SESSION['subscribed'] = $subscribed;
                 } catch (Exception $ex) {
-                    //TODO: Show error without NoccException!
-                    $ev = new NoccException($ex->getMessage());
+                    //TODO: Show error without NVLL_Exception!
+                    $ev = new NVLL_Exception($ex->getMessage());
                     require './html/header.php';
                     require './html/error.php';
                     require './html/footer.php';
@@ -739,8 +730,8 @@ switch ($action) {
 /**
  * Display attached RFC822 Message (e.g. .eml attachment)
  * @param string content filled with rfc822 content
- * @param nocc_imap $pop
- * @param NOCC_MailPart $attachmentPart RFC822 Attachment part
+ * @param NVLL_IMAP $pop
+ * @param NVLL_MailPart $attachmentPart RFC822 Attachment part
  * @param string name attachment name
  * @param string header attachment header
  * @param string body attachment body
@@ -750,7 +741,7 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
 {
     global $conf;
     global $html_subject_label, $html_from_label, $html_date_label, $html_to_label;
-    $lang = $_SESSION['nocc_lang'];
+    $lang = $_SESSION['nvll_lang'];
 
     $isHorde = $pop->is_horde();
 
@@ -780,7 +771,7 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         $body = $pop->fetchbody($_REQUEST['mail'], $partNumber, $mimeID, false, true);
         $charset = $partStructure->getCharset();
         $header = $pop->parse_headers($header);
-        $body = nocc_imap::decode($body, $encoding);
+        $body = NVLL_IMAP::decode($body, $encoding);
         $charset = detect_body_charset($body, $charset);
         if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
             $charset = $_REQUEST['user_charset'];
@@ -845,27 +836,27 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         $parts = $partStructure->getParts();
         $body_index = -1;
         for ($i = 0; $i < count($parts); $i++) {
-            $bodyPartStructure = new NOCC_MailStructure($parts[$i], $isHorde, $parts_info);
+            $bodyPartStructure = new NVLL_MailStructure($parts[$i], $isHorde, $parts_info);
             if (! $bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isHtmlText()) {
                 $body_index = $i;
             }
         }
         if ($body_index == -1) {
             for ($i = 0; $i < count($parts); $i++) {
-                $bodyPartStructure = new NOCC_MailStructure($parts[$i], $isHorde, $parts_info);
+                $bodyPartStructure = new NVLL_MailStructure($parts[$i], $isHorde, $parts_info);
                 if (! $bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isPlainText()) {
                     $body_index = $i;
                 }
             }
         }
         if ($body_index >= 0) {
-            $bodyPartStructure = new NOCC_MailStructure($parts[$body_index], $isHorde, $parts_info);
-            $part = new NOCC_MailPart($bodyPartStructure, $body_index);
+            $bodyPartStructure = new NVLL_MailStructure($parts[$body_index], $isHorde, $parts_info);
+            $part = new NVLL_MailPart($bodyPartStructure, $body_index);
             display_rfc822($content, $pop, $part, $name, $header, $body, $partNumber . '.' . ($body_index + 1));
         } else {
             for ($i = 0; $i < count($parts); $i++) {
-                $bodyPartStructure = new NOCC_MailStructure($parts[$i], $isHorde, $parts_info);
-                $part = new NOCC_MailPart($bodyPartStructure, $i);
+                $bodyPartStructure = new NVLL_MailStructure($parts[$i], $isHorde, $parts_info);
+                $part = new NVLL_MailPart($bodyPartStructure, $i);
                 if (
                     $bodyPartStructure->getInternetMediaType()->__toString() == 'multipart/mixed' ||
                     $bodyPartStructure->getInternetMediaType()->__toString() == 'multipart/related' ||
@@ -884,7 +875,7 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
 
 /**
  * Display attachments
- * @param nocc_imap $pop
+ * @param NVLL_IMAP $pop
  * @param array $attachmentParts Attachment parts
  */
 function create_rfc822_content(&$content, $pop, $attachmentParts)
@@ -904,9 +895,9 @@ function create_rfc822_content(&$content, $pop, $attachmentParts)
             $rfc822_content_array = array('body' => $rfc822_content);
             display_embedded_html_images($rfc822_content_array, $attachmentParts);
             // Display or hide distant HTML images
-            if (!NOCC_Request::getBoolValue('display_images')) {
-                $rfc822_content_array['body'] = NOCC_Security::disableHtmlImages($rfc822_content_array['body']);
-                $rfc822_hasImages = NOCC_Security::hasDisabledHtmlImages($rfc822_content_array['body']);
+            if (!NVLL_Request::getBoolValue('display_images')) {
+                $rfc822_content_array['body'] = NVLL_Security::disableHtmlImages($rfc822_content_array['body']);
+                $rfc822_hasImages = NVLL_Security::hasDisabledHtmlImages($rfc822_content_array['body']);
             }
             $content['rfc822'] = $rfc822_content_array['body'];
         }
@@ -938,10 +929,10 @@ function display_attachments($content, $pop, $attachmentParts)
             echo '</div> <!-- .mailTextAttach -->';
         } else if ($partStructure->getInternetMediaType()->isImage() && $partStructure->isAttachment() && $conf->display_img_attach) { //if attached image...
             $imageType = $attachmentPart->getInternetMediaType()->__toString();
-            if (NOCC_Security::isSupportedImageType($imageType)) {
+            if (NVLL_Security::isSupportedImageType($imageType)) {
                 echo $name . '<hr class="mailAttachSep" />';
                 echo '<div class="mailImgAttach">';
-                echo '<img src="get_img.php?' . NOCC_Session::getUrlGetSession() . '&amp;mail=' . $_REQUEST['mail'] . '&amp;num=' . $attachmentPart->getPartNumber() . '&amp;mime='
+                echo '<img src="get_img.php?' . NVLL_Session::getUrlGetSession() . '&amp;mail=' . $_REQUEST['mail'] . '&amp;num=' . $attachmentPart->getPartNumber() . '&amp;mime='
                     . $imageType . '&amp;transfer=' . $attachmentPart->getEncoding()->__toString() . '" alt="" title="' . $partStructure->getName() . '" />';
                 echo '</div> <!-- .mailImgAttach -->';
             }
@@ -964,8 +955,8 @@ function display_embedded_html_images(&$content, $attachmentParts)
 
         if ($partStructure->getInternetMediaType()->isImage() && ! $partStructure->isAttachment() && $conf->display_img_attach) { //if embedded image...
             $imageType = $attachmentPart->getInternetMediaType()->__toString();
-            if (NOCC_Security::isSupportedImageType($imageType)) {
-                $new_img_src = 'get_img.php?' . NOCC_Session::getUrlGetSession() . '&amp;mail=' . $_REQUEST['mail'] . '&amp;num=' . $attachmentPart->getPartNumber() . '&amp;mime=' . $imageType . '&amp;transfer=' . $attachmentPart->getEncoding()->__toString();
+            if (NVLL_Security::isSupportedImageType($imageType)) {
+                $new_img_src = 'get_img.php?' . NVLL_Session::getUrlGetSession() . '&amp;mail=' . $_REQUEST['mail'] . '&amp;num=' . $attachmentPart->getPartNumber() . '&amp;mime=' . $imageType . '&amp;transfer=' . $attachmentPart->getEncoding()->__toString();
                 $img_id = 'cid:' . trim($partStructure->getId(true), '<>');
                 $content['body'] = str_replace('[' . $img_id . ']', '<img src="' . $new_img_src . '" alt="" title="' . $partStructure->getName() . '" />', $content['body']);
                 $content['body'] = str_replace($img_id, $new_img_src, $content['body']);
@@ -976,7 +967,7 @@ function display_embedded_html_images(&$content, $attachmentParts)
 
 function add_signature(&$body)
 {
-    $user_prefs = NOCC_Session::getUserPrefs();
+    $user_prefs = NVLL_Session::getUserPrefs();
     if ($user_prefs->getSignature() != '') {
         // Add signature with separation if needed
         //TODO: Really add separator if HTML mail?
@@ -1014,7 +1005,7 @@ function add_quoting(&$mail_body, $content)
     } else {
         $crlf = "\r\n";
         $body = $content['body'];
-        $stripped_content = NOCC_Security::convertHtmlToPlainText($body, $content['body_mime']);
+        $stripped_content = NVLL_Security::convertHtmlToPlainText($body, $content['body_mime']);
     }
 
     if ($user_prefs->getOutlookQuoting()) {
@@ -1028,7 +1019,7 @@ function add_quoting(&$mail_body, $content)
             && isset($user_prefs->reply_leadin)
             && ($user_prefs->reply_leadin != '')
         ) {
-            $parsed_leadin = NOCCUserPrefs::parseLeadin($user_prefs->reply_leadin, $content);
+            $parsed_leadin = NVLL_UserPrefs::parseLeadin($user_prefs->reply_leadin, $content);
             $mail_body = mailquote($stripped_content, $parsed_leadin, '', $content['body_mime']);
         } else {
             $mail_body = mailquote($stripped_content, '', '', $content['body_mime']);
@@ -1050,7 +1041,7 @@ function add_reply_to_subject($subject)
 
 /**
  * ...
- * @param nocc_imap $pop
+ * @param NVLL_IMAP $pop
  * @param array $subscribed
  * @return string
  */
@@ -1071,7 +1062,7 @@ function set_list_of_folders($pop, $subscribed)
         }
         if ($unread > 0) {
             if (!in_array($folder_name, $new_folders)) {
-                $list_of_folders .= ' <a href="action.php?' . NOCC_Session::getUrlGetSession() . '&amp;folder=' . $folder_name
+                $list_of_folders .= ' <a href="action.php?' . NVLL_Session::getUrlGetSession() . '&amp;folder=' . $folder_name
                     . '">' . $folder_name . " ($unread)" . '</a>';
                 $_SESSION['list_of_folders'] = $list_of_folders;
                 array_push($new_folders, $folder_name);

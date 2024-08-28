@@ -1,11 +1,10 @@
 <!-- start of $Id: folders.php 2967 2021-12-10 14:24:34Z oheil $ -->
 <?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
+if (!isset($conf->loaded)) die('Hacking attempt');
 
-$renameoldbox = $pop->html_folder_select('renameoldbox', $_SESSION['nocc_folder']);
-$removeoldbox = $pop->html_folder_select('removeoldbox', $_SESSION['nocc_folder']);
-$downloadbox = $pop->html_folder_select('downloadbox', $_SESSION['nocc_folder']);
+$renameoldbox = $pop->html_folder_select('renameoldbox', $_SESSION['nvll_folder']);
+$removeoldbox = $pop->html_folder_select('removeoldbox', $_SESSION['nvll_folder']);
+$downloadbox = $pop->html_folder_select('downloadbox', $_SESSION['nvll_folder']);
 
 $big_list = $pop->getmailboxesnames();
 
@@ -13,7 +12,7 @@ $select_list = array();
 if (count($big_list) > 1) {
   for ($i = 0; $i < count($big_list); $i++) {
     $selected = "";
-    if ($big_list[$i] == $_SESSION['nocc_folder']) {
+    if ($big_list[$i] == $_SESSION['nvll_folder']) {
       $selected = "selected=\"selected\"";
     }
     array_push($select_list, "\t<option " . $selected . " value=\"" . $big_list[$i] . "\">" . $big_list[$i] . "</option>\n");
@@ -27,7 +26,7 @@ if (count($big_list) > 1) {
   <fieldset>
     <legend><?php echo strtoupper(convertLang2Html($html_folders)); ?></legend>
   </fieldset>
-  <form method="post" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>" accept-charset="UTF-8">
+  <form method="post" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" accept-charset="UTF-8">
     <div>
       <input type="hidden" name="action" value="managefolders" />
       <input type="hidden" name="submit_folders" value="1" />
@@ -73,7 +72,7 @@ if (count($big_list) > 1) {
         </tr>
       </table>
       <?php
-      if (NoccException::isException($ev)) {
+      if (NVLL_Exception::isException($ev)) {
       ?>
         <div class="error">
           <table class="errorTable">
@@ -92,7 +91,7 @@ if (count($big_list) > 1) {
       <p class="prefsSubmitButtonsLeft">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save_selected) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+        <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
         </a>
       </p>

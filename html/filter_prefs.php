@@ -7,7 +7,7 @@
     <legend><?php echo strtoupper(convertLang2Html($html_manage_filters)); ?></legend>
   </fieldset>
   <?php if ($html_filter_select) { ?>
-    <form class="managefilterLists" method="POST" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+    <form class="managefilterLists" method="POST" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
       <div>
         <input type="hidden" name="action" value="filters" />
         <input type="hidden" name="do" value="delete" />
@@ -28,7 +28,7 @@
     </form>
   <?php } ?>
 
-  <form method="POST" action="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+  <form method="POST" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
     <div>
       <input type="hidden" name="action" value="filters" />
       <input type="hidden" name="do" value="create" />
@@ -103,9 +103,7 @@
           </td>
         </tr>
       </table>
-      <?php
-      if (NoccException::isException($ev)) {
-      ?>
+      <?php if (NVLL_Exception::isException($ev)) { ?>
         <div class="error">
           <table class="errorTable">
             <tr class="errorTitle">
@@ -123,7 +121,7 @@
       <p class="prefsSubmitButtonsLeft">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>">
+        <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
         </a>
       </p>

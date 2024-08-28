@@ -1,16 +1,15 @@
 <!-- start of $Id: menu_inbox.php 2713 2017-09-06 12:34:03Z oheil $ -->
 <?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
+if (!isset($conf->loaded)) die('Hacking attempt');
 
-$action = NOCC_Request::getStringValue('action');
+$action = NVLL_Request::getStringValue('action');
 $selected = 0;
 switch ($action) {
   case '':
   case 'login':
   case 'cookie':
     $selected = 1;
-    $line = '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
+    $line = '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
     break;
   case 'compose':
     $selected = 2;
@@ -30,14 +29,14 @@ switch ($action) {
     break;
   case 'managefolders':
     $selected = 3;
-    $line = '<a href="action.php?' . NOCC_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
+    $line = '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
     break;
 }
 ?>
 <div class="mainmenu">
   <ul>
     <?php if ($selected != 1 && $user_prefs->getUseInboxFolder()) { ?>
-      <li><a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_back); ?></a></li>
+      <li><a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_back); ?></a></li>
     <?php } ?>
     <?php if ($selected == 1) echo '<li class="selected">';
     else echo '<li>'; ?>
@@ -50,7 +49,7 @@ switch ($action) {
       $jumpInbox = "&folder=" . $user_prefs->getInboxFolderName();
     }
     ?>
-    <a href="action.php?<?php echo NOCC_Session::getUrlGetSession() . $jumpInbox; ?>"><?php echo convertLang2Html($html_inbox); ?><span class="inbox_changed" style="display:none;color:darkred;">!</span></a>
+    <a href="action.php?<?php echo NVLL_Session::getUrlGetSession() . $jumpInbox; ?>"><?php echo convertLang2Html($html_inbox); ?><span class="inbox_changed" style="display:none;color:darkred;">!</span></a>
     </li>
     <?php if ($selected == 2) echo '<li class="selected">';
     else echo '<li>'; ?>
@@ -59,12 +58,12 @@ switch ($action) {
     <?php if ($_SESSION['is_imap']) { ?>
       <?php if ($selected == 3) echo '<li class="selected">';
       else echo '<li>'; ?>
-      <a href="action.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&action=managefolders" title="<?php echo convertLang2Html($html_manage_folders_link); ?>"><?php echo convertLang2Html($html_folders); ?></a>
+      <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=managefolders" title="<?php echo convertLang2Html($html_manage_folders_link); ?>"><?php echo convertLang2Html($html_folders); ?></a>
       </li>
     <?php } ?>
     <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
       <li>
-        <a href="javascript:void(0);" onclick="window.open('contacts_manager.php?<?php echo NOCC_Session::getUrlGetSession(); ?>&<?php echo NOCC_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo i18n_message($html_contacts, ''); ?></a>
+        <a href="javascript:void(0);" onclick="window.open('contacts_manager.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo i18n_message($html_contacts, ''); ?></a>
       </li>
     <?php } ?>
     <?php if (isset($_GET['successfulsend']) && $_GET['successfulsend']) { ?>

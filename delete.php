@@ -2,31 +2,22 @@
 
 /**
  * This file just delete the selected message(s)
- *
- * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
- * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
- * Copyright 2002 Mike Rylander <mrylander@mail.com>
- * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
- *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * 
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: delete.php 2580 2013-08-19 21:57:33Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 require_once './common.php';
-require_once './classes/class_local.php';
+require_once './classes/NVLL_SMTP.php';
 
 $ev = "";
 
 try {
-    $pop = new nocc_imap();
+    $pop = new NVLL_IMAP();
 } catch (Exception $ex) {
-    //TODO: Show error without NoccException!
-    $ev = new NoccException($ex->getMessage());
+    //TODO: Show error without NVLL_Exception!
+    $ev = new NVLL_Exception($ex->getMessage());
     require './html/header.php';
     require './html/error.php';
     require './html/footer.php';
@@ -34,12 +25,12 @@ try {
 }
 
 $num_messages = $pop->num_msg();
-$url_session = NOCC_Session::getUrlGetSession();
+$url_session = NVLL_Session::getUrlGetSession();
 $url = "action.php?{$url_session}";
-$user_prefs = NOCC_Session::getUserPrefs();
+$user_prefs = NVLL_Session::getUserPrefs();
 $referrer = $_SERVER['HTTP_REFERER'] ?? '';
 // Work out folder and target_folder
-$folder = $_SESSION['nocc_folder'];
+$folder = $_SESSION['nvll_folder'];
 $target_folder = $_REQUEST['target_folder'] ?? '';
 $bottom_target_folder = $_REQUEST['bottom_target_folder'] ?? '';
 
@@ -79,7 +70,7 @@ if (isset($_REQUEST['only_one'])) {
         $_SESSION['message_deleted'] = "true";
         $target_folder = $_SESSION['imap_namespace'] . $user_prefs->getTrashFolderName();
 
-        if ($pop->is_imap() && $user_prefs->getUseTrashFolder() && $_SESSION['nocc_folder'] !== $target_folder) {
+        if ($pop->is_imap() && $user_prefs->getUseTrashFolder() && $_SESSION['nvll_folder'] !== $target_folder) {
             $pop->mail_move($mail, $target_folder);
         } else {
             $pop->delete($mail);
@@ -119,7 +110,7 @@ if (isset($_REQUEST['only_one'])) {
                 $_SESSION['message_deleted'] = "true";
                 $target_folder = $_SESSION['imap_namespace'] . $user_prefs->getTrashFolderName();
 
-                if ($pop->is_imap() && $user_prefs->getUseTrashFolder() && $_SESSION['nocc_folder'] != $target_folder) {
+                if ($pop->is_imap() && $user_prefs->getUseTrashFolder() && $_SESSION['nvll_folder'] != $target_folder) {
                     $pop->mail_move($i, $target_folder);
                 } else {
                     $pop->delete($i);
@@ -160,7 +151,7 @@ if (isset($_REQUEST['only_one'])) {
 
 $pop->close();
 
-if (NoccException::isException($ev)) {
+if (NVLL_Exception::isException($ev)) {
     require './html/header.php';
     require './html/error.php';
     require './html/footer.php';
