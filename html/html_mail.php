@@ -60,8 +60,10 @@
       echo '<input type="hidden" name="mail" value="' . $_REQUEST['mail'] . '"/>';
       echo '<input type="hidden" name="verbose" value="' . $_REQUEST['verbose'] . '"/>';
       echo '<select class="button" name="user_charset">';
+
       $group = '';
       $optgroupOpen = false;
+
       for ($i = 0; $i < sizeof($charset_array); $i++) { //for each charset...
         if ($charset_array[$i]->group != $group) { //if group changed...
           $group = $charset_array[$i]->group;
@@ -121,8 +123,7 @@
     ?>
   </table>
 </div>
-<?php
-if (($has_images || $rfc822_hasImages) && $display_images != 1) {
+<?php if (($has_images || $rfc822_hasImages) && $display_images != 1) {
   //TODO: USe better CSS class name as "nopic"!
   echo ('<div class="nopic">');
   echo ($html_images_warning);
@@ -130,10 +131,7 @@ if (($has_images || $rfc822_hasImages) && $display_images != 1) {
   echo ('<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=aff_mail&mail=' . $content['msgnum'] . '&verbose=' . $verbose . '&display_images=1">' . $html_images_display . '</a>');
   echo ('</div>');
 }
-if ($content['spam']) {
-  echo ('<div class="spamWarning">' . $html_spam_warning . '</div>');
-}
-?>
+if ($content['spam']) echo ('<div class="spamWarning">' . $html_spam_warning . '</div>'); ?>
 <div class="mailData">
   <?php
   //TODO: Rename this CSS class "mail" to "mailBody"?

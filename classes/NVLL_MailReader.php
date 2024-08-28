@@ -96,11 +96,11 @@ class NVLL_MailReader
      */
     private $_timestamp;
     /**
-     * Is unread?
+     * Is unseen?
      * @var bool
      * @access private
      */
-    private $_isunread;
+    private $_isunseen;
     /**
      * Is flagged?
      * @var bool
@@ -159,10 +159,10 @@ class NVLL_MailReader
         $this->_replytoaddress = $mailheaderinfo->getReplyToAddress();
         $this->_timestamp = $mailheaderinfo->getTimestamp();
 
-        $this->_isunread = false;
+        $this->_isunseen = false;
         $this->_isflagged = false;
         if ($pop->is_imap()) {
-            $this->_isunread = $mailheaderinfo->isUnread();
+            $this->_isunseen = $mailheaderinfo->isUnseen();
             $this->_isflagged = $mailheaderinfo->isFlagged();
         }
         //--------------------------------------------------------------------------------
@@ -298,23 +298,23 @@ class NVLL_MailReader
     }
 
     /**
-     * Is the mail unread?
-     * @return boolean Is unread?
+     * Is the mail unseen?
+     * @return boolean Is unseen?
      */
-    public function isUnread()
+    public function isUnseen()
     {
-        return $this->_isunread;
+        return $this->_isunseen;
     }
 
     /**
-     * Is the mail unread on a UCB POP Server?
+     * Is the mail unseen on a UCB POP Server?
      * 
      * Check "Status" line with UCB POP Server to see if this is a new message.
      * This is a non-RFC standard line header.
      *
-     * @return boolean Is unread on a UCB POP Server?
+     * @return boolean Is unseen on a UCB POP Server?
      */
-    public function isUnreadUcb()
+    public function isUnseenUcb()
     {
         if ($this->_header->getStatus() == '') {
             return true;

@@ -601,7 +601,6 @@ class NVLL_UserPrefs
 
         $key = preg_replace("/(\\\|\/)/", "_", $key);
         $key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
-
         $prefs = new NVLL_UserPrefs($key);
 
         if (empty($conf->prefs_dir)) {

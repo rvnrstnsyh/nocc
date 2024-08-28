@@ -68,41 +68,32 @@ function utf8_substr($string, $start, $length = 0)
 function inbox(&$pop, $skip = 0)
 {
     $msg_list = array();
-
     $lang = $_SESSION['nvll_lang'];
     $sort = $_SESSION['nvll_sort'];
     $sortdir = $_SESSION['nvll_sortdir'];
-
     $num_msg = $pop->num_msg();
     $per_page = get_per_page();
-
     $start_msg = $skip * $per_page;
     $end_msg = $start_msg + $per_page;
-
     $sorted = $pop->sort($sort, $sortdir);
-
     $end_msg = ($num_msg > $end_msg) ? $end_msg : $num_msg;
-    if ($start_msg > $num_msg) {
-        return $msg_list;
-    }
+
+    if ($start_msg > $num_msg) return $msg_list;
 
     for ($i = $start_msg; $i < $end_msg; $i++) {
         $msgnum = $sorted[$i];
         $mail_reader = new NVLL_MailReader($msgnum, $pop, false);
-
-        $unread_mail = $mail_reader->isUnread();
+        $unseen_mail = $mail_reader->isUnseen();
         // Check "Status" line with UCB POP Server to see if this is a new message.
         // This is a non-RFC standard line header. Set this in conf.php
-        if ($_SESSION['ucb_pop_server']) {
-            $unread_mail = $mail_reader->isUnreadUcb();
-        }
+        if ($_SESSION['ucb_pop_server']) $unseen_mail = $mail_reader->isUnseenUcb();
 
         $timestamp = $mail_reader->getTimestamp();
         $date = format_date($timestamp, $lang);
         $time = format_time($timestamp, $lang);
         $msg_list[$i] =  array(
             'index' => $i,
-            'unread' => $unread_mail,
+            'unseen' => $unseen_mail,
             'number' => $msgnum,
             'attach' => $mail_reader->hasAttachments(),
             'to' => $mail_reader->getToAddress(),
@@ -141,18 +132,15 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
     $sort = $_SESSION['nvll_sort'];
     $sortdir = $_SESSION['nvll_sortdir'];
     $lang = $_SESSION['nvll_lang'];
-
     // Clear variables
     $body = $body_charset = $to = $cc = '';
-
     // Message Found boolean
     $msg_found = false;
-
     // Get message numbers in sorted order
     $sorted = $pop->sort($sort, $sortdir);
-
     // Finding the next and previous message number
     $prev_msg = $next_msg = 0;
+
     for ($i = 0; $i < sizeof($sorted); $i++) {
         if ($mail == $sorted[$i]) {
             $prev_msg = ($i - 1 >= 0) ? $sorted[$i - 1] : 0;
@@ -162,31 +150,25 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         }
     }
 
-    if (!$msg_found) {
-        throw new Exception($lang_invalid_msg_num);
-    }
+    if (!$msg_found) throw new Exception($lang_invalid_msg_num);
 
     $mail_reader = new NVLL_MailReader($mail, $pop, true);
-
     // If we are showing all headers, gather them into a header array
     $header = '';
-    if (($verbose == true) && ($conf->use_verbose == true)) {
-        $header = $mail_reader->getHeader();
-    }
+
+    if (($verbose == true) && ($conf->use_verbose == true)) $header = $mail_reader->getHeader();
 
     // Get the first part
     $body_mime = '';
     $body_transfer = '';
     $bodyPart = $mail_reader->getBodyPart();
+
     if (!empty($bodyPart)) { //if has body...
         $bodyPartStructure = $bodyPart->getPartStructure();
-
         $body_mime = $bodyPart->getInternetMediaType()->__toString();
         $body_transfer = $bodyPart->getEncoding()->__toString();
         $body = $pop->fetchbody($mail, $bodyPart->getPartNumber(), $bodyPart->getMimeId(), false);
-
         $body = NVLL_IMAP::decode($body, $bodyPart->getEncoding()->__toString());
-
         $body_charset = detect_body_charset($body, $bodyPartStructure->getCharset());
         // If user has selected another charset, we'll use it
         if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
@@ -194,15 +176,13 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         }
 
         $body = remove_stuff($body, $body_mime, $body_charset);
-
         //TODO: Move to a own function!?
         $body_converted = os_iconv($body_charset, 'UTF-8', $body);
         $body = ($body_converted === false) ? $body : $body_converted;
         //tmp['charset'] = ($body_converted===false) ? $body_charset : 'UTF-8';
     }
 
-    $link_att = GetAttachmentsTableRow($mail_reader, $pop->is_horde());
-
+    $link_att = GetAttachmentsTableRow($mail_reader);
     $attachmentParts = $mail_reader->getAttachmentParts();
 
     //show special attachments inline
@@ -218,6 +198,7 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
             }
         }
     }
+
     $timestamp = $mail_reader->getTimestamp();
     $date = format_date($timestamp, $lang);
     $time = format_time($timestamp, $lang);
@@ -247,6 +228,7 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         'msgnum' => $mail,
         'charset' => $body_charset
     );
+
     return ($content);
 }
 
@@ -263,9 +245,7 @@ function detect_body_charset($body, $suspectedCharset)
 
     $body_charset = ($suspectedCharset == 'default') ? detect_charset($body) : $suspectedCharset;
     // Convert US-ASCII to ISO-8859-1 for systems which have difficulties with.
-    if (strtolower($body_charset) == 'us-ascii') {
-        $body_charset = 'ISO-8859-1';
-    }
+    if (strtolower($body_charset) == 'us-ascii') $body_charset = 'ISO-8859-1';
     // Use default charset if no charset is provided by the displayed mail.
     // If no default charset is defined, use ISO-8859-1.
     if ($body_charset == '' || $body_charset == null) {
@@ -312,7 +292,7 @@ function fillAttachTabFromMailReader($mail_reader, &$attach_tab)
  * @param NVLL_MailReader $mail_reader Mail reader
  * @todo Only temporary needed!
  */
-function GetAttachmentsTableRow($mail_reader, $is_horde = false)
+function GetAttachmentsTableRow($mail_reader)
 {
     global $html_att_label, $html_atts_label;
 
@@ -325,10 +305,10 @@ function GetAttachmentsTableRow($mail_reader, $is_horde = false)
             case 0:
                 break;
             case 1:
-                $link_att = '<tr><th class="mailHeaderLabel right">' . $html_att_label . '</th><td class="mailHeaderData">' . link_att($mail_reader->getMessageNumber(), $attach_tab, $is_horde) . '</td></tr>';
+                $link_att = '<tr><th class="mailHeaderLabel right">' . $html_att_label . '</th><td class="mailHeaderData">' . link_att($mail_reader->getMessageNumber(), $attach_tab) . '</td></tr>';
                 break;
             default:
-                $link_att = '<tr><th class="mailHeaderLabel right">' . $html_atts_label . '</th><td class="mailHeaderData">' . link_att($mail_reader->getMessageNumber(), $attach_tab, $is_horde) . '</td></tr>';
+                $link_att = '<tr><th class="mailHeaderLabel right">' . $html_atts_label . '</th><td class="mailHeaderData">' . link_att($mail_reader->getMessageNumber(), $attach_tab) . '</td></tr>';
                 break;
         }
     }
@@ -344,17 +324,18 @@ function GetAttachmentsTableRow($mail_reader, $is_horde = false)
 function remove_stuff($body, $mime, $charset = 'UTF-8')
 {
     if (preg_match('|html|i', $mime)) {
-
         //get base href url
         $base_href = "";
         $matches = array();
         preg_match("/<head.*?>.*<base .*href=\"(http.*?)\".*?>.*<\/head>/i", $body, $matches);
+
         if (isset($matches[1])) {
+            //insert base url
             $base_href = $matches[1];
             $base_href = $base_href . "/";
             $base_href = preg_replace("/\/+$/", "/", $base_href);
-            //insert base url
             $matches = array();
+
             while (preg_match("/(<img .*src=\"(?:(?!http.*:))(?:(?!cid:)).*\")/iU", $body, $matches)) {
                 $img_tag = $matches[1];
                 $img_tag_based = preg_replace("/(<img .*src=\")(.*\")/iU", "$1" . $base_href . "$2", $img_tag);
@@ -379,13 +360,8 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
         $body = htmlspecialchars($body, ENT_COMPAT | ENT_SUBSTITUTE, $charset);
         $body = NVLL_Body::prepareTextLinks($body);
 
-        if ($user_prefs->getColoredQuotes()) {
-            $body = NVLL_Body::addColoredQuotes($body);
-        }
-
-        if ($user_prefs->getDisplayStructuredText()) {
-            $body = NVLL_Body::addStructuredText($body);
-        }
+        if ($user_prefs->getColoredQuotes()) $body = NVLL_Body::addColoredQuotes($body);
+        if ($user_prefs->getDisplayStructuredText()) $body = NVLL_Body::addStructuredText($body);
 
         $body = trim($body);
         $body = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $body . '</span>';
@@ -409,6 +385,7 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
             'cid' => true
         )
     );
+
     $hp_purifier = new HTMLPurifier($hp_config);
     $body = $hp_purifier->purify($body);
 
@@ -423,23 +400,20 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
  * @return string
  * @todo Rewrite to use direct a NVLL_MailReader object!
  */
-function link_att($mail, $attach_tab, $is_horde = false)
+function link_att($mail, $attach_tab)
 {
     global $html_kb;
     sort($attach_tab);
     $html = '<ul class="attachments">';
+
     while ($tmp = array_shift($attach_tab)) {
         if (!empty($tmp['name'])) {
             $mime = str_replace('/', '-', $tmp['mime']);
-            $decode = $is_horde ? false : true;
-            $att_name = NVLL_IMAP::mime_header_decode($tmp['name'], $decode, $is_horde);
-            $att_name = htmlentities($att_name, ENT_COMPAT, 'UTF-8');
+            $decode = true;
+            $att_name = NVLL_IMAP::mime_header_decode($tmp['name'], $decode);
             $att_name_dl = $att_name;
+            $att_name = htmlentities($att_name, ENT_COMPAT, 'UTF-8');
 
-            if ($mime === 'message-rfc822') {
-                $att_name .= '.eml';
-                $att_name_dl .= '.eml';
-            };
             //if we got a problem with the $att_name encoding...
             if (empty($att_name)) $att_name = htmlentities($att_name_dl, ENT_COMPAT);
 
@@ -451,10 +425,10 @@ function link_att($mail, $attach_tab, $is_horde = false)
                     'transfer' => $tmp['transfer'],
                     'filename' => base64_encode($att_name_dl),
                     'mime' => $mime
-                ]) .
-                '">' . htmlspecialchars($att_name) . '</a><em>(' . htmlspecialchars($tmp['size']) . ' ' . htmlspecialchars($html_kb) . ')</em></li>';
+                ]) . '">' . htmlspecialchars($att_name) . '</a><em>(' . htmlspecialchars($tmp['size']) . ' ' . htmlspecialchars($html_kb) . ')</em></li>';
         }
     }
+
     $html .= '</ul>';
     return ($html);
 }
@@ -475,18 +449,17 @@ function format_date(&$date, &$lang)
     global $no_locale_date_format;
 
     // handle bad inputs
-    if (empty($date))
-        return '';
+    if (empty($date)) return '';
 
     // if locale can't be set, use default for no locale
-    if (!setlocale(LC_TIME, $lang_locale))
-        $default_date_format = $no_locale_date_format;
+    if (!setlocale(LC_TIME, $lang_locale)) $default_date_format = $no_locale_date_format;
 
     // format dates
     //return strftime($default_date_format, $date);
     $default_date_format = str_replace("%A", "%l", $default_date_format);
     $default_date_format = str_replace("%B", "%F", $default_date_format);
     $default_date_format = str_replace("%", "", $default_date_format);
+
     return date($default_date_format, $date);
 }
 
@@ -504,8 +477,7 @@ function format_time(&$time, &$lang)
     global $lang_locale;
 
     // handle bad inputs
-    if (empty($time))
-        return '';
+    if (empty($time)) return '';
 
     // if locale can't be set, use default for no locale
     setlocale(LC_TIME, $lang_locale);
@@ -547,6 +519,7 @@ function semisplit_address_list($adresses, &$emails, $sep = ',')
     $all_first = array();
     $all_last = array();
     split_address_list($adresses, $all_emails, $all_first, $all_last, $sep);
+
     for ($j = 0; $j < count($all_emails); $j++) {
         $tmp_email = "";
         if (strlen($all_first[$j]) > 0 && strlen($all_last[$j]) > 0) {
@@ -572,20 +545,18 @@ function semisplit_address_list($adresses, &$emails, $sep = ',')
  */
 function split_address_list($adresses, &$emails, &$firstnames, &$lastnames, $sep = ',')
 {
-    if (strlen($adresses) == 0 || ! is_array($emails) || ! is_array($firstnames) || ! is_array($lastnames)) {
-        return;
-    }
+    if (strlen($adresses) == 0 || ! is_array($emails) || ! is_array($firstnames) || ! is_array($lastnames)) return;
 
     $all = $sep . $adresses . $sep;
     $all = preg_replace("/^" . $sep . "*(.*?)" . $sep . "*$/", $sep . "$1" . $sep, $all);
     $all = preg_replace("/" . $sep . "/", $sep . $sep, $all);
-
     $regexp = array();
     $regexp[] = "/(\s*'.+'\s*)<(.+)>/U"; // example: 'name name' <email@mail.com>, 'name, name' <email@mail.com>
     $regexp[] = "/(\s*\".+\"\s*)<(.+)>/U"; // example: "name name" <email@mail.com>, "name, name" <email@mail.com>
     $regexp[] = '/' . $sep . '{1}\s*([^' . $sep . ']\S+@\S+)\s*' . $sep . '/U'; // example: email@mail.com
     $regexp[] = '/' . $sep . '\s*([^' . $sep . ']+\s*)<(\S+)>\s*' . $sep . '/U'; // example: name name <email@mail.com>
     $matches = array();
+
     for ($r = 0; $r < count($regexp); $r++) {
         $matches[] = array();
         if (preg_match_all($regexp[$r], $all, $matches[$r])) {
@@ -632,19 +603,18 @@ function split_address_list($adresses, &$emails, &$firstnames, &$lastnames, $sep
  */
 function reformat_address_list($adresses, $remove = array(), $sep = ',')
 {
-    if (! is_array($remove)) {
-        $remove = array($remove);
-    }
+    if (!is_array($remove)) $remove = array($remove);
+
     $all = $sep . $adresses . $sep;
     $all = preg_replace("/^" . $sep . "*(.*?)" . $sep . "*$/", $sep . "$1" . $sep, $all);
     $all = preg_replace("/" . $sep . "/", $sep . $sep, $all);
-
     $regexp = array();
     $regexp[] = "/(\s*'.+'\s*)<(.+)>/U"; // example: 'name name' <email@mail.com>, 'name, name' <email@mail.com>
     $regexp[] = "/(\s*\".+\"\s*)<(.+)>/U"; // example: "name name" <email@mail.com>, "name, name" <email@mail.com>
     $regexp[] = '/' . $sep . '{1}\s*([^' . $sep . ']\S+@\S+)\s*' . $sep . '/U'; // example: email@mail.com
     $regexp[] = '/' . $sep . '\s*([^' . $sep . ']+\s*)<(\S+)>\s*' . $sep . '/U'; // example: name name <email@mail.com>
     $matches = array();
+
     for ($r = 0; $r < count($regexp); $r++) {
         $matches[] = array();
         if (preg_match_all($regexp[$r], $all, $matches[$r])) {
@@ -658,6 +628,7 @@ function reformat_address_list($adresses, $remove = array(), $sep = ',')
             }
         }
     }
+
     $all = preg_replace("/\s*" . $sep . "+\s*/", ";", $all);
     $all = preg_replace("/^\s*;+\s*(.*?)\s*;+\s*$/", "$1", $all);
     $all = preg_replace("/;+/", ";", $all);
@@ -675,14 +646,12 @@ function reformat_address_list($adresses, $remove = array(), $sep = ',')
                 $name = '"' . $name . '"';
                 $found = $name . " <" . trim($matches[$r][2][$i]) . ">";
             }
+
             $found = str_replace($sep . $sep, $sep, $found);
             $remove_this = false;
 
-            foreach ($remove as $single_remove) {
-                if (strlen($single_remove) > 0 &&  preg_match("/" . $single_remove . "/i", $found)) {
-                    $remove_this = true;
-                }
-            }
+            foreach ($remove as $single_remove) if (strlen($single_remove) > 0 &&  preg_match("/" . $single_remove . "/i", $found)) $remove_this = true;
+
             if ($remove_this) {
                 $rcpt = str_replace($sep . "###" . $r . "_" . $i . "###", "", $rcpt);
                 $rcpt = str_replace("###" . $r . "_" . $i . "###" . $sep, "", $rcpt);
@@ -693,10 +662,12 @@ function reformat_address_list($adresses, $remove = array(), $sep = ',')
             }
         }
     }
+
     $rcpt = preg_replace("/###\S+?###" . $sep . "/", "", $rcpt);
     $rcpt = preg_replace("/" . $sep . "###\S+?###/", "", $rcpt);
     $rcpt = preg_replace("/###\S+?###/", "", $rcpt);
     $rcpt = preg_replace("/^\s*(.*?)\s*$/", "$1", $rcpt);
+
     return ($rcpt);
 }
 
@@ -715,7 +686,6 @@ function get_reply_all(&$from, &$to, &$cc)
     $my2 = reformat_address_list(get_default_from_address());
     $my2 = preg_replace("/^.*<(\S+)>.*$/", "$1", $my2);
     $remove = array($my1, $my2);
-
     $all = $from . "; " . $to . "; " . $cc;
     $rcpt = reformat_address_list($all, $remove, ";");
 
@@ -733,20 +703,17 @@ function cut_address($addr, $charset)
 {
     // Strip slashes from input
     $addr = safestrip($addr);
-
     // Break address line into individual addresses, taking
     // quoted addresses into account
     $addresses = array();
     $token = '';
     $quote_esc = false;
+
     for ($i = 0; $i < strlen($addr); $i++) {
         $c = substr($addr, $i, 1);
 
         // Are we entering/leaving escaped mode
-        if ($c == '"') {
-            $quote_esc = !$quote_esc;
-        }
-
+        if ($c == '"') $quote_esc = !$quote_esc;
         // Is this an address seperator (comma/semicolon)
         if ($c == ',' || $c == ';') {
             if (!$quote_esc) {
@@ -805,7 +772,6 @@ function pkcs7_attachment_view(&$pop, $mail, $part_no, &$content_type, &$charset
         openssl_pkcs7_verify($ciphertext_file, 0, $ciphertext_file . '.cert');
 
         $verified = openssl_pkcs7_verify($ciphertext_file, 0, $ciphertext_file . '.cert', array(), $ciphertext_file . '.cert', $ciphertext_file . '.out');
-
         $body = file_get_contents($ciphertext_file . '.out');
 
         unlink($ciphertext_file);
@@ -813,17 +779,13 @@ function pkcs7_attachment_view(&$pop, $mail, $part_no, &$content_type, &$charset
         unlink($ciphertext_file . '.out');
 
         $match = array();
-        if (preg_match('/Content-Type:\s*(\S+);/i', $body, $match)) {
-            $content_type = $match[1];
-        }
+        if (preg_match('/Content-Type:\s*(\S+);/i', $body, $match)) $content_type = $match[1];
+
         $match = array();
-        if (preg_match('/Content-Type:.*charset=\"(.*)\"/i', $body, $match)) {
-            $charset = $match[1];
-        }
+        if (preg_match('/Content-Type:.*charset=\"(.*)\"/i', $body, $match)) $charset = $match[1];
+
         $charset = detect_body_charset($body, $charset);
-
         $body = remove_stuff($body, $content_type, $charset);
-
         $body = preg_replace("/Content-Type:.*/i", "", $body);
     }
     return $body;
@@ -840,14 +802,13 @@ function pkcs7_attachment_view(&$pop, $mail, $part_no, &$content_type, &$charset
  */
 function view_part(&$pop, &$mail, $part_no, $transfer, $msg_charset)
 {
-    if (isset($ev) && NVLL_Exception::isException($ev)) {
-        return '<p class="error">' . $ev->getMessage . '</p>';
-    }
+    if (isset($ev) && NVLL_Exception::isException($ev)) return '<p class="error">' . $ev->getMessage . '</p>';
+
     $text = $pop->fetchbody($mail, $part_no, $part_no, false);
     $charset = detect_body_charset($text, $msg_charset);
-    if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-        $charset = $_REQUEST['user_charset'];
-    }
+
+    if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') $charset = $_REQUEST['user_charset'];
+
     $text = nl2br(htmlspecialchars(NVLL_IMAP::decode($text, $transfer), ENT_COMPAT | ENT_SUBSTITUTE, $charset));
     $text = os_iconv($charset, 'UTF-8', $text);
 
@@ -882,18 +843,15 @@ function display_address($address)
     global $html_unknown;
 
     // Check for null
-    if ($address == '')
-        return $html_unknown;
+    if ($address == '') return $html_unknown;
 
     $remove = array();
     $address = reformat_address_list($address, $remove, ";");
-
     // Get preference
     $user_prefs = NVLL_Session::getUserPrefs();
 
     // If not set, return full address.
-    if (!$user_prefs->getHideAddresses())
-        return $address;
+    if (!$user_prefs->getHideAddresses()) return $address;
 
     return NVLL_MailAddress::chopAddress($address);
 }
@@ -910,13 +868,13 @@ function mailquote(&$body, $from = '', $html_wrote = '', $mime = 'text/html')
     $user_prefs = NVLL_Session::getUserPrefs();
     $rewrap_pre = false;
     $crlf = "\r\n";
+
     if ($user_prefs->getSendHtmlMail()) {
         $body = preg_replace("/<span\s+[^>]*>\s*<\/span>/Ui", "", $body);
         $body = preg_replace("/<span>\s*<\/span>/Ui", "", $body);
         $body = preg_replace("/<span style=\"white-space:pre-wrap.*>(.*?)<\/span>/sUi", "$1", $body);
         $body = preg_replace("/<p\s+[^>]*>\s*<\/p>/Ui", "", $body);
         $body = preg_replace("/<p>\s*<\/p>/Ui", "", $body);
-
         $body = trim($body);
 
         if ($mime == 'text/plain') {
@@ -925,11 +883,9 @@ function mailquote(&$body, $from = '', $html_wrote = '', $mime = 'text/html')
         }
 
         $body = '<blockquote style="border-left:1px solid;margin: 0px;padding-left: 10px;">' . $body . "</blockquote>";
-
         $wrap_msg = $user_prefs->getWrapMessages();
-        if ($wrap_msg) { //If we must wrap the message...
-            $body = wrap_outgoing_msg($body, $wrap_msg);
-        }
+        //If we must wrap the message...
+        if ($wrap_msg) $body = wrap_outgoing_msg($body, $wrap_msg);
     } else {
         $body = str_replace("\r\n", "\n", $body);
         $body = str_replace("\r", "\n", $body);
@@ -1003,14 +959,13 @@ function safestrip(&$string)
 function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = "")
 {
     $msg = '';
-
     $crlf = $newline;
     $txt = str_replace("\r\n", "\n", $txt);
     $txt = str_replace("\r", "\n", $txt);
     $txt = str_replace("\n", $crlf, $txt);
-
     $user_prefs = NVLL_Session::getUserPrefs();
     $br = "";
+
     if ($user_prefs->getSendHtmlMail()) {
         $br = "<br />";
         $txt = preg_replace("/(<\S+?[^>]*>)/", $crlf . "$1" . $crlf, $txt);
@@ -1023,12 +978,14 @@ function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = ""
         $quote = "";
         $match = array();
         $quote_line = $new_line;
+
         while (1 === preg_match("/^(>\s*)(.*)$/", $quote_line, $match)) {
             $quote = $quote . $match[1];
             $quote_line = $match[2];
         }
+
         $match = array();
-        if (! preg_match("/^</", $new_line)) {
+        if (!preg_match("/^</", $new_line)) {
             while (1 === preg_match("/^(.{" . $length . "})(.*)$/", $new_line, $match)) {
                 $head = $match[1];
                 $tail = $match[2];
@@ -1037,13 +994,14 @@ function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = ""
                     $head = $match[1];
                     $tail = $match[2] . $tail;
                 }
-                if (! $user_prefs->getSendHtmlMail() || strlen(trim($head)) > 0) {
+                if (!$user_prefs->getSendHtmlMail() || strlen(trim($head)) > 0) {
                     $msg = $msg . $head . $br . $crlf;
                 }
                 $new_line = $quote . $tail;
             }
         }
-        if (! $user_prefs->getSendHtmlMail() || strlen(trim($new_line)) > 0) {
+
+        if (!$user_prefs->getSendHtmlMail() || strlen(trim($new_line)) > 0) {
             $msg = $msg . $new_line . $crlf;
         }
     }
@@ -1061,14 +1019,11 @@ function escape_dots($txt)
 {
     $crlf = "\r\n";
     $msg = '';
-
     // cut message in segment
     $tbl = explode($crlf, $txt);
 
     for ($i = 0; $i < count($tbl); ++$i) {
-        if (strlen($tbl[$i]) != 0 && $tbl[$i][0] == '.')
-            $tbl[$i] = "." . $tbl[$i];
-
+        if (strlen($tbl[$i]) != 0 && $tbl[$i][0] == '.') $tbl[$i] = "." . $tbl[$i];
         $msg .= $tbl[$i] . $crlf;
     }
 
@@ -1087,6 +1042,7 @@ function strip_tags2(&$string, $allow)
     $string = preg_replace('|>>|', '><nvll_greater_than_tag>;', $string);
     $string = strip_tags($string, $allow . '<nvll_less_than_tag><nvll_greater_than_tag>');
     $string = preg_replace('|<nvll_less_than_tag>|', '<', $string);
+
     return preg_replace('|<nvll_greater_than_tag>|', '>', $string);
 }
 
@@ -1101,13 +1057,11 @@ function get_per_page()
 
     $user_prefs = NVLL_Session::getUserPrefs();
     $msg_per_page = 0;
-    if (isset($conf->msg_per_page))
-        $msg_per_page = $conf->msg_per_page;
-    if (isset($user_prefs->msg_per_page))
-        $msg_per_page = $user_prefs->msg_per_page;
+
+    if (isset($conf->msg_per_page)) $msg_per_page = $conf->msg_per_page;
+    if (isset($user_prefs->msg_per_page)) $msg_per_page = $user_prefs->msg_per_page;
     // Failsafe
-    if ($msg_per_page < 1)
-        $msg_per_page = 25;
+    if ($msg_per_page < 1) $msg_per_page = 25;
 
     return $msg_per_page;
 }
@@ -1121,6 +1075,7 @@ function unhtmlentities($string)
 {
     $trans_tbl = get_html_translation_table(HTML_ENTITIES);
     $trans_tbl = array_flip($trans_tbl);
+
     return strtr($string, $trans_tbl);
 }
 
@@ -1161,10 +1116,7 @@ function convertLang2Html($langstring)
  */
 function os_iconv($input_charset, $output_charset, &$text)
 {
-    if (strlen($text) == 0) {
-        return $text;
-    }
-
+    if (strlen($text) == 0) return $text;
     if (PHP_OS == 'AIX') {
         // AIX has its own small selection of names.
         $input_charset = strtolower($input_charset);
@@ -1233,14 +1185,14 @@ function get_page_nav($pages, $skip)
             }
             $form_select .= '<option ' . $selected . ' value="' . $i . '">' . $xpage . '</option>';
         }
-        $form_select .= '</select>';
 
+        $form_select .= '</select>';
         $page = $skip + 1;
         $pskip = $skip - 1;
         $nskip = $skip + 1;
-
         $start_page = $page - 2;
         $end_page = $page + 2;
+
         if ($page < 4) { // if first three pages...
             $start_page = 1;
             $end_page = 6;
@@ -1259,6 +1211,7 @@ function get_page_nav($pages, $skip)
         $html = '<form method="post" action="action.php?' . NVLL_Session::getUrlGetSession() . '">';
         $html .= '<div class="pagenav"><ul>';
         $html .= '<li class="pagexofy"><span>' . $html_page . ' ' . $form_select . ' ' . $html_of . ' ' . $pages . '</span></li>';
+
         if ($pskip > -1) // if NOT first page...
             $html .= '<li class="prev"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&skip=' . $pskip . '" title="' . $title_prev_page . '" rel="prev">&laquo; ' . $alt_prev . '</a></li>';
         else // if first page...
@@ -1286,6 +1239,7 @@ function get_page_nav($pages, $skip)
             $html .= '<li class="next"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&skip=' . $nskip . '" title="' . $title_next_page . '" rel="next">' . $alt_next . ' &raquo;</a></li>';
         else // if last page...
             $html .= '<li class="next"><span>' . $alt_next . ' &raquo;</span></li>';
+
         $html .= '</ul></div>';
         $html .= '</form>';
     }
@@ -1310,6 +1264,7 @@ function removeUnicodeBOM($data)
     } elseif (substr($data, 0, 4) == pack('CCCC', 0x00, 0x00, 0xFF, 0xFE)) { //UTF-32 (LE)...
         return substr($data, 4);
     }
+
     return $data;
 }
 
@@ -1320,10 +1275,10 @@ function removeUnicodeBOM($data)
 function isRssAllowed()
 {
     global $conf;
+
     $is_globally_allowed = false;
-    if (isset($conf->allow_rss)) {
-        $is_globally_allowed = $conf->allow_rss;
-    }
+    if (isset($conf->allow_rss)) $is_globally_allowed = $conf->allow_rss;
+
     $is_domain_allowed = false;
     if (
         isset($_SESSION['nvll_domain_index']) &&
@@ -1335,5 +1290,6 @@ function isRssAllowed()
     } else {
         $is_domain_allowed = true;
     }
+
     return $is_globally_allowed & $is_domain_allowed;
 }

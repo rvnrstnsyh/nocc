@@ -27,20 +27,6 @@ class NVLL_HeaderInfo
      */
     private $_defaultcharset;
 
-    /**
-     * we are using Horde/Imap library
-     * @var bool
-     * @access private
-     */
-    private $_ishorde;
-
-    /**
-     * hold some more headerinfo from horde call
-     * @var object
-     * @access private
-     */
-    private $_horde_flags;
-
 
     /**
      * Initialize the wrapper
@@ -48,10 +34,8 @@ class NVLL_HeaderInfo
      * @param string $defaultcharset Default charset
      * @todo Throw exception, if no vaild header info? 
      */
-    public function __construct($headerinfo, $defaultcharset = 'ISO-8859-1', $horde_flags = null, $is_horde = false)
+    public function __construct($headerinfo, $defaultcharset = 'ISO-8859-1')
     {
-        $this->_ishorde = $is_horde;
-        $this->_horde_flags = $horde_flags;
         $this->_headerinfo = $headerinfo;
         $this->_defaultcharset = $defaultcharset;
     }
@@ -80,14 +64,8 @@ class NVLL_HeaderInfo
      */
     public function getMessageId()
     {
-        if (! $this->_ishorde) {
-            if (isset($this->_headerinfo->message_id)) {
-                return $this->_headerinfo->message_id;
-            }
-        } else {
-            if ($this->_headerinfo->count() >= 1) {
-                return $this->_headerinfo->first()->getEnvelope()->message_id;
-            }
+        if (isset($this->_headerinfo->message_id)) {
+            return $this->_headerinfo->message_id;
         }
         return '';
     }
@@ -98,14 +76,8 @@ class NVLL_HeaderInfo
      */
     public function getSubject()
     {
-        if (! $this->_ishorde) {
-            if (isset($this->_headerinfo->subject)) {
-                return $this->_decodeMimeHeader($this->_headerinfo->subject, $this->_defaultcharset);
-            }
-        } else {
-            if ($this->_headerinfo->count() >= 1) {
-                return $this->_decodeMimeHeader($this->_headerinfo->first()->getEnvelope()->subject, $this->_defaultcharset, false);
-            }
+        if (isset($this->_headerinfo->subject)) {
+            return $this->_decodeMimeHeader($this->_headerinfo->subject, $this->_defaultcharset);
         }
         return '';
     }
@@ -117,18 +89,11 @@ class NVLL_HeaderInfo
     public function getFromAddress()
     {
         $ret = '';
-        if (! $this->_ishorde) {
-            if (isset($this->_headerinfo->fromaddress)) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->fromaddress, $this->_defaultcharset);
-                $ret = reformat_address_list($ret);
-            }
-        } else {
-            if ($this->_headerinfo->count() >= 1) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->first()->getEnvelope()->from, $this->_defaultcharset, false);
-                //$ret=$this->_headerinfo->first()->getEnvelope()->from;
-                $ret = reformat_address_list($ret);
-            }
+        if (isset($this->_headerinfo->fromaddress)) {
+            $ret = $this->_decodeMimeHeader($this->_headerinfo->fromaddress, $this->_defaultcharset);
+            $ret = reformat_address_list($ret);
         }
+
         return $ret;
     }
 
@@ -139,17 +104,11 @@ class NVLL_HeaderInfo
     public function getToAddress()
     {
         $ret = '';
-        if (! $this->_ishorde) {
-            if (isset($this->_headerinfo->toaddress)) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->toaddress, $this->_defaultcharset);
-                $ret = reformat_address_list($ret);
-            }
-        } else {
-            if ($this->_headerinfo->count() >= 1) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->first()->getEnvelope()->to, $this->_defaultcharset, false);
-                $ret = reformat_address_list($ret);
-            }
+        if (isset($this->_headerinfo->toaddress)) {
+            $ret = $this->_decodeMimeHeader($this->_headerinfo->toaddress, $this->_defaultcharset);
+            $ret = reformat_address_list($ret);
         }
+
         return $ret;
     }
 
@@ -160,17 +119,11 @@ class NVLL_HeaderInfo
     public function getCcAddress()
     {
         $ret = '';
-        if (! $this->_ishorde) {
-            if (isset($this->_headerinfo->ccaddress)) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->ccaddress, $this->_defaultcharset);
-                $ret = reformat_address_list($ret);
-            }
-        } else {
-            if ($this->_headerinfo->count() >= 1) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->first()->getEnvelope()->cc, $this->_defaultcharset, false);
-                $ret = reformat_address_list($ret);
-            }
+        if (isset($this->_headerinfo->ccaddress)) {
+            $ret = $this->_decodeMimeHeader($this->_headerinfo->ccaddress, $this->_defaultcharset);
+            $ret = reformat_address_list($ret);
         }
+
         return $ret;
     }
 
@@ -181,17 +134,11 @@ class NVLL_HeaderInfo
     public function getReplyToAddress()
     {
         $ret = '';
-        if (! $this->_ishorde) {
-            if (isset($this->_headerinfo->reply_toaddress)) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->reply_toaddress, $this->_defaultcharset);
-                $ret = reformat_address_list($ret);
-            }
-        } else {
-            if ($this->_headerinfo->count() >= 1) {
-                $ret = $this->_decodeMimeHeader($this->_headerinfo->first()->getEnvelope()->reply_to, $this->_defaultcharset, false);
-                $ret = reformat_address_list($ret);
-            }
+        if (isset($this->_headerinfo->reply_toaddress)) {
+            $ret = $this->_decodeMimeHeader($this->_headerinfo->reply_toaddress, $this->_defaultcharset);
+            $ret = reformat_address_list($ret);
         }
+
         return $ret;
     }
 
@@ -201,40 +148,17 @@ class NVLL_HeaderInfo
      */
     public function getTimestamp()
     {
-        if (! $this->_ishorde) {
-            if (isset($this->_headerinfo->udate)) {
-                return $this->_headerinfo->udate;
-            }
-        } else {
-            if ($this->_headerinfo->count() >= 1) {
-                return $this->_headerinfo->first()->getEnvelope()->date->__toString();
-            }
-        }
+        if (isset($this->_headerinfo->udate)) return $this->_headerinfo->udate;
         return 0;
     }
 
     /**
-     * Is the mail unread?
-     * @return boolean Is unread?
+     * Is the mail unseen?
+     * @return boolean Is unseen?
      */
-    public function isUnread()
+    public function isUnseen()
     {
-        if (! $this->_ishorde) {
-            if (($this->_headerinfo->Unseen == 'U') || ($this->_headerinfo->Recent == 'N')) {
-                return true;
-            }
-        } else {
-            if ($this->_horde_flags != null && $this->_horde_flags->count() >= 1) {
-                $flags = $this->_horde_flags->first()->getFlags();
-                $unseen = true;
-                foreach ($flags as $flag) {
-                    if (strtolower($flag) == '\seen' || strtolower($flag) == '\recent') {
-                        $unseen = false;
-                    }
-                }
-                return $unseen;
-            }
-        }
+        if (($this->_headerinfo->Unseen == 'U') || ($this->_headerinfo->Recent == 'N')) return true;
         return false;
     }
 
@@ -244,22 +168,7 @@ class NVLL_HeaderInfo
      */
     public function isFlagged()
     {
-        if (! $this->_ishorde) {
-            if ($this->_headerinfo->Flagged == 'F') {
-                return true;
-            }
-        } else {
-            if ($this->_horde_flags != null && $this->_horde_flags->count() >= 1) {
-                $flags = $this->_horde_flags->first()->getFlags();
-                $flagged = false;
-                foreach ($flags as $flag) {
-                    if (strtolower($flag) == '\flagged') {
-                        $flagged = true;
-                    }
-                }
-                return $flagged;
-            }
-        }
+        if ($this->_headerinfo->Flagged == 'F') return true;
         return false;
     }
 
@@ -275,7 +184,7 @@ class NVLL_HeaderInfo
         $decodedheader = '';
         if (isset($mimeheader)) {
             $mimeheader = str_replace('x-unknown', $defaultcharset, $mimeheader);
-            $decodedheader = NVLL_IMAP::mime_header_decode($mimeheader, $decode, $this->_ishorde);
+            $decodedheader = NVLL_IMAP::mime_header_decode($mimeheader, $decode);
         }
         return $decodedheader;
     }

@@ -574,9 +574,9 @@ class NVLL_UserPrefsTest extends PHPUnit\Framework\TestCase
     }
 
     /**
-     * @todo Implement testRead().
+     * @todo Implement testSeen().
      */
-    public function testRead()
+    public function testSeen()
     {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(
@@ -587,7 +587,7 @@ class NVLL_UserPrefsTest extends PHPUnit\Framework\TestCase
     /**
      * Test case for readFromFile().
      */
-    public function testReadFromFile()
+    public function testSeenFromFile()
     {
         $ev = '';
         $defaultUserPrefs = new NVLL_UserPrefs('');

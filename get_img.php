@@ -12,20 +12,12 @@ require_once './common.php';
 
 try {
     $pop = new NVLL_IMAP();
-
     $mail = $_REQUEST['mail'];
     $num = $_REQUEST['num'];
     $transfer = $_REQUEST['transfer'];
     $mime = $_REQUEST['mime'];
-
-    if (!$pop->is_horde()) {
-        $img = $pop->fetchbody($mail, $num);
-    } else {
-        $img = $pop->fetchbody($mail, $num, $num, false);
-    }
-
+    $img = $pop->fetchbody($mail, $num);
     $img = NVLL_IMAP::decode(removeUnicodeBOM($img), $transfer);
-
     $pop->close();
 
     if (preg_match("/^image/", $mime)) {

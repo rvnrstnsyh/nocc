@@ -32,7 +32,6 @@ $_SESSION['smtp_auth'] = base64_decode($_REQUEST['smtp_auth']);
 $_SESSION['ucb_pop_server'] = base64_decode($_REQUEST['ucb_pop_server']);
 $_SESSION['quota_enable'] = base64_decode($_REQUEST['quota_enable']);
 $_SESSION['quota_type'] = base64_decode($_REQUEST['quota_type']);
-$_SESSION['is_horde'] = base64_decode($_REQUEST['is_horde']);
 
 //
 //   RSS-QUESTION

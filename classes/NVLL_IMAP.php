@@ -19,8 +19,6 @@ require_once 'NVLL_Exception.php';
 require_once './utils/detect_cyr_charset.php';
 require_once './utils/crypt.php';
 
-require_once 'Horde_AutoLoader.php';
-
 class result
 {
 	public $text = '';
@@ -56,20 +54,18 @@ class NVLL_IMAP
 		}
 
 		$this->server = $_SESSION['nvll_servr'];
+
 		if (isset($_SESSION['ajxfolder'])) {
 			$this->folder = $_SESSION['ajxfolder'];
 		} else {
 			$this->folder = $_SESSION['nvll_folder'];
 		}
+
 		$this->login = $_SESSION['nvll_login'];
 		/* decrypt password */
 		$this->passwd = decpass($_SESSION['nvll_passwd'], $conf->master_key);
-
 		$this->namespace = $_SESSION['imap_namespace'];
 
-		if (! isset($_SESSION['is_horde'])) {
-			$_SESSION['is_horde'] = $this->is_horde();
-		}
 
 		$memcache = null;
 		$login_attempts = -1;
@@ -97,143 +93,8 @@ class NVLL_IMAP
 		}
 
 		// $ev is set if there is a problem with the connection
-		if (! $this->is_horde()) {
-			$conn = @imap_open('{' . $this->server . '}' . mb_convert_encoding($this->folder, 'UTF7-IMAP', 'UTF-8'), $this->login, $this->passwd, 0);
-		} else {
-			$spec = explode("/", $this->server);
-			$host_port = explode(":", $spec[0]);
-			$host = $host_port[0];
-			$port = $host_port[1];
-			$imap = false;
-			$pop3 = false;
-			$secure = "false";
-			foreach ($spec as $index => $param) {
-				if ($param == "service=imap" || preg_match("/^imap/", $param)) {
-					$imap = true;
-				}
-				if ($param == "service=pop3" || $param == "pop3") {
-					$pop3 = true;
-				}
-				if (preg_match("/^ssl/", $param)) {
-					$secure = $param;
-				}
-				if (preg_match("/^tls/", $param)) {
-					$secure = $param;
-				}
-				if ($param == "true") {
-					$secure = "true";
-				}
-			}
+		$conn = @imap_open('{' . $this->server . '}' . mb_convert_encoding($this->folder, 'UTF7-IMAP', 'UTF-8'), $this->login, $this->passwd, 0);
 
-			$tmp_username = $this->login;
-			if (preg_match("/^ssl/", $secure)) {
-				//With SSL we most probably run into PLAIN SASL AUTH
-				// strip domain part from login user name
-				//  For PLAIN SASL auth we want as a login string:
-				//    authzid\0authcid\0passwd
-				//  If authcid is something like "ad\user" the "ad\" must be stripped from authzid
-				//  For Details about PLAIN SASL see https://www.rfc-editor.org/rfc/rfc4616.html
-				if (
-					isset($conf->domains[$_SESSION['nvll_domain_index']]->from_part) &&
-					strlen($conf->domains[$_SESSION['nvll_domain_index']]->from_part) > 0
-				) {
-					$reg = $conf->domains[$_SESSION['nvll_domain_index']]->from_part;
-					$reg = preg_replace("/\\\/", '\\\\\\', $reg);
-					$tmp_username = preg_replace("/^" . $reg . "$/", "$1", $tmp_username);
-				}
-			}
-
-			if ($pop3) {
-				try {
-					$conn = new Horde_Imap_Client_Socket_Pop3(array(
-						'username' => $tmp_username,
-						'authusername' => $this->login,
-						'password' => $this->passwd,
-						'hostspec' => $host,
-						'port' => $port,
-						'secure' => $secure
-					));
-					if ($conn != null) {
-						$conn->openMailbox($this->folder);
-						$this->_isImap = false;
-						$_SESSION['is_imap'] = $this->_isImap;
-					}
-				} catch (Horde_Imap_Client_Exception $e) {
-					throw new Exception($lang_could_not_connect . "(1)" . ":" . $e->raw_msg);
-				}
-			} else if ($imap) {
-				try {
-					$conn = new Horde_Imap_Client_Socket(array(
-						'username' => $tmp_username,
-						'authusername' => $this->login,
-						'password' => $this->passwd,
-						'hostspec' => $host,
-						'port' => $port,
-						'secure' => $secure
-					));
-					if ($conn != null) {
-						$conn->openMailbox($this->folder);
-						$this->_isImap = true;
-						$_SESSION['is_imap'] = $this->_isImap;
-					}
-				} catch (Horde_Imap_Client_Exception $e) {
-					throw new Exception($lang_could_not_connect . "(2)" . ":" . $e->raw_msg);
-				}
-			} else {
-				$success = false;
-				try {
-					$conn = new Horde_Imap_Client_Socket(array(
-						'username' => $tmp_username,
-						'authusername' => $this->login,
-						'password' => $this->passwd,
-						'hostspec' => $host,
-						'port' => $port,
-						'secure' => $secure
-					));
-					if ($conn != null) {
-						$conn->openMailbox($this->folder);
-						$success = true;
-						$this->_isImap = true;
-						$_SESSION['is_imap'] = $this->_isImap;
-					}
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: open imap connection to ' . $host . ' failed with: "' . $e->raw_msg . '", trying pop3';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-				}
-				if (! $success) {
-					try {
-						$conn = new Horde_Imap_Client_Socket_Pop3(array(
-							'username' => $tmp_username,
-							'authusername' => $this->login,
-							'password' => $this->passwd,
-							'hostspec' => $host,
-							'port' => $port,
-							'secure' => $secure
-						));
-						if ($conn != null) {
-							$conn->openMailbox($this->folder);
-							$success = true;
-							$this->_isImap = false;
-							$_SESSION['is_imap'] = $this->_isImap;
-						}
-					} catch (Horde_Imap_Client_Exception $e) {
-						$log_string = 'NVLL: open pop3 connection to ' . $host . ' failed with: "' . $e->raw_msg . '", giving up';
-						error_log($log_string);
-						$error = "";
-						if (strlen($this->login) == 0) {
-							$error = $error . $err_user_empty . ".\n";
-						}
-						if (strlen($this->passwd) == 0) {
-							$error = $error . $err_passwd_empty . ".\n";
-						}
-						throw new Exception($error . $lang_could_not_connect . "(3)");
-					}
-				}
-			}
-		}
 		if (!$conn) {
 			//php.log,syslog message to be used against brute force attempts e.g. with fail2ban
 			//don't change text or rules may fail
@@ -244,18 +105,13 @@ class NVLL_IMAP
 					syslog(LOG_INFO, $log_string);
 				}
 			}
+
 			$error = "";
-			if (strlen($this->login) == 0) {
-				$error = $error . $err_user_empty . ".\n";
-			}
-			if (strlen($this->passwd) == 0) {
-				$error = $error . $err_passwd_empty . ".\n";
-			}
-			if (! $this->is_horde()) {
-				throw new Exception($error . $lang_could_not_connect . ":\n" . $this->last_error());
-			} else {
-				throw new Exception($error . $lang_could_not_connect);
-			}
+
+			if (strlen($this->login) == 0) $error = $error . $err_user_empty . ".\n";
+			if (strlen($this->passwd) == 0) $error = $error . $err_passwd_empty . ".\n";
+
+			throw new Exception($error . $lang_could_not_connect . ":\n" . $this->last_error());
 		}
 
 		if (isset($_REQUEST['enter'])) {
@@ -268,11 +124,8 @@ class NVLL_IMAP
 
 		$this->conn = $conn;
 		//$_SESSION['conn']=$conn;
-
-		if (! $this->is_horde()) {
-			$this->_isImap = $this->isImapCheck();
-			$_SESSION['is_imap'] = $this->_isImap;
-		}
+		$this->_isImap = $this->isImapCheck();
+		$_SESSION['is_imap'] = $this->_isImap;
 
 		if ($memcache != null && $login_attempts > 0) {
 			$count = 0;
@@ -292,15 +145,7 @@ class NVLL_IMAP
 	 */
 	public function write_address($mailbox, $host, $personal)
 	{
-		if (! $this->is_horde()) {
-			return imap_rfc822_write_address($mailbox, $host, $personal);
-		} else {
-			$r = new Horde_Mail_Rfc822_Address();
-			$r->mailbox = $mailbox;
-			$r->host = $host;
-			$r->personal = $personal;
-			return $r->__toString();
-		}
+		return imap_rfc822_write_address($mailbox, $host, $personal);
 	}
 
 	/**
@@ -312,53 +157,7 @@ class NVLL_IMAP
 	 */
 	public function parse_headers($headers, $defaulthost = "UNKNOWN")
 	{
-		if (! $this->is_horde()) {
-			$result = imap_rfc822_parse_headers($headers, $defaulthost);
-		} else {
-			//this is called only for rfc822 header
-			$result = new stdClass();
-			$result->subject = "";
-			$result->date = "";
-			$result->from = array();
-			$result->from[0] = new stdClass();
-			$result->from[0]->mailbox = "";
-			$result->from[0]->host = "";
-			$result->from[0]->personal = "";
-			$result->to = array();
-			$result->to[0] = new stdClass();
-			$result->to[0]->mailbox = "";
-			$result->to[0]->host = "";
-			$result->to[0]->personal = "";
-			$matches = array();
-			if (preg_match("/^\s*Subject:\s+(.*)$/im", $headers, $matches)) {
-				$result->subject = $matches[1];
-			}
-			$matches = array();
-			if (preg_match("/^\s*From:(.*)<(.*)@(.*)>\s+/im", $headers, $matches)) {
-				$result->from[0]->personal = trim($matches[1]);
-				$result->from[0]->mailbox = trim($matches[2]);
-				$result->from[0]->host = trim($matches[3]);
-			} else if (preg_match("/^\s*From:\s*?<*(.*)@(.*)>*\s+/im", $headers, $matches)) {
-				$result->from[0]->personal = "";
-				$result->from[0]->mailbox = trim($matches[1]);
-				$result->from[0]->host = trim($matches[2]);
-			}
-			$matches = array();
-			if (preg_match("/^\s*To:(.*)<(.*)@(.*)>\s+/im", $headers, $matches)) {
-				$result->to[0]->personal = trim($matches[1]);
-				$result->to[0]->mailbox = trim($matches[2]);
-				$result->to[0]->host = trim($matches[3]);
-			} else if (preg_match("/^\s*To:\s*?<*(.*)@(.*)>*\s+/im", $headers, $matches)) {
-				$result->to[0]->personal = "";
-				$result->to[0]->mailbox = trim($matches[1]);
-				$result->to[0]->host = trim($matches[2]);
-			}
-			$matches = array();
-			if (preg_match("/^\s*Date:\s+(.*)$/im", $headers, $matches)) {
-				$result->date = $matches[1];
-			}
-		}
-		return $result;
+		return imap_rfc822_parse_headers($headers, $defaulthost);
 	}
 
 	/**
@@ -368,11 +167,7 @@ class NVLL_IMAP
 	 */
 	public function last_error()
 	{
-		if (! $this->is_horde()) {
-			return imap_last_error();
-		} else {
-			return "";
-		}
+		return imap_last_error();
 	}
 
 	/**
@@ -383,59 +178,10 @@ class NVLL_IMAP
 	public function search($criteria)
 	{
 		$messages = array();
-		if (! $this->is_horde()) {
-			$search_result = @imap_search($this->conn, $criteria);
-			if (is_array($search_result)) {
-				return $search_result;
-			}
-		} else {
-			$elements = explode(" ", $criteria);
-			$query = new Horde_Imap_Client_Search_Query();
-			for ($i = 0; $i < count($elements); $i++) {
-				switch (strtolower($elements[$i])) {
-					case "unseen":
-						//$query->newMsgs(true);
-						$query->flag("\\Seen", false);
-						break;
-					case "subject":
-					case "to":
-					case "from":
-					case "cc":
-						if ($i + 1 < count($elements)) {
-							$par = $elements[$i + 1];
-							$par = preg_replace("/^\"/", "", $par);
-							$par = preg_replace("/\"$/", "", $par);
-							$query->headerText($elements[$i], $par);
-							$i++;
-						}
-						break;
-					case "body":
-						if ($i + 1 < count($elements)) {
-							$par = $elements[$i + 1];
-							$par = preg_replace("/^\"/", "", $par);
-							$par = preg_replace("/\"$/", "", $par);
-							$query->text($par);
-							$i++;
-						}
-						break;
-				}
-			}
-			$options = array(
-				"sequence" => true,
-			);
-			try {
-				$horde_search = $this->conn->search($this->folder, $query, $options);
-				if ($horde_search['count'] > 0) {
-					$messages = $horde_search['match']->ids;
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: search failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		$search_result = @imap_search($this->conn, $criteria);
+
+		if (is_array($search_result)) return $search_result;
+
 		return $messages;
 	}
 
@@ -447,70 +193,11 @@ class NVLL_IMAP
 	public function fetchstructure($msgnum)
 	{
 		$parts_info = array();
-		if (! $this->is_horde()) {
-			$structure = @imap_fetchstructure($this->conn, $msgnum);
-		} else {
-			try {
-				$query = new Horde_Imap_Client_Fetch_Query();
-				$query->structure();
-				$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-				$options = array(
-					"ids" => $ids
-				);
-				$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-				if ($fetch_result->count() == 1) {
-					$structure = $fetch_result->first()->getStructure();
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: fetching structure failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
+		$structure = @imap_fetchstructure($this->conn, $msgnum);
 
-			$rec = function ($part) use (&$rec, &$parts_info, $msgnum) {
-				$mimeID = $part->getMimeId();
-				$query = new Horde_Imap_Client_Fetch_Query();
-				$opts = array(
-					"peek" => true,
-				);
-				$query->mimeHeader($mimeID, $opts);
-				$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-				$options = array(
-					"ids" => $ids,
-				);
-				$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-				if ($fetch_result != null && $fetch_result->count() > 0 && $fetch_result->first() != null) {
-					$mimeHeader = $fetch_result->first()->getMimeHeader($mimeID, Horde_Imap_Client_Data_Fetch::HEADER_PARSE);
-					$tmp_encoding = "";
-					$tmp_contentid = "";
-					if ($mimeHeader != null) {
-						if ($mimeHeader->getHeader("Content-Transfer-Encoding") != null) {
-							$tmp_encoding = strtolower($mimeHeader->getHeader("Content-Transfer-Encoding")->value);
-						}
-						if ($mimeHeader->getHeader("Content-ID") != null) {
-							$tmp_contentid = $mimeHeader->getHeader("Content-ID")->value;
-						}
-					}
-					$parts_info[$mimeID] = array(
-						'encoding' => $tmp_encoding,
-						'contentId' => $tmp_contentid
-					);
-				}
-				$subparts = $part->getParts();
-				if (count($subparts) > 0) {
-					foreach ($subparts as $part) {
-						$rec($part);
-					}
-				}
-			};
-			$rec($structure);
-		}
-		if (!is_object($structure)) {
-			throw new Exception('imap_fetchstructure() did not return an object.');
-		}
-		return new NVLL_MailStructure($structure, $this->is_horde(), $parts_info);
+		if (!is_object($structure)) throw new Exception('imap_fetchstructure() did not return an object.');
+
+		return new NVLL_MailStructure($structure, $parts_info);
 	}
 
 	/**
@@ -521,32 +208,9 @@ class NVLL_IMAP
 	 */
 	public function fetchheader($msgnum)
 	{
-		if (! $this->is_horde()) {
-			$header = imap_fetchheader($this->conn, $msgnum);
-		} else {
-			try {
-				$query = new Horde_Imap_Client_Fetch_Query();
-				$query_options = array(
-					"peek" => true,
-				);
-				$query->headerText($query_options);
-				$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-				$options = array(
-					"ids" => $ids,
-				);
-				$header_fetch = $this->conn->fetch($this->folder, $query, $options);
-				if ($header_fetch->count() >= 1 && $header_fetch->first() != null) {
-					$header = $header_fetch->first()->getHeaderText();
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: fetching header failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
-		return new NVLL_Header($header, $this->is_horde());
+		$header = imap_fetchheader($this->conn, $msgnum);
+
+		return new NVLL_Header($header);
 	}
 
 	/**
@@ -556,101 +220,9 @@ class NVLL_IMAP
 	 * @return string Body
 	 * @todo Throw exceptions?
 	 */
-	public function fetchbody($msgnum, $partnum, $mimeid = "", $decode = true, $rfc822 = false)
+	public function fetchbody($msgnum, $partnum)
 	{
-		$bodyText = "";
-		if (! $this->is_horde()) {
-			$bodyText = @imap_fetchbody($this->conn, $msgnum, $partnum);
-		} else {
-			try {
-				if ($rfc822) {
-					$headerText = "";
-					$body_only = false;
-					$header_only = false;
-					$matches = array();
-					if (preg_match("/(\d*).*?\.(\d*)/", $partnum, $matches)) {
-						if ($matches[2] == "0") {
-							$header_only = true;
-						}
-						if ($matches[2] == "1") {
-							$body_only = true;
-						}
-						//$partnum=$matches[1];
-						//$mimeid=$partnum;
-					}
-					if (! $body_only) {
-						$query = new Horde_Imap_Client_Fetch_Query();
-						$opts = array(
-							"id" => $mimeid,
-							"peek" => true,
-						);
-						$query->headerText($opts);
-						$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-						$options = array(
-							"ids" => $ids,
-						);
-						$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-						if ($fetch_result->count() >= 1) {
-							$headerText = $fetch_result->first()->getHeaderText($mimeid);
-						}
-					}
-					if ($header_only) {
-						$bodyText = $headerText;
-					} else {
-						$query = new Horde_Imap_Client_Fetch_Query();
-						$opts = array(
-							"id" => $mimeid,
-						);
-						$query->bodyText($opts);
-						$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-						$options = array(
-							"ids" => $ids,
-						);
-						$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-						if ($fetch_result->count() >= 1) {
-							$bodyText = $fetch_result->first()->getBodyText($mimeid);
-						}
-						if (strlen($bodyText) == 0) {
-							$query = new Horde_Imap_Client_Fetch_Query();
-							$opts = array(
-								"decode" => $decode,
-							);
-							$query->bodyPart($mimeid, $opts);
-							$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-							$options = array(
-								"ids" => $ids,
-							);
-							$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-							if ($fetch_result->count() >= 1) {
-								$bodyText = $fetch_result->first()->getBodyPart($mimeid);
-							}
-						}
-						$bodyText = $headerText . $bodyText;
-					}
-				} else {
-					$query = new Horde_Imap_Client_Fetch_Query();
-					$opts = array(
-						"decode" => $decode,
-					);
-					$query->bodyPart($mimeid, $opts);
-					$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-					$options = array(
-						"ids" => $ids,
-					);
-					$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-					if ($fetch_result->count() >= 1) {
-						$bodyText = $fetch_result->first()->getBodyPart($mimeid);
-					}
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: fetching body text failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
-		return $bodyText;
+		return @imap_fetchbody($this->conn, $msgnum, $partnum);
 	}
 
 	/**
@@ -661,31 +233,10 @@ class NVLL_IMAP
 	public function get_size($msgnum)
 	{
 		$size = 0;
-		if (! $this->is_horde()) {
-			$overview = imap_fetch_overview($this->conn, $msgnum);
-			if (isset($overview[0]->size)) {
-				$size = $overview[0]->size;
-			}
-		} else {
-			try {
-				$query = new Horde_Imap_Client_Fetch_Query();
-				$query->size();
-				$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-				$options = array(
-					"ids" => $ids,
-				);
-				$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-				if ($fetch_result->count() >= 1) {
-					$size = $fetch_result->first()->getSize();
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: fetching message size failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		$overview = imap_fetch_overview($this->conn, $msgnum);
+
+		if (isset($overview[0]->size)) $size = $overview[0]->size;
+
 		return $size;
 	}
 
@@ -697,30 +248,7 @@ class NVLL_IMAP
 	 */
 	public function fetchmessage($msgnum)
 	{
-		$fullText = "";
-		if (! $this->is_horde()) {
-			$fullText = @imap_fetchbody($this->conn, $msgnum, '');
-		} else {
-			try {
-				$query = new Horde_Imap_Client_Fetch_Query();
-				$query->fullText();
-				$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-				$options = array(
-					"ids" => $ids,
-				);
-				$fetch_result = $this->conn->fetch($this->folder, $query, $options);
-				if ($fetch_result->count() >= 1) {
-					$fullText = $fetch_result->first()->getFullMsg();
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: fetching message size failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
-		return $fullText;
+		return @imap_fetchbody($this->conn, $msgnum, '');
 	}
 
 	/**
@@ -730,23 +258,7 @@ class NVLL_IMAP
 	 */
 	public function num_msg()
 	{
-		if (! $this->is_horde()) {
-			return imap_num_msg($this->conn);
-		} else {
-			$count = 0;
-			$status = array();
-			try {
-				$status = $this->conn->status($this->folder, Horde_Imap_Client::STATUS_MESSAGES);
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: getting number of messages from folder ' . $this->folder . ' failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-			$count = $status["messages"];
-			return $count;
-		}
+		return imap_num_msg($this->conn);
 	}
 
 	/**
@@ -757,79 +269,28 @@ class NVLL_IMAP
 	 */
 	public function sort($sort, $sortdir)
 	{
-		if (! $this->is_horde()) {
-			switch ($sort) {
-				case '1':
-					$imapsort = SORTFROM;
-					break;
-				case '2':
-					$imapsort = SORTTO;
-					break;
-				case '3':
-					$imapsort = SORTSUBJECT;
-					break;
-				case '4':
-					$imapsort = SORTDATE;
-					break;
-				case '5':
-					$imapsort = SORTSIZE;
-					break;
-			}
-			$sorted = imap_sort($this->conn, $imapsort, $sortdir, SE_NOPREFETCH);
-			if (!is_array($sorted)) {
-				throw new Exception('imap_sort() did not return an array.');
-			}
-		} else {
-			switch ($sort) {
-				case '1':
-					$imapsort = Horde_Imap_Client::SORT_FROM;
-					break;
-				case '2':
-					$imapsort = Horde_Imap_Client::SORT_TO;
-					break;
-				case '3':
-					$imapsort = Horde_Imap_Client::SORT_SUBJECT;
-					break;
-				case '4':
-					$imapsort = Horde_Imap_Client::SORT_DATE;
-					break;
-				case '5':
-					$imapsort = Horde_Imap_Client::SORT_SIZE;
-					break;
-			}
-			$sort_array = array();
-			if ($sortdir) {
-				$sort_array[] = Horde_Imap_Client::SORT_REVERSE;
-			}
-			$sort_array[] = $imapsort;
-			try {
-				$options = array(
-					"sort" => $sort_array,
-					"sequence" => true,
-				);
-				$result = $this->conn->search($this->folder, null, $options);
-				$sorted = $result["match"]->ids;
-				$options = array(
-					"sort" => $sort_array,
-					"sequence" => false,
-				);
-				$result = $this->conn->search($this->folder, null, $options);
-				$sorted_uids = $result["match"]->ids;
-				$_SESSION['horde_sequence2uid'] = array();
-				for ($i = 0; $i < count($sorted); $i++) {
-					$_SESSION['horde_sequence2uid'][$sorted[$i]] = -1;
-					if (isset($sorted_uids[$i])) {
-						$_SESSION['horde_sequence2uid'][$sorted[$i]] = $sorted_uids[$i];
-					}
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: getting sequence numbers of messages from folder ' . $this->folder . ' failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
+		switch ($sort) {
+			case '1':
+				$imapsort = SORTFROM;
+				break;
+			case '2':
+				$imapsort = SORTTO;
+				break;
+			case '3':
+				$imapsort = SORTSUBJECT;
+				break;
+			case '4':
+				$imapsort = SORTDATE;
+				break;
+			case '5':
+				$imapsort = SORTSIZE;
+				break;
 		}
+
+		$sorted = imap_sort($this->conn, $imapsort, $sortdir, SE_NOPREFETCH);
+
+		if (!is_array($sorted)) throw new Exception('imap_sort() did not return an array.');
+
 		return $sorted;
 	}
 
@@ -841,34 +302,11 @@ class NVLL_IMAP
 	 */
 	public function headerinfo($msgnum, $defaultcharset = 'ISO-8859-1')
 	{
-		$horde_flags = null;
-		if (! $this->is_horde()) {
-			$headerinfo = @imap_headerinfo($this->conn, $msgnum);
-		} else {
-			try {
-				$query = new Horde_Imap_Client_Fetch_Query();
-				$query->envelope();
-				$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-				$options = array(
-					"ids" => $ids
-				);
-				$headerinfo = $this->conn->fetch($this->folder, $query, $options);
-				$queryflags = new Horde_Imap_Client_Fetch_Query();
-				$queryflags->flags();
-				$horde_flags = $this->conn->fetch($this->folder, $queryflags, $options);
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: fetching headerinfo failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		$headerinfo = @imap_headerinfo($this->conn, $msgnum);
 
-		if (!is_object($headerinfo)) {
-			throw new Exception('imap_headerinfo() did not return an object.');
-		}
-		return new NVLL_HeaderInfo($headerinfo, $defaultcharset, $horde_flags, $this->is_horde());
+		if (!is_object($headerinfo)) throw new Exception('imap_headerinfo() did not return an object.');
+
+		return new NVLL_HeaderInfo($headerinfo, $defaultcharset);
 	}
 
 	/**
@@ -879,20 +317,7 @@ class NVLL_IMAP
 	 */
 	public function deletemailbox($mailbox)
 	{
-		if (! $this->is_horde()) {
-			return imap_deletemailbox($this->conn, '{' . $this->server . '}' . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
-		} else {
-			try {
-				$this->conn->deleteMailbox($mailbox);
-				return true;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: deleting mailbox ' . $mailbox . ' failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		return imap_deletemailbox($this->conn, '{' . $this->server . '}' . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
 		return false;
 	}
 
@@ -950,12 +375,11 @@ class NVLL_IMAP
 		// Create a sanitised mbox filename based on the folder name
 		$filename = preg_replace('/[\\/:\*\?"<>\|;]/', '_', str_replace('&nbsp;', ' ', $download_box)) . ".mbox";
 		$_SESSION['fd_message'][] = $filename;
-
 		$remember_folder = $_SESSION['nvll_folder'];
 		$_SESSION['nvll_folder'] = $download_box;
-
 		$ev = '';
 		$pop = new NVLL_IMAP($ev);
+
 		if (NVLL_Exception::isException($ev)) {
 			$_SESSION['nvll_folder'] = $remember_folder;
 			unset($_SESSION['fd_message']);
@@ -990,8 +414,8 @@ class NVLL_IMAP
 		$_SESSION['fd_message'][] = $tmpFile;
 		$tmpFile = $conf->tmpdir . '/' . $tmpFile;
 		$_SESSION[$tmpFile] = 1;
-
 		$mail_skipped = 0;
+
 		if ($mbox = fopen($tmpFile, 'w')) {
 			// Find out how many messages are in the folder and loop for each one
 			$tot_msgs = $pop->num_msg();
@@ -1005,12 +429,11 @@ class NVLL_IMAP
 				$header_obj = $pop->fetchheader($mail);
 				$header = $header_obj->getHeader();
 				$header = "\n" . str_replace("\r", "", $header);
-
 				$headerinfo_obj = $pop->headerinfo($mail);
 				$subject = $headerinfo_obj->getSubject();
-
 				// Find a "from" e-mail address in the headers
 				$from = $pop->find_email_header("From", $header);
+
 				if ($from == "") $from = $pop->find_email_header("Reply-To", $header);
 				if ($from == "") $from = $pop->find_email_header("X-From-Line", $header);
 				if ($from == "") $from = "MAILER-DAEMON"; // Fallback if no From addr
@@ -1019,8 +442,10 @@ class NVLL_IMAP
 				// Yes, Delivery-date: takes priority over Date:, which many
 				// mbox creation programs forget to take into account!
 				$date = $pop->find_email_header("Delivery-date", $header);
+
 				if ($date == "") $date = $pop->find_email_header("Date", $header);
 				if ($date == "") $date = 0; // Time zero fallback
+
 				$showdate = format_date($date, $lang);
 				$date = date("D M d H:i:s Y", $date);
 
@@ -1044,6 +469,7 @@ class NVLL_IMAP
 			fwrite($mbox, "\n");
 			fclose($mbox);
 		}
+
 		$pop->close();
 		$_SESSION['nvll_folder'] = $remember_folder;
 
@@ -1073,7 +499,6 @@ class NVLL_IMAP
 			$filename = $_SESSION['fd_tmpfile'][1];
 			if (is_file($tmpFile)) {
 				$file_size = filesize($tmpFile);
-
 				// If no messages were found in the folder, don't offer the download
 				// and simply fall into displaying the Folder page again. Maybe a warning
 				// message should go here (JavaScripted "<foldername> folder contains
@@ -1084,20 +509,11 @@ class NVLL_IMAP
 				// too? Would need to take $filename and $file as parameters.
 				$isIE = $isIE6 = 0;
 
-				if (!isset($HTTP_USER_AGENT)) {
-					$HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
-				}
-
+				if (!isset($HTTP_USER_AGENT)) $HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
 				// Set correct http headers.
 				// Thanks to Squirrelmail folks :-)
-				if (strstr($HTTP_USER_AGENT, 'compatible; MSIE ') !== false && strstr($HTTP_USER_AGENT, 'Opera') === false) {
-					$isIE = 1;
-				}
-
-				if (strstr($HTTP_USER_AGENT, 'compatible; MSIE 6') !== false && strstr($HTTP_USER_AGENT, 'Opera') === false) {
-					$isIE6 = 1;
-				}
-
+				if (strstr($HTTP_USER_AGENT, 'compatible; MSIE ') !== false && strstr($HTTP_USER_AGENT, 'Opera') === false) $isIE = 1;
+				if (strstr($HTTP_USER_AGENT, 'compatible; MSIE 6') !== false && strstr($HTTP_USER_AGENT, 'Opera') === false) $isIE6 = 1;
 				if ($isIE) {
 					$filename = rawurlencode($filename);
 					header("Pragma: public");
@@ -1155,47 +571,20 @@ class NVLL_IMAP
 	 */
 	public function renamemailbox($oldMailbox, $newMailbox)
 	{
-		if (! $this->is_horde()) {
-			return imap_renamemailbox($this->conn, '{' . $this->server . '}' . $oldMailbox, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($newMailbox, 'UTF7-IMAP', 'UTF-8'));
-		} else {
-			try {
-				//$this->conn->renameMailbox(imap_mutf7_to_utf8($oldMailbox),$newMailbox);
-				$this->conn->renameMailbox($oldMailbox, $newMailbox);
-				return true;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: renaming mailbox ' . $oldMailbox . ' to ' . $newMailbox . 'failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		return imap_renamemailbox($this->conn, '{' . $this->server . '}' . $oldMailbox, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($newMailbox, 'UTF7-IMAP', 'UTF-8'));
 	}
 
 	/**
 	 * Create a mailbox
-	 * @param srtring $mailbox Mailbox
+	 * @param string $mailbox Mailbox
 	 * @return boolean Successful?
 	 * @todo Rename to createMailbox()?
 	 */
 	public function createmailbox($mailbox)
 	{
-		if (! $this->is_horde()) {
-			return imap_createmailbox($this->conn, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
-		} else {
-			try {
-				$this->conn->createMailbox($mailbox);
-				return true;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: creating mailbox failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-				return false;
-			}
-		}
+		return imap_createmailbox($this->conn, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
 	}
+
 
 	/**
 	 * Check if target mailbox is local
@@ -1235,7 +624,6 @@ class NVLL_IMAP
 							$TMP_SESSION['creation_time'],
 							$TMP_SESSION['persistent'],
 							$TMP_SESSION['remote_addr'],
-							$TMP_SESSION['is_horde']
 						) = explode(" ", base64_decode($line));
 						if ($session_id == $cookie_value) {
 							foreach ($conf->domains as $index => $domain) {
@@ -1280,106 +668,24 @@ class NVLL_IMAP
 	public function put_remote(&$TMP_SESSION, $msg)
 	{
 		global $conf;
+
 		$success = false;
-		if (! $TMP_SESSION['is_horde']) {
-			$conn = @imap_open(
+		$conn = @imap_open(
+			'{' . $TMP_SESSION['nvll_servr'] . '}' . mb_convert_encoding($TMP_SESSION['nvll_folder'], 'UTF7-IMAP', 'UTF-8'),
+			$TMP_SESSION['nvll_login'],
+			decpass($TMP_SESSION['nvll_passwd'], $conf->master_key),
+			0
+		);
+		if ($conn) {
+			$success = imap_append(
+				$conn,
 				'{' . $TMP_SESSION['nvll_servr'] . '}' . mb_convert_encoding($TMP_SESSION['nvll_folder'], 'UTF7-IMAP', 'UTF-8'),
-				$TMP_SESSION['nvll_login'],
-				decpass($TMP_SESSION['nvll_passwd'], $conf->master_key),
-				0
+				$msg,
+				'\Seen'
 			);
-			if ($conn) {
-				$success = imap_append(
-					$conn,
-					'{' . $TMP_SESSION['nvll_servr'] . '}' . mb_convert_encoding($TMP_SESSION['nvll_folder'], 'UTF7-IMAP', 'UTF-8'),
-					$msg,
-					'\Seen'
-				);
-				imap_close($conn);
-			}
-		} else {
-			$conn = null;
-
-			$spec = explode("/", $TMP_SESSION['nvll_servr']);
-			$host_port = explode(":", $spec[0]);
-			$host = $host_port[0];
-			$port = $host_port[1];
-			$imap = false;
-			$pop3 = false;
-			$secure = "false";
-			foreach ($spec as $index => $param) {
-				if ($param == "service=imap" || preg_match("/^imap/", $param)) {
-					$imap = true;
-				}
-				if ($param == "service=pop3" || $param == "pop3") {
-					$pop3 = true;
-				}
-				if (preg_match("/^ssl/", $param)) {
-					$secure = $param;
-				}
-				if (preg_match("/^tls/", $param)) {
-					$secure = $param;
-				}
-				if ($param == "true") {
-					$secure = "true";
-				}
-			}
-
-			$tmp_username = $TMP_SESSION['nvll_login'];
-			if (preg_match("/^ssl/", $secure)) {
-				//With SSL we most probably run into PLAIN SASL AUTH
-				// strip domain part from login user name
-				//  For PLAIN SASL auth we want as a login string:
-				//    authzid\0authcid\0passwd
-				//  If authcid is something like "ad\user" the "ad\" must be stripped from authzid
-				//  For Details about PLAIN SASL see https://www.rfc-editor.org/rfc/rfc4616.html
-				if (
-					isset($conf->domains[$TMP_SESSION['nvll_domain_index']]->from_part) &&
-					strlen($conf->domains[$TMP_SESSION['nvll_domain_index']]->from_part) > 0
-				) {
-					$reg = $conf->domains[$TMP_SESSION['nvll_domain_index']]->from_part;
-					$reg = preg_replace("/\\\/", '\\\\\\', $reg);
-					$tmp_username = preg_replace("/^" . $reg . "$/", "$1", $tmp_username);
-				}
-			}
-
-			if ($pop3) {
-				$conn = new Horde_Imap_Client_Socket_Pop3(array(
-					'username' => $tmp_username,
-					'authusername' => $TMP_SESSION['nvll_login'],
-					'password' => decpass($TMP_SESSION['nvll_passwd'], $conf->master_key),
-					'hostspec' => $host,
-					'port' => $port,
-					'secure' => $secure
-				));
-				if ($conn != null) {
-					$conn->openMailbox($TMP_SESSION['nvll_folder']);
-				}
-			} else {
-				$conn = new Horde_Imap_Client_Socket(array(
-					'username' => $tmp_username,
-					'authusername' => $TMP_SESSION['nvll_login'],
-					'password' => decpass($TMP_SESSION['nvll_passwd'], $conf->master_key),
-					'hostspec' => $host,
-					'port' => $port,
-					'secure' => $secure
-				));
-				if ($conn != null) {
-					$conn->openMailbox($TMP_SESSION['nvll_folder']);
-				}
-			}
-			if ($conn != null) {
-				try {
-					$data = array(array('data' => $msg, 'flags' => ['\Seen']));
-					$ids = $conn->append($TMP_SESSION['nvll_folder'], $data);
-					if (! $ids->isEmpty()) {
-						$success = true;
-					}
-				} catch (Horde_Imap_Client_Exception $e) {
-				}
-				$conn->close();
-			}
+			imap_close($conn);
 		}
+
 		return $success;
 	}
 
@@ -1395,25 +701,7 @@ class NVLL_IMAP
 		$TMP_SESSION = array();
 		$is_mb_local = $this->check_mb_local($TMP_SESSION, $mailbox);
 		if ($is_mb_local) {
-			if (! $this->is_horde()) {
-				return imap_mail_copy($this->conn, $msgnum, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), 0);
-			} else {
-				try {
-					$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-					$options = array(
-						"ids" => $ids
-					);
-					$this->conn->copy($this->folder, $mailbox, $options);
-					return true;
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: copying mail failed';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-					return false;
-				}
-			}
+			return imap_mail_copy($this->conn, $msgnum, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), 0);
 		} else {
 			$msg = $this->fetchmessage($msgnum);
 			return $this->put_remote($TMP_SESSION, $msg);
@@ -1429,24 +717,10 @@ class NVLL_IMAP
 	 */
 	public function subscribe($mailbox, $isNewMailbox)
 	{
-		if (! $this->is_horde()) {
-			if ($isNewMailbox) {
-				return @imap_subscribe($this->conn, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
-			} else {
-				return @imap_subscribe($this->conn, '{' . $this->server . '}' . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
-			}
+		if ($isNewMailbox) {
+			return @imap_subscribe($this->conn, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
 		} else {
-			try {
-				$this->conn->subscribeMailbox($mailbox, true);
-				return true;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: subscribing to mailbox failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-				return false;
-			}
+			return @imap_subscribe($this->conn, '{' . $this->server . '}' . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
 		}
 	}
 
@@ -1457,21 +731,7 @@ class NVLL_IMAP
 	 */
 	public function unsubscribe($mailbox)
 	{
-		if (! $this->is_horde()) {
-			return @imap_unsubscribe($this->conn, '{' . $this->server . '}' . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
-		} else {
-			try {
-				$this->conn->subscribeMailbox($mailbox, false);
-				return true;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: unsubscribing from mailbox failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-				return false;
-			}
-		}
+		return @imap_unsubscribe($this->conn, '{' . $this->server . '}' . mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'));
 	}
 
 	/**
@@ -1486,32 +746,12 @@ class NVLL_IMAP
 		$TMP_SESSION = array();
 		$is_mb_local = $this->check_mb_local($TMP_SESSION, $mailbox);
 		if ($is_mb_local) {
-			if (! $this->is_horde()) {
-				return imap_mail_move($this->conn, $msgnum, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), 0);
-			} else {
-				try {
-					$ids = new Horde_Imap_Client_Ids(array($msgnum), true);
-					$options = array(
-						"ids" => $ids,
-						"move" => true,
-					);
-					$this->conn->copy($this->folder, $mailbox, $options);
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: move mail to folder ' . $mailbox . ' failed';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-					return false;
-				}
-				return true;
-			}
+			return imap_mail_move($this->conn, $msgnum, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), 0);
 		} else {
 			$msg = $this->fetchmessage($msgnum);
 			$ret = $this->put_remote($TMP_SESSION, $msg);
-			if ($ret) {
-				$ret = $this->delete($msgnum);
-			}
+
+			if ($ret)  $ret = $this->delete($msgnum);
 			return $ret;
 		}
 	}
@@ -1522,20 +762,7 @@ class NVLL_IMAP
 	 */
 	public function expunge()
 	{
-		if (! $this->is_horde()) {
-			return imap_expunge($this->conn);
-		} else {
-			try {
-				$this->conn->expunge($this->folder);
-				return true;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: expunge of folder ' . $this->folder . ' failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		return imap_expunge($this->conn);
 	}
 
 	/**
@@ -1546,51 +773,13 @@ class NVLL_IMAP
 	 */
 	public function delete($msgnum)
 	{
-		if (! $this->is_horde()) {
-			return imap_delete($this->conn, $msgnum, 0);
-		} else {
-			//only works with uids
-			if (isset($_SESSION['horde_sequence2uid'][$msgnum]) && $_SESSION['horde_sequence2uid'][$msgnum] >= 0) {
-				try {
-					$uid = $_SESSION['horde_sequence2uid'][$msgnum];
-					$ids = new Horde_Imap_Client_Ids(array($uid), false);
-					$options = array(
-						'ids' => $ids,
-						'add' => array(Horde_Imap_Client::FLAG_DELETED),
-					);
-					$this->conn->store($this->folder, $options);
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: deleting message failed';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-				}
-			}
-			return false;
-		}
-		return true;
+		return imap_delete($this->conn, $msgnum, 0);
+		return false;
 	}
 
 	public function close()
 	{
-		if (! $this->is_horde()) {
-			return imap_close($this->conn, CL_EXPUNGE);
-		} else {
-			try {
-				$options = array(
-					"expunge" => true,
-				);
-				$this->conn->close($options);
-				return;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: close failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		return imap_close($this->conn, CL_EXPUNGE);
 	}
 
 	/**
@@ -1609,38 +798,33 @@ class NVLL_IMAP
 	 */
 	private function isImapCheck()
 	{
-		if (! $this->is_horde()) {
-			//--------------------------------------------------------------------------------
-			// Check IMAP keywords...
-			//--------------------------------------------------------------------------------
-			$keywords = array('/imap', '/service=imap', ':143');
-			foreach ($keywords as $keyword) { //for each IMAP keyword...
-				if (stripos($this->server, $keyword) !== false) {
-					return true;
-				}
+		//--------------------------------------------------------------------------------
+		// Check IMAP keywords...
+		//--------------------------------------------------------------------------------
+		$keywords = array('/imap', '/service=imap', ':143');
+		foreach ($keywords as $keyword) { //for each IMAP keyword...
+			if (stripos($this->server, $keyword) !== false) {
+				return true;
 			}
+		}
 
-			//--------------------------------------------------------------------------------
-			// Check POP3 keywords...
-			//--------------------------------------------------------------------------------
-			$keywords = array('/pop3', '/service=pop3', ':110');
-			foreach ($keywords as $keyword) { //for each POP3 keyword...
-				if (stripos($this->server, $keyword) !== false) {
-					return false;
-				}
+		//--------------------------------------------------------------------------------
+		// Check POP3 keywords...
+		//--------------------------------------------------------------------------------
+		$keywords = array('/pop3', '/service=pop3', ':110');
+		foreach ($keywords as $keyword) { //for each POP3 keyword...
+			if (stripos($this->server, $keyword) !== false) {
+				return false;
 			}
-			//--------------------------------------------------------------------------------
+		}
+		//--------------------------------------------------------------------------------
 
-			//--------------------------------------------------------------------------------
-			// Check driver...
-			//--------------------------------------------------------------------------------
-			$check = imap_check($this->conn);
-			if ($check) {
-				return ($check->{'Driver'} == 'imap');
-			}
-			//--------------------------------------------------------------------------------
-		} else {
-			return $this->_isImap;
+		//--------------------------------------------------------------------------------
+		// Check driver...
+		//--------------------------------------------------------------------------------
+		$check = imap_check($this->conn);
+		if ($check) {
+			return ($check->{'Driver'} == 'imap');
 		}
 
 		return false;
@@ -1683,38 +867,15 @@ class NVLL_IMAP
 	 */
 	public function getmailboxes()
 	{
-		if (! $this->is_horde()) {
-			$mailboxes = @imap_getmailboxes($this->conn, '{' . $this->server . '}', '*');
-			if (!is_array($mailboxes)) {
-				throw new Exception('imap_getmailboxes() did not return an array.');
-			} else {
-				sort($mailboxes);
-			}
-			return $mailboxes;
+		$mailboxes = @imap_getmailboxes($this->conn, '{' . $this->server . '}', '*');
+
+		if (!is_array($mailboxes)) {
+			throw new Exception('imap_getmailboxes() did not return an array.');
 		} else {
-			try {
-				$mode = Horde_Imap_Client::MBOX_ALL;
-				$options = array(
-					"flat" => true,
-					"sort" => true,
-				);
-				$horde_mboxes = $this->conn->listMailboxes("*", $mode, $options);
-				$allmailboxes = array();
-				foreach ($horde_mboxes as $mbox) {
-					$obj = new stdClass();
-					$obj->name = "{" . $this->server . "}" . $mbox->utf8;
-					$allmailboxes[] = $obj;
-				}
-				return $allmailboxes;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: failed to get mailbox names';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-				throw new Exception('imap_getmailboxes() did not return an array.');
-			}
+			sort($mailboxes);
 		}
+
+		return $mailboxes;
 	}
 
 	/**
@@ -1728,11 +889,7 @@ class NVLL_IMAP
 			$mailboxes = $this->getmailboxes();
 			$names = array();
 			foreach ($mailboxes as $mailbox) { //for all mailboxes...
-				if (! $this->is_horde()) {
-					$name = str_replace('{' . $this->server . '}', '', mb_convert_encoding($mailbox->name, 'UTF-8', 'UTF7-IMAP'));
-				} else {
-					$name = str_replace('{' . $this->server . '}', '', $mailbox->name);
-				}
+				$name = str_replace('{' . $this->server . '}', '', mb_convert_encoding($mailbox->name, 'UTF-8', 'UTF7-IMAP'));
 				//TODO: Why not add names with more the 32 chars?
 				//if (strlen($name) <= 32) {
 				array_push($names, $name);
@@ -1751,35 +908,14 @@ class NVLL_IMAP
 	 */
 	public function getsubscribed()
 	{
-		if (! $this->is_horde()) {
-			$subscribed = @imap_getsubscribed($this->conn, '{' . $this->server . '}', '*');
-			if (!is_array($subscribed)) {
-				throw new Exception('imap_getsubscribed() did not return an array.');
-			} else {
-				sort($subscribed);
-			}
+		$subscribed = @imap_getsubscribed($this->conn, '{' . $this->server . '}', '*');
+
+		if (!is_array($subscribed)) {
+			throw new Exception('imap_getsubscribed() did not return an array.');
 		} else {
-			try {
-				$mode = Horde_Imap_Client::MBOX_SUBSCRIBED;
-				$options = array(
-					"flat" => true,
-					"sort" => true,
-				);
-				$horde_mboxes = $this->conn->listMailboxes("*", $mode, $options);
-				$subscribed = array();
-				foreach ($horde_mboxes as $mbox) {
-					$obj = new stdClass();
-					$obj->name = "{" . $this->server . "}" . $mbox->utf8;
-					$subscribed[] = $obj;
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: list subscribed mailboxes failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
+			sort($subscribed);
 		}
+
 		return $subscribed;
 	}
 
@@ -1795,14 +931,9 @@ class NVLL_IMAP
 
 			$names = array();
 			foreach ($subscribed as $mailbox) { //for all mailboxes...
-				if (! $this->is_horde()) {
-					$name = str_replace('{' . $this->server . '}', '', mb_convert_encoding($mailbox->name, 'UTF-8', 'UTF7-IMAP'));
-				} else {
-					$name = str_replace('{' . $this->server . '}', '', $mailbox->name);
-				}
-				if (!in_array($name, $names)) {
-					array_push($names, $name);
-				}
+				$name = str_replace('{' . $this->server . '}', '', mb_convert_encoding($mailbox->name, 'UTF-8', 'UTF7-IMAP'));
+
+				if (!in_array($name, $names)) array_push($names, $name);
 			}
 			return $names;
 		} catch (Exception $ex) {
@@ -1811,67 +942,25 @@ class NVLL_IMAP
 	}
 
 	/**
-	 * Mark mail as read
+	 * Mark mail as seen
 	 * @param integer $msgnum Message number
 	 * @return boolean Successful?
-	 * @todo Rename to markMailRead()?
+	 * @todo Rename to markMailSeen()?
 	 */
-	public function mail_mark_read($msgnum)
+	public function mail_mark_seen($msgnum)
 	{
-		if (! $this->is_horde()) {
-			return imap_setflag_full($this->conn, $msgnum, '\\Seen');
-		} else {
-			//only works with uids
-			if (isset($_SESSION['horde_sequence2uid'][$msgnum]) && $_SESSION['horde_sequence2uid'][$msgnum] >= 0) {
-				try {
-					$uid = $_SESSION['horde_sequence2uid'][$msgnum];
-					$ids = new Horde_Imap_Client_Ids(array($uid), false);
-					$options = array(
-						"ids" => $ids,
-						"add" => array(Horde_Imap_Client::FLAG_SEEN),
-					);
-					$this->conn->store($this->folder, $options);
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: setting mail as read failed';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-				}
-			}
-		}
+		return imap_setflag_full($this->conn, $msgnum, '\\Seen');
 	}
 
 	/**
-	 * Mark mail as unread
+	 * Mark mail as unseen
 	 * @param integer $msgnum Message number
 	 * @return boolean Successful?
-	 * @todo Rename to markMailUnread()?
+	 * @todo Rename to markMailUnseen()?
 	 */
-	public function mail_mark_unread($msgnum)
+	public function mail_mark_unseen($msgnum)
 	{
-		if (! $this->is_horde()) {
-			return imap_clearflag_full($this->conn, $msgnum, '\\Seen');
-		} else {
-			//only works with uids
-			if (isset($_SESSION['horde_sequence2uid'][$msgnum]) && $_SESSION['horde_sequence2uid'][$msgnum] >= 0) {
-				try {
-					$uid = $_SESSION['horde_sequence2uid'][$msgnum];
-					$ids = new Horde_Imap_Client_Ids(array($uid), false);
-					$options = array(
-						"ids" => $ids,
-						"remove" => array(Horde_Imap_Client::FLAG_SEEN),
-					);
-					$this->conn->store($this->folder, $options);
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: setting mail as read failed';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-				}
-			}
-		}
+		return imap_clearflag_full($this->conn, $msgnum, '\\Seen');
 	}
 
 	/**
@@ -1882,28 +971,7 @@ class NVLL_IMAP
 	 */
 	public function mail_mark_flag($msgnum)
 	{
-		if (!$this->is_horde()) {
-			return imap_setflag_full($this->conn, $msgnum, '\\Flagged');
-		} else {
-			//only works with uids
-			if (isset($_SESSION['horde_sequence2uid'][$msgnum]) && $_SESSION['horde_sequence2uid'][$msgnum] >= 0) {
-				try {
-					$uid = $_SESSION['horde_sequence2uid'][$msgnum];
-					$ids = new Horde_Imap_Client_Ids(array($uid), false);
-					$options = array(
-						"ids" => $ids,
-						"add" => array(Horde_Imap_Client::FLAG_FLAGGED),
-					);
-					$this->conn->store($this->folder, $options);
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: flagging mail failed';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-				}
-			}
-		}
+		return imap_setflag_full($this->conn, $msgnum, '\\Flagged');
 	}
 
 	/**
@@ -1914,54 +982,14 @@ class NVLL_IMAP
 	 */
 	public function mail_mark_unflag($msgnum)
 	{
-		if (!$this->is_horde()) {
-			return imap_clearflag_full($this->conn, $msgnum, '\\Flagged');
-		} else {
-			//only works with uids
-			if (isset($_SESSION['horde_sequence2uid'][$msgnum]) && $_SESSION['horde_sequence2uid'][$msgnum] >= 0) {
-				try {
-					$uid = $_SESSION['horde_sequence2uid'][$msgnum];
-					$ids = new Horde_Imap_Client_Ids(array($uid), false);
-					$options = array(
-						"ids" => $ids,
-						"remove" => array(Horde_Imap_Client::FLAG_FLAGGED),
-					);
-					$this->conn->store($this->folder, $options);
-				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NVLL: unflagging mail failed';
-					error_log($log_string);
-					if (isset($conf->syslog) && $conf->syslog) {
-						syslog(LOG_INFO, $log_string);
-					}
-				}
-			}
-		}
+		return imap_clearflag_full($this->conn, $msgnum, '\\Flagged');
 	}
 
 	public function copytosentfolder($maildata, &$ev, $sent_folder_name)
 	{
-		if (! $this->is_horde()) {
-			if (!(imap_append($this->conn, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($sent_folder_name, 'UTF7-IMAP', 'UTF-8'), $maildata, "\\Seen"))) {
-				$ev = new NVLL_Exception("could not copy mail into $sent_folder_name folder: " . $this->last_error());
-				return false;
-			}
-		} else {
-			try {
-				$data = array(
-					array(
-						"data" => $maildata,
-						"flags" => array(Horde_Imap_Client::FLAG_SEEN),
-					),
-				);
-				$ids = $this->conn->append($sent_folder_name, $data);
-				if ($ids->isEmpty()) {
-					$ev = new NVLL_Exception("could not copy mail into $sent_folder_name folder, ids empty");
-					return false;
-				}
-			} catch (Horde_Imap_Client_Exception $e) {
-				$ev = new NVLL_Exception("could not copy mail into $sent_folder_name folder");
-				return false;
-			}
+		if (!(imap_append($this->conn, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($sent_folder_name, 'UTF7-IMAP', 'UTF-8'), $maildata, "\\Seen"))) {
+			$ev = new NVLL_Exception("could not copy mail into $sent_folder_name folder: " . $this->last_error());
+			return false;
 		}
 		return true;
 	}
@@ -2001,84 +1029,49 @@ class NVLL_IMAP
 		return $data;
 	}
 
-	public static function mime_header_decode($header, $decode = true, $ishorde = false)
+	public static function mime_header_decode($header, $decode = true)
 	{
 		global $conf;
 		$decodedheader = "";
-		if (! $ishorde) {
+		//special utf-16 handling:
+		$do_pre_decoding = false;
+		$source = imap_mime_header_decode($header);
 
-			//special utf-16 handling:
-			$do_pre_decoding = false;
-			$source = imap_mime_header_decode($header);
-			for ($j = 0; $j < count($source); $j++) {
-				if ($source[$j]->charset == 'utf-16') {
-					$do_pre_decoding = true;
-				}
-			}
-			if ($do_pre_decoding) {
-				if (isset($conf->default_charset) && $conf->default_charset != '') {
-					$header = mb_convert_encoding(mb_decode_mimeheader($header), $conf->default_charset, 'UTF-8');
-				} else {
-					$header = mb_convert_encoding(mb_decode_mimeheader($header), 'ISO-8859-1', 'UTF-8');
-				}
-			}
-
-			$source = imap_mime_header_decode($header);
-			for ($j = 0; $j < count($source); $j++) {
-				$element_charset = ($source[$j]->charset == 'default') ? detect_charset($source[$j]->text) : $source[$j]->charset;
-				if ($element_charset == '' || $element_charset == null) {
-					if (isset($conf->default_charset) && $conf->default_charset != '') {
-						$element_charset = $conf->default_charset;
-					} else {
-						$element_charset = 'ISO-8859-1';
-					}
-				}
-				if ($decode) {
-					//$element_converted = os_iconv($element_charset, 'UTF-8', $source[$j]->text);
-					$element_converted = mb_convert_encoding($source[$j]->text, 'UTF-8', $element_charset);
-				} else {
-					$element_converted = $source[$j]->text;
-				}
-				$decodedheader = $decodedheader . $element_converted;
-			}
-		} else {
-			$charset_all = "";
-			$tail = $header;
-			$matches = array();
-			while (preg_match("/^(.*)(=\?.*\?.*\?=)(.*)$/U", $tail, $matches)) {
-				$decodedheader = $decodedheader . trim($matches[1]);
-				$mime_encoded = $matches[2];
-				$tail = trim($matches[3]);
-				$encoding = "";
-				$charset = "";
-				$matches = array();
-				if (preg_match("/^=\?(.*)\?.*\?=/U", $mime_encoded, $matches)) {
-					$charset = mb_strtoupper($matches[1]);
-				}
-				$matches = array();
-				if (preg_match("/^=\?.*\?([pq])\?.*\?=/iU", $mime_encoded, $matches)) {
-					$encoding = mb_strtoupper($matches[1]);
-				}
-				if ($charset == '' || $charset == null) {
-					$charset = 'ISO-8859-1';
-				}
-				$charset_all = $charset;
-				$mime_decoded = mb_convert_encoding(mb_decode_mimeheader($mime_encoded), $charset);
-				if ($encoding == "Q") {
-					$mime_decoded = preg_replace("/_/", " ", $mime_decoded);
-				}
-				$decodedheader = $decodedheader . $mime_decoded;
-				$matches = array();
-			}
-			$decodedheader = $decodedheader . $tail;
-
-			if ($decode) {
-				if ($charset_all == '' || $charset_all == null) {
-					$charset_all = 'ISO-8859-1';
-				}
-				$decodedheader = mb_convert_encoding($decodedheader, "UTF-8", $charset_all);
+		for ($j = 0; $j < count($source); $j++) {
+			if ($source[$j]->charset == 'utf-16') {
+				$do_pre_decoding = true;
 			}
 		}
+
+		if ($do_pre_decoding) {
+			if (isset($conf->default_charset) && $conf->default_charset != '') {
+				$header = mb_convert_encoding(mb_decode_mimeheader($header), $conf->default_charset, 'UTF-8');
+			} else {
+				$header = mb_convert_encoding(mb_decode_mimeheader($header), 'ISO-8859-1', 'UTF-8');
+			}
+		}
+
+		$source = imap_mime_header_decode($header);
+
+		for ($j = 0; $j < count($source); $j++) {
+			$element_charset = ($source[$j]->charset == 'default') ? detect_charset($source[$j]->text) : $source[$j]->charset;
+			if ($element_charset == '' || $element_charset == null) {
+				if (isset($conf->default_charset) && $conf->default_charset != '') {
+					$element_charset = $conf->default_charset;
+				} else {
+					$element_charset = 'ISO-8859-1';
+				}
+			}
+
+			if ($decode) {
+				//$element_converted = os_iconv($element_charset, 'UTF-8', $source[$j]->text);
+				$element_converted = mb_convert_encoding($source[$j]->text, 'UTF-8', $element_charset);
+			} else {
+				$element_converted = $source[$j]->text;
+			}
+			$decodedheader = $decodedheader . $element_converted;
+		}
+
 		return $decodedheader;
 	}
 
@@ -2154,7 +1147,6 @@ class NVLL_IMAP
 						$TMP_SESSION['creation_time'],
 						$TMP_SESSION['persistent'],
 						$TMP_SESSION['remote_addr'],
-						$TMP_SESSION['is_horde']
 					) = explode(" ", base64_decode($line));
 
 					//unclear if INBOX is always the best default, but we don't have available folders of another server session
@@ -2214,20 +1206,7 @@ class NVLL_IMAP
 	 */
 	public function get_quota_usage($quotaRoot)
 	{
-		if (! $this->is_horde()) {
-			return @imap_get_quotaroot($this->conn, mb_convert_encoding($quotaRoot, 'UTF7-IMAP', 'UTF-8'));
-		} else {
-			try {
-				$quota = $this->conn->getQuotaRoot($quotaRoot);
-				return $quota;
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: getting quotaroot failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-		}
+		return @imap_get_quotaroot($this->conn, mb_convert_encoding($quotaRoot, 'UTF7-IMAP', 'UTF-8'));
 		return false;
 	}
 
@@ -2238,50 +1217,15 @@ class NVLL_IMAP
 	 */
 	public function status($mailbox)
 	{
-		if (! $this->is_horde()) {
-			$status_obj = imap_status($this->conn, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), SA_ALL);
-			$status = array();
-			if (isset($status_obj->unseen)) {
-				$status['unseen'] = $status_obj->unseen;
-			} else {
-				$status['unseen'] = 0;
-			}
-			return $status;
-		} else {
-			$status = array();
-			try {
-				$mailbox = str_replace('{' . $this->server . '}', '', $mailbox);
-				$status = $this->conn->status($mailbox, Horde_Imap_Client::STATUS_ALL);
-			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NVLL: getting status failed';
-				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
-			}
-			return $status;
-		}
-	}
+		$status_obj = imap_status($this->conn, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), SA_ALL);
+		$status = array();
 
-	/**
-	 * Check if we should use Horde/Imap_Client
-	 * @param
-	 * @return bool true if Horde/Imap_Client should be used, default is false
-	 */
-	public function is_horde()
-	{
-		global $conf;
-		$r = false;
-		if (isset($conf->horde_imap_client) && $conf->horde_imap_client) {
-			$r = true;
+		if (isset($status_obj->unseen)) {
+			$status['unseen'] = $status_obj->unseen;
+		} else {
+			$status['unseen'] = 0;
 		}
-		if (isset($conf->domains[$_SESSION['nvll_domain_index']]->horde_imap_client)) {
-			if ($conf->domains[$_SESSION['nvll_domain_index']]->horde_imap_client) {
-				$r = true;
-			} else {
-				$r = false;
-			}
-		}
-		return $r;
+
+		return $status;
 	}
 }

@@ -56,8 +56,8 @@ if (isset($_REQUEST['only_one'])) {
         $pop->mail_copy($mail, $target_folder);
     } elseif (isset($_REQUEST['mark_mode'])) {
         switch ($mark_mode) {
-            case 'unread':
-                $pop->mail_mark_unread($mail);
+            case 'unseen':
+                $pop->mail_mark_unseen($mail);
                 break;
             case 'flag':
                 $pop->mail_mark_flag($mail);
@@ -79,7 +79,7 @@ if (isset($_REQUEST['only_one'])) {
         $mail = max(0, $mail - 1);
     }
 
-    $url = $mark_mode === 'unread' || $mail === 0
+    $url = $mark_mode === 'unseen' || $mail === 0
         ? "action.php?{$url_session}"
         : "action.php?{$url_session}&action=aff_mail&mail={$mail}&verbose={$verbose}&display_images={$display_images}";
 } else {
@@ -125,11 +125,11 @@ if (isset($_REQUEST['only_one'])) {
             foreach ($mark_actions as $flag_type => $mode) {
                 if (isset($_REQUEST[$flag_type])) {
                     switch ($mode) {
-                        case 'read':
-                            $pop->mail_mark_read($i);
+                        case 'seen':
+                            $pop->mail_mark_seen($i);
                             break;
-                        case 'unread':
-                            $pop->mail_mark_unread($i);
+                        case 'unseen':
+                            $pop->mail_mark_unseen($i);
                             break;
                         case 'flag':
                             $pop->mail_mark_flag($i);

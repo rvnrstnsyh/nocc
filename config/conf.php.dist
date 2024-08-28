@@ -167,24 +167,6 @@ $conf->loaded = true;
 //  part from the user login before authentication to the SMTP server. If true this will also
 //  happen if you provide the user name with $conf->domains[$i]->smtp_user option.
 //  
-// $conf->domains[$i]->horde_imap_client = false;
-//  Use Horde/Imap_Client Library instead of PHP's imap (c-client) extension for this domain
-//  See below
-//    $conf->horde_imap_client = false;
-//  for a system wide configuration option. The system wide option will be overwritten by domain specific options.
-//    https://dev.horde.org/imap_client/
-//    https://dev.horde.org/imap_client/install.php
-//    https://pear.horde.org/
-//  Typically Horde needs some utility libraries too. The tested lib/Horde folder looks like:
-//    Array/ Array.php Domhtml.php Exception/ Exception.php Idna/ Idna.php Imap/ Mail/ Mime/ Mime.php
-//    Socket/ Stream/ Stream.php String/ String.php Support/ Translation/ Translation.php Util.php
-//    Variables.php
-//  These are the installed Horde libraries (https://pear.horde.org/):
-//    Horde_Exception Horde_Idna Horde_Mail Horde_Mime Horde_Socket_Client Horde_Stream Horde_Support 
-//    Horde_Translation Horde_Util
-//  Horde supports additional to /ssl and /tls (see above) the following encryption methods in the connection string:
-//    /sslv2,/sslv3,/tlsv1,/false (for no encryption, default),/true (TLS if available)
-//  
 // $conf->domains[$i]->allow_address_change = true;
 //  Is the user allowed to change his "From:" address? (true/false)
 //  This domain specific option overrides the global option
@@ -232,7 +214,6 @@ $conf->domains[$i]->smtp_security_level = -1;
 $conf->domains[$i]->smtp_user = '';
 $conf->domains[$i]->smtp_password = '';
 $conf->domains[$i]->smtp_user_without_domain = false;
-$conf->domains[$i]->horde_imap_client = false;
 $conf->domains[$i]->allow_address_change = false;
 $conf->domains[$i]->from_part = '';
 $conf->domains[$i]->allow_rss = true;
@@ -335,7 +316,7 @@ $conf->utf8_decode = true;
 //  3 = Subject
 //  4 = Date
 //  5 = Size
-//  6 = Read/Unread
+//  6 = Seen/Unseen (Read/Unread)
 //  7 = Attachment
 //  8 = Priority Text
 //  9 = Priority Number
@@ -432,15 +413,6 @@ $conf->syslog = false;
 // large mails attachments. Try to find correct setting (about 2.5x total
 // attachment size)
 $conf->memory_limit = "25M";
-
-// Use Horde/Imap_Client Library instead of PHP's imap (c-client) extension.
-// https://dev.horde.org/imap_client/
-// https://dev.horde.org/imap_client/install.php
-$conf->horde_imap_client = false;
-
-// Optional path to the Horde/Imap client library, only needed if library is
-// in some unusual place
-//$conf->horde_imap_client_path = "/usr/local/php72/lib/php/Horde";
 
 // ##
 // ## Server options

@@ -30,7 +30,7 @@ class NVLL_MailPart
     private $partNumber;
 
     /**
-     * if using Horde/Imap we need the parts mime ID to fetch body
+     * Parts mime ID to fetch body
      * @var string
      * @access private
      */
@@ -42,14 +42,11 @@ class NVLL_MailPart
      * @param string $partNumber Part number
      * @todo Throw exception, if no vaild mail structure?
      */
-    public function __construct($partStructure, $partNumber, $isHorde = false)
+    public function __construct($partStructure, $partNumber)
     {
         $this->partStructure = $partStructure;
         $this->partNumber = $partNumber;
         $this->mimeId = "";
-        if ($isHorde) {
-            $this->mimeId = $partStructure->getStructure()->getMimeId();
-        }
     }
 
     /**

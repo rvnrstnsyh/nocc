@@ -31,6 +31,7 @@ if (!isset($_REQUEST['sort'])) {
             require './html/footer.php';
             exit;
         }
+
         $quota = $pop->get_quota_usage($_SESSION['nvll_folder']);
         $_SESSION['quota'] = $quota;
     }
@@ -47,10 +48,7 @@ if ($action == 'logout') {
 
 if ($action == 'inbox_changed') {
     $_SESSION['ajxfolder'] = "INBOX";
-    if (
-        $user_prefs->getUseInboxFolder()
-        && strlen($user_prefs->getInboxFolderName()) > 0
-    ) {
+    if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) {
         $_SESSION['ajxfolder'] = $user_prefs->getInboxFolderName();
     }
 }
@@ -65,7 +63,6 @@ try {
     }
     //TODO: Show error without NVLL_Exception!
     $ev = new NVLL_Exception($ex->getMessage());
-
     require './html/header.php';
     require './html/error.php';
     require './html/footer.php';
@@ -130,7 +127,6 @@ switch ($action) {
         // Compose/Write a mail...
         //--------------------------------------------------------------------------------
     case 'compose':
-
         if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
             if (isset($_SESSION['send_backup']['mail_to'])) {
                 $mail_to = $_SESSION['send_backup']['mail_to'];
@@ -218,7 +214,6 @@ switch ($action) {
 
         // Add quoting
         add_quoting($mail_body, $content);
-
         // Add signature
         add_signature($mail_body);
 
@@ -458,12 +453,10 @@ switch ($action) {
     case 'setprefs':
         //TODO: Move all isset() to if()!
         if (isset($_REQUEST['submit_prefs'])) {
-            if (isset($_REQUEST['full_name']))
-                $user_prefs->setFullName(NVLL_Request::getStringValue('full_name'));
-            if (isset($_REQUEST['msg_per_page']))
-                $user_prefs->msg_per_page = $_REQUEST['msg_per_page'];
-            if (isset($_REQUEST['email_address']))
-                $user_prefs->setEmailAddress(NVLL_Request::getStringValue('email_address'));
+            if (isset($_REQUEST['full_name'])) $user_prefs->setFullName(NVLL_Request::getStringValue('full_name'));
+            if (isset($_REQUEST['msg_per_page'])) $user_prefs->msg_per_page = $_REQUEST['msg_per_page'];
+            if (isset($_REQUEST['email_address'])) $user_prefs->setEmailAddress(NVLL_Request::getStringValue('email_address'));
+
             $user_prefs->setBccSelf(isset($_REQUEST['cc_self']));
             $user_prefs->setHideAddresses(isset($_REQUEST['hide_addresses']));
             $user_prefs->setShowAlert(isset($_REQUEST['show_alert']));
@@ -471,42 +464,43 @@ switch ($action) {
             $user_prefs->setColoredQuotes(isset($_REQUEST['colored_quotes']));
             $user_prefs->setDisplayStructuredText(isset($_REQUEST['display_struct']));
             $user_prefs->seperate_msg_win = isset($_REQUEST['seperate_msg_win']);
-            if (isset($_REQUEST['reply_leadin']))
-                $user_prefs->reply_leadin = NVLL_Request::getStringValue('reply_leadin');
-            if (isset($_REQUEST['signature']))
+
+            if (isset($_REQUEST['reply_leadin'])) $user_prefs->reply_leadin = NVLL_Request::getStringValue('reply_leadin');
+            if (isset($_REQUEST['signature'])) {
                 if (NVLL_Request::getBoolValue('html_mail_send')) {
                     $user_prefs->setSignature($_REQUEST['signature']);
                 } else {
                     $user_prefs->setSignature(NVLL_Request::getStringValue('signature'));
                 }
-            if (isset($_REQUEST['wrap_msg']))
-                $user_prefs->setWrapMessages($_REQUEST['wrap_msg']);
+            }
+            if (isset($_REQUEST['wrap_msg'])) $user_prefs->setWrapMessages($_REQUEST['wrap_msg']);
+
             $user_prefs->setUseSignatureSeparator(isset($_REQUEST['sig_sep']));
             $user_prefs->setSendHtmlMail(isset($_REQUEST['html_mail_send']));
             $user_prefs->setUseGraphicalSmilies(isset($_REQUEST['graphical_smilies']));
             $user_prefs->setUseSentFolder(isset($_REQUEST['sent_folder']));
+
             if (isset($_REQUEST['sent_folder_name'])) {
                 $replace = str_replace($_SESSION['imap_namespace'], "", $_REQUEST['sent_folder_name']);
                 $user_prefs->setSentFolderName(safestrip($replace));
             }
+
             $user_prefs->setUseTrashFolder(isset($_REQUEST['trash_folder']));
+
             if (isset($_REQUEST['trash_folder_name'])) {
                 $replace = str_replace($_SESSION['imap_namespace'], "", $_REQUEST['trash_folder_name']);
                 $user_prefs->setTrashFolderName(safestrip($replace));
             }
+
             $user_prefs->setUseInboxFolder(isset($_REQUEST['inbox_folder']));
+
             if (isset($_REQUEST['inbox_folder_name'])) {
                 $replace = str_replace($_SESSION['imap_namespace'], "", $_REQUEST['inbox_folder_name']);
                 $user_prefs->setInboxFolderName(safestrip($replace));
             }
 
-            if (isset($_REQUEST['collect'])) {
-                $user_prefs->setCollect($_REQUEST['collect']);
-            }
-
-            if (isset($_REQUEST['lang']))
-                $user_prefs->lang = $_REQUEST['lang'];
-
+            if (isset($_REQUEST['collect'])) $user_prefs->setCollect($_REQUEST['collect']);
+            if (isset($_REQUEST['lang'])) $user_prefs->lang = $_REQUEST['lang'];
             if (isset($_REQUEST['theme'])) {
                 $user_prefs->theme = $_REQUEST['theme'];
                 if ($_REQUEST['theme'] == "default") {
@@ -523,6 +517,7 @@ switch ($action) {
                 // Validate preferences
                 $user_prefs->validate($ev);
             }
+
             if (NVLL_Exception::isException($ev)) {
                 require './html/header.php';
                 require './html/error.php';
@@ -591,10 +586,8 @@ switch ($action) {
                             $ev = null;
                         }
 
-                        $small_search = 'unread ';
-                        if (NVLL_Request::getBoolValue('reapply_filters')) {
-                            $small_search = '';
-                        }
+                        $small_search = 'unseen ';
+                        if (NVLL_Request::getBoolValue('reapply_filters')) $small_search = '';
                         if ($filters != null) {
                             foreach ($filters->filterset as $name => $filter) {
                                 //new filter criteria must be implemented in $pop->search(...) function!!!
@@ -740,28 +733,18 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
 {
     global $conf;
     global $html_subject_label, $html_from_label, $html_date_label, $html_to_label;
+
     $lang = $_SESSION['nvll_lang'];
-
-    $isHorde = $pop->is_horde();
-
     $partStructure = $attachmentPart->getPartStructure();
-
     $parts_info = $partStructure->getPartsInfo();
 
-    if ($name == '') {
-        $name = $partStructure->getName($name);
-    }
-    if ($partNumber == '') {
-        $partNumber = $attachmentPart->getPartNumber();
-    }
+    if ($name == '') $name = $partStructure->getName($name);
+    if ($partNumber == '') $partNumber = $attachmentPart->getPartNumber();
 
     $mimeID = "";
-    if ($isHorde) {
-        $mimeID = $partStructure->getStructure()->getMimeId();
-    }
-
     $body_mime = $attachmentPart->getInternetMediaType()->__toString();
     $encoding = $partStructure->getEncoding()->__toString();
+
     if ($partStructure->getInternetMediaType()->isRfc822Message() && $conf->display_text_attach) {
         //$header=$pop->fetchbody($_REQUEST['mail'],$partNumber.'.0',$partNumber,true,true);
         $header = $pop->fetchbody($_REQUEST['mail'], $partNumber . '.0', $mimeID, true, true);
@@ -772,19 +755,18 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         $header = $pop->parse_headers($header);
         $body = NVLL_IMAP::decode($body, $encoding);
         $charset = detect_body_charset($body, $charset);
-        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-            $charset = $_REQUEST['user_charset'];
-        }
+
+        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') $charset = $_REQUEST['user_charset'];
+
         $body = remove_stuff($body, $body_mime, $charset);
         $body = os_iconv($charset, 'UTF-8', $body);
         $body = graphicalsmilies($body);
-
         $content = $content . $name . '<hr class="mailAttachSep" />';
         $content = $content . '<div class="mailTextAttach">';
-
         $subject = $header->subject;
         $charset = detect_body_charset($subject, 'default');
         $match = array();
+
         if (preg_match('/^=\?(.*?)\?/', $subject, $match)) {
             $charset = $match[1];
             $subject = iconv_mime_decode($subject, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset);
@@ -792,13 +774,14 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
             $charset = $_REQUEST['user_charset'];
         }
+
         $subject = os_iconv($charset, 'UTF-8', $subject);
         $content = $content . $html_subject_label . " " . $subject . '<br />';
-
         $from = imap_rfc822_write_address($header->from[0]->mailbox, $header->from[0]->host, $header->from[0]->personal);
         // $from = $pop->write_address($header->from[0]->mailbox, $header->from[0]->host, $header->from[0]->personal);
         $charset = detect_body_charset($from, 'default');
         $match = array();
+
         if (preg_match('/^=\?(.*?)\?/', $from, $match)) {
             $charset = $match[1];
             $from = iconv_mime_decode($from, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset);
@@ -806,17 +789,17 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
             $charset = $_REQUEST['user_charset'];
         }
+
         $from = os_iconv($charset, 'UTF-8', $from);
         $from = htmlentities($from, ENT_COMPAT, 'UTF-8');
         $content = $content . $html_from_label . " " . $from . '<br />';
-
         $date = strtotime($header->date);
         $content = $content . $html_date_label . " " . format_date($date, $lang) . ' ' . format_time($date, $lang) . '<br />';
-
         $to = imap_rfc822_write_address($header->to[0]->mailbox, $header->to[0]->host, $header->to[0]->personal);
         // $to = $pop->write_address($header->to[0]->mailbox, $header->to[0]->host, $header->to[0]->personal);
         $charset = detect_body_charset($to, 'default');
         $match = array();
+
         if (preg_match('/^=\?(.*?)\?/', $to, $match)) {
             $charset = $match[1];
             $to = iconv_mime_decode($to, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset);
@@ -824,10 +807,10 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
             $charset = $_REQUEST['user_charset'];
         }
+
         $to = os_iconv($charset, 'UTF-8', $to);
         $to = htmlentities($to, ENT_COMPAT, 'UTF-8');
         $content = $content . $html_to_label . " " . $to . '<br />';
-
         $content = $content . '<br />';
         $content = $content . $body;
         $content = $content . '</div> <!-- .mailTextAttach -->';
@@ -835,26 +818,26 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         $parts = $partStructure->getParts();
         $body_index = -1;
         for ($i = 0; $i < count($parts); $i++) {
-            $bodyPartStructure = new NVLL_MailStructure($parts[$i], $isHorde, $parts_info);
+            $bodyPartStructure = new NVLL_MailStructure($parts[$i], $parts_info);
             if (! $bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isHtmlText()) {
                 $body_index = $i;
             }
         }
         if ($body_index == -1) {
             for ($i = 0; $i < count($parts); $i++) {
-                $bodyPartStructure = new NVLL_MailStructure($parts[$i], $isHorde, $parts_info);
+                $bodyPartStructure = new NVLL_MailStructure($parts[$i], $parts_info);
                 if (! $bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isPlainText()) {
                     $body_index = $i;
                 }
             }
         }
         if ($body_index >= 0) {
-            $bodyPartStructure = new NVLL_MailStructure($parts[$body_index], $isHorde, $parts_info);
+            $bodyPartStructure = new NVLL_MailStructure($parts[$body_index], $parts_info);
             $part = new NVLL_MailPart($bodyPartStructure, $body_index);
             display_rfc822($content, $pop, $part, $name, $header, $body, $partNumber . '.' . ($body_index + 1));
         } else {
             for ($i = 0; $i < count($parts); $i++) {
-                $bodyPartStructure = new NVLL_MailStructure($parts[$i], $isHorde, $parts_info);
+                $bodyPartStructure = new NVLL_MailStructure($parts[$i], $parts_info);
                 $part = new NVLL_MailPart($bodyPartStructure, $i);
                 if (
                     $bodyPartStructure->getInternetMediaType()->__toString() == 'multipart/mixed' ||
@@ -880,9 +863,10 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
 function create_rfc822_content(&$content, $pop, $attachmentParts)
 {
     global $conf;
-    $rfc822_hasImages = false;
 
+    $rfc822_hasImages = false;
     $name = '';
+
     //foreach ($attachmentParts as $attachmentPart) { //for all rfc822 parts...
     for ($i = count($attachmentParts) - 1; $i >= 0; $i--) { //for all rfc822 parts...
         $attachmentPart = $attachmentParts[$i];
@@ -912,9 +896,7 @@ function display_attachments($content, $pop, $attachmentParts)
     //TODO: Use "mailData" DIV from file "html/html_mail.php"!
     echo '<div class="mailData">';
 
-    if (isset($content['rfc822'])) {
-        echo $content['rfc822'];
-    }
+    if (isset($content['rfc822'])) echo $content['rfc822'];
 
     $name = '';
     foreach ($attachmentParts as $attachmentPart) { //for all attached txt or image parts...
@@ -1055,14 +1037,13 @@ function set_list_of_folders($pop, $subscribed)
     foreach ($subscribed as $folder) {
         $folder_name = substr(strstr($folder->name, '}'), 1);
         $status = $pop->status($folder->name);
-        $unread = 0;
-        if (isset($status['unread']) && $status['unread'] > 0) {
-            $unread = $status['unread'];
+        $unseen = 0;
+        if (isset($status['unseen']) && $status['unseen'] > 0) {
+            $unseen = $status['unseen'];
         }
-        if ($unread > 0) {
+        if ($unseen > 0) {
             if (!in_array($folder_name, $new_folders)) {
-                $list_of_folders .= ' <a href="action.php?' . NVLL_Session::getUrlGetSession() . '&amp;folder=' . $folder_name
-                    . '">' . $folder_name . " ($unread)" . '</a>';
+                $list_of_folders .= ' <a href="action.php?' . NVLL_Session::getUrlGetSession() . '&amp;folder=' . $folder_name . '">' . $folder_name . " ($unseen)" . '</a>';
                 $_SESSION['list_of_folders'] = $list_of_folders;
                 array_push($new_folders, $folder_name);
             }

@@ -43,6 +43,7 @@ class NVLL_MailParts
 		$parts = array();
 		$this->_fillArrayWithParts($parts, $mailstructure);
 		$body_index = -1;
+
 		if (!empty($parts)) {
 			$not_attachment_parts = array();
 			for ($i = 0; $i < count($parts); $i++) {
@@ -59,14 +60,15 @@ class NVLL_MailParts
 					}
 				}
 			}
-			if ($body_index >= 0) {
-				$this->_bodyPart = $parts[$body_index];
-			}
+
+			if ($body_index >= 0) $this->_bodyPart = $parts[$body_index];
+
 			$count = 0;
 			foreach ($not_attachment_parts as $i) {
 				array_splice($parts, $i - $count, 1);
 				$count++;
 			}
+
 			$this->_attachmentParts = $parts;
 		}
 	}
@@ -103,8 +105,6 @@ class NVLL_MailParts
 		//$this_part = $mailstructure->getStructure();
 		$mailstructure_parts = $mailstructure->getParts();
 		$parts_info = $mailstructure->getPartsInfo();
-
-		$isHorde = $mailstructure->isHorde();
 		$internetMediaType = $mailstructure->getInternetMediaType();
 		if ($internetMediaType->isMultipart()) { //if multipart...
 			//$num_parts = count($this_part->parts);
@@ -114,75 +114,49 @@ class NVLL_MailParts
 			if ($internetMediaType->isAlternativeMultipart()) {
 				// check if alternative consists of PLAIN and HTML, if yes we skip the PLAIN
 				for ($i = 0; $i < $num_parts; $i++) {
-					if (! $isHorde) {
-						//if( $this_part->parts[$i]->subtype == "PLAIN" ) {
-						if ($mailstructure_parts[$i]->subtype == "PLAIN") {
-							$found_plain = true;
-						}
-						//if( $this_part->parts[$i]->subtype == "HTML" ) {
-						if ($mailstructure_parts[$i]->subtype == "HTML") {
-							$found_html = true;
-						}
-					} else {
-						$subtype = strtolower($mailstructure_parts[$i]->getSubType());
-						if ($subtype == "plain") {
-							$found_plain = true;
-						}
-						if ($subtype == "html") {
-							$found_html = true;
-						}
+					//if( $this_part->parts[$i]->subtype == "PLAIN" ) {
+					if ($mailstructure_parts[$i]->subtype == "PLAIN") {
+						$found_plain = true;
+					}
+					//if( $this_part->parts[$i]->subtype == "HTML" ) {
+					if ($mailstructure_parts[$i]->subtype == "HTML") {
+						$found_html = true;
 					}
 				}
 			}
 			for ($i = 0; $i < $num_parts; $i++) {
-				if (! $isHorde) {
-					$subtype = strtolower($mailstructure_parts[$i]->subtype);
-				} else {
-					$subtype = strtolower($mailstructure_parts[$i]->getSubType());
-				}
+				$subtype = strtolower($mailstructure_parts[$i]->subtype);
+
 				if ($partNumber != '') {
 					if (substr($partNumber, -1) != '.') $partNumber = $partNumber . '.';
 				}
 				if ($found_plain == true && $found_html == true) {
 					if ($subtype != "plain") {
-						$this->_fillArrayWithParts($parts, new NVLL_MailStructure($mailstructure_parts[$i], $isHorde, $parts_info), $partNumber . ($i + 1), $skip_message);
+						$this->_fillArrayWithParts($parts, new NVLL_MailStructure($mailstructure_parts[$i], $parts_info), $partNumber . ($i + 1), $skip_message);
 					}
 				} else {
-					$this->_fillArrayWithParts($parts, new NVLL_MailStructure($mailstructure_parts[$i], $isHorde, $parts_info), $partNumber . ($i + 1), $skip_message);
+					$this->_fillArrayWithParts($parts, new NVLL_MailStructure($mailstructure_parts[$i], $parts_info), $partNumber . ($i + 1), $skip_message);
 				}
 			}
 		} else if ($internetMediaType->isMessage()) { //if message...
 			if ($internetMediaType->isRfc822Message()) { //if RFC822 message...
-				if (empty($partNumber)) {
-					$partNumber = '1';
-				}
-				$part = new NVLL_MailPart($mailstructure, $partNumber, $isHorde);
+				if (empty($partNumber)) $partNumber = '1';
+
+				$part = new NVLL_MailPart($mailstructure, $partNumber);
 				array_unshift($parts, $part);
 				$skip_message = true;
 			}
+
 			$num_parts = -1;
-			if (! $isHorde && isset($mailstructure_parts[0]->parts)) {
-				$num_parts = count($mailstructure_parts[0]->parts);
-			}
-			if ($isHorde) {
-				$num_parts = count($mailstructure_parts[0]->getParts());
-			}
+			if (isset($mailstructure_parts[0]->parts)) $num_parts = count($mailstructure_parts[0]->parts);
 			for ($i = 0; $i < $num_parts; $i++) {
-				if (! $isHorde) {
-					$tmp_part = ($mailstructure_parts[0]->parts)[$i];
-				} else {
-					$tmp_part = ($mailstructure_parts[0]->getParts())[$i];
-				}
-				$this->_fillArrayWithParts($parts, new NVLL_MailStructure($tmp_part, $isHorde, $parts_info), $partNumber . '.' . ($i + 1), $skip_message);
+				$tmp_part = ($mailstructure_parts[0]->parts)[$i];
+				$this->_fillArrayWithParts($parts, new NVLL_MailStructure($tmp_part, $parts_info), $partNumber . '.' . ($i + 1), $skip_message);
 			}
 		} else {
-			if (empty($partNumber)) {
-				$partNumber = '1';
-			}
-			$part = new NVLL_MailPart($mailstructure, $partNumber, $isHorde);
-			if ($mailstructure->isAttachment() || !$skip_message || ! $internetMediaType->isPlainOrHtmlText()) {
-				array_unshift($parts, $part);
-			}
+			if (empty($partNumber)) $partNumber = '1';
+			$part = new NVLL_MailPart($mailstructure, $partNumber);
+			if ($mailstructure->isAttachment() || !$skip_message || ! $internetMediaType->isPlainOrHtmlText()) array_unshift($parts, $part);
 		}
 	}
 }

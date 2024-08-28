@@ -123,54 +123,55 @@ class NVLL_Security
      * @static
      * @todo Remove empty lines from Outlook HTML mails.
      */
-    public static function convertHtmlToPlainText($string, $mime = 'text/html')
-    {
+    public static function convertHtmlToPlainText($string,$mime='text/html') {
         $crlf = "\r\n";
-        $string = str_replace(["\r\n", "\r"], "\n", $string);
-        $string = str_replace("\n", $crlf, $string);
-
-        $string = preg_replace([
-            "/^<pre>/Ui",
-            "/<\/pre>$/Ui",
-            "/{$crlf}\s*<p/Ui",
-            "/(<p.*>)/Ui",
-            "/<br\s*\/?>/Ui",
-            "/(\S+)\s*{$crlf}\s*<br \/>/Ui",
-            "/<br \/>\s*{$crlf}/Ui",
-            "/<br \/>/Ui",
-            "/<p[^>]*>\s*?(.*?)\s*?<\/p>/is"
-        ], [
-            "",
-            "",
-            "<p",
-            "{$crlf}$1",
-            "<br />",
-            "$1<br />",
-            "<br />",
-            "<br />{$crlf}",
-            "<p>$1</p>"
-        ], $string);
-
-        while (preg_match("/^(.*?)<blockquote([^>]*?)>(.*)<\/blockquote>(.*)$/si", $string, $match)) {
-            $left = $match[1];
-            $inner = $match[3];
-            $right = $match[4];
-
-            $new_inner = implode($crlf, array_map(function ($line) use ($crlf) {
-                return "> {$line}<br />{$crlf}";
-            }, explode($crlf, $inner)));
-
-            $string = $left . $new_inner . $right;
+        $string=str_replace("\r\n","\n",$string);
+        $string=str_replace("\r","\n",$string);
+        $string=str_replace("\n",$crlf,$string);
+        $string=preg_replace("/^<pre>/Ui","",$string);
+        $string=preg_replace("/<\/pre>$/Ui","",$string);
+        //$string=preg_replace('/^<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">/Ui',"",$string);
+        //$string=preg_replace('/<\/span>$/Ui',"",$string);
+        $string=preg_replace("/".$crlf."\s*<p/Ui","<p",$string);
+        $string=preg_replace("/(<p.*>)/Ui",$crlf."$1",$string);
+        $string=preg_replace("/<br\s*>/Ui","<br />",$string);
+        $string=preg_replace("/<br\s*\/\s*>/Ui","<br />",$string);
+        $string=preg_replace("/(\S+)\s*".$crlf."\s*<br \/>/Ui","$1<br />",$string);
+        $string=preg_replace("/<br \/>\s*".$crlf."/Ui","<br />",$string);
+        $string=preg_replace("/<br \/>/Ui","<br />".$crlf,$string);
+        $string=preg_replace("/<p[^>]*>\s*?(.*)\s*?<\/p>/Uis","<p>$1</p>",$string);
+    
+        $new_string=$string;
+        do {
+            $string=$new_string;
+            $match=array();
+            if( 1 === preg_match("/^(.*?)<blockquote([^>]*?)>(.*)<\/blockquote>(.*)$/si",$new_string,$match) ) {
+                $left=$match[1];
+                $attributes=$match[2];
+                $inner=$match[3];
+                $right=$match[4];
+                $new_inner="";
+                $lines=explode($crlf,$inner);
+                foreach($lines as $line) {
+                    $new_inner=$new_inner."> ".$line."<br />".$crlf;
+                }
+                $new_outer=$new_inner;
+                $new_string=$left.$new_outer.$right;
+            }	
+        } while( $new_string!=$string );
+    
+        $tmp_string=strip_tags($string);
+        if( $mime == "text/html" ) {
+            $lines=preg_split("/".$crlf."/",$tmp_string);
+            $tmp_string="";
+            foreach( $lines as $line ) {
+                $new_line=preg_replace("/^\s*/","",$line);
+                $tmp_string=$tmp_string.$new_line.$crlf;
+            }
         }
-
-        $string = strip_tags($string);
-
-        if ($mime === "text/html") {
-            $string = implode($crlf, array_map('trim', explode($crlf, $string)));
+        $string=$tmp_string;
+            return html_entity_decode($string, ENT_COMPAT, 'UTF-8');
         }
-
-        return html_entity_decode($string, ENT_COMPAT, 'UTF-8');
-    }
 
     /**
      * Is supported image type?

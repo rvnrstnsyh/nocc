@@ -65,7 +65,6 @@ class NVLL_UserFilters
 
         $key = preg_replace("/(\\\|\/)/", "_", $key);
         $key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
-
         $filters = new NVLL_UserFilters($key, $ev);
         /* Open the preferences file */
         $filename = $conf->prefs_dir . '/' . $key . '.filter';
@@ -76,6 +75,7 @@ class NVLL_UserFilters
             if (NVLL_Exception::isException($ev))
                 return;
         }
+
         $file = fopen($filename, 'r');
         if (!$file) {
             $ev = new NVLL_Exception("Could not open $filename for reading user preferences");

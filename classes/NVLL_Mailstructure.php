@@ -38,14 +38,7 @@ class NVLL_MailStructure
     private $_encoding;
 
     /**
-     * we are using Horde/Imap library
-     * @var bool
-     * @access private
-     */
-    private $_ishorde;
-
-    /**
-     * contains mimeIDs and content_transfer_encoding for each part if Horde/Imap is used
+     * contains mimeIDs and content_transfer_encoding for each part
      * @var array
      * @access private
      */
@@ -54,30 +47,18 @@ class NVLL_MailStructure
     /**
      * Initialize the wrapper
      * @param object $structure imap_fetchstructure() object
-     * @param boolean $is_horde true if Horde/Imap is used
      * @param array $parts_info contains mimeIDs and content_transfer_encoding for each part
      * @todo Throw exception, if no vaild structure? 
      */
-    public function __construct($structure, $is_horde = false, $parts_info = array())
+    public function __construct($structure, $parts_info = array())
     {
         $this->_parts_info = $parts_info;
-        $this->_ishorde = $is_horde;
-        $this->_structure = $structure;  //in case of Horde this must be a Horde_Mime_Part
-        $this->_internetMediaType = NVLL_MailStructure::getInternetMediaTypeFromStructure($structure, $is_horde);
-        $this->_encoding = NVLL_MailStructure::getEncodingFromStructure($structure, $is_horde, $parts_info);
+        $this->_structure = $structure;
+        $this->_internetMediaType = NVLL_MailStructure::getInternetMediaTypeFromStructure($structure);
+        $this->_encoding = NVLL_MailStructure::getEncodingFromStructure($structure, $parts_info);
     }
 
     /**
-     * Check if this structure was obtained using Horde/Imap library
-     * @return boolean
-     */
-    public function isHorde()
-    {
-        return $this->_ishorde;
-    }
-
-    /**
-     * return the parts info if we use Horde/Imap library, empty if not Horde/Imap
      * @return array
      */
     public function getPartsInfo()
@@ -109,16 +90,10 @@ class NVLL_MailStructure
      */
     public function getDescription()
     {
-        if (! $this->_ishorde) {
-            if ($this->_structure->ifdescription) {
-                return $this->_structure->description;
-            }
-        } else {
-            if ($this->_structure != null) {
-                $description = $this->_structure->getDescription();
-                return ($description == null ? '' : $description);
-            }
+        if ($this->_structure->ifdescription) {
+            return $this->_structure->description;
         }
+
         return '';
     }
 
@@ -126,28 +101,12 @@ class NVLL_MailStructure
      * Get the identification from the structure
      * @return string Identification
      */
-    public function getId($contentID = false)
+    public function getId()
     {
         $result = "";
-        if (! $this->_ishorde) {
-            if ($this->_structure->ifid) {
-                $result = $this->_structure->id;
-            }
-        } else {
-            if ($this->_structure != null) {
-                $id = $this->_structure->getMimeId();
-                if ($id != null) {
-                    if (! $contentID) {
-                        $result = $id;
-                    } else {
-                        $parts_info = $this->_parts_info;
-                        if (isset($parts_info[$id]) && isset($parts_info[$id]['contentId'])) {
-                            $result = $parts_info[$id]['contentId'];
-                        }
-                    }
-                }
-            }
-        }
+
+        if ($this->_structure->ifid) $result = $this->_structure->id;
+
         return $result;
     }
 
@@ -179,15 +138,10 @@ class NVLL_MailStructure
      */
     public function getBytes()
     {
-        if (! $this->_ishorde) {
-            if (isset($this->_structure->bytes)) {
-                return $this->_structure->bytes;
-            }
-        } else {
-            if ($this->_structure != null) {
-                return $this->_structure->getBytes();
-            }
+        if (isset($this->_structure->bytes)) {
+            return $this->_structure->bytes;
         }
+
         return 0;
     }
 
@@ -199,19 +153,10 @@ class NVLL_MailStructure
     {
         $totalbytes = $this->getBytes();
         if ($totalbytes == 0) { //if a mail has ANY attachements, $structure->bytes is ALWAYS empty...
-            if (! $this->_ishorde) {
-                if (isset($this->_structure->parts)) {
-                    for ($i = 0; $i < count($this->_structure->parts); $i++) { //for all parts...
-                        if (isset($this->_structure->parts[$i]->bytes)) {
-                            $totalbytes += $this->_structure->parts[$i]->bytes;
-                        }
-                    }
-                }
-            } else {
-                if ($this->_structure != null) {
-                    $all_parts = $this->_structure->getParts();
-                    foreach ($all_parts as $part) {
-                        $totalbytes += $part->getBytes();
+            if (isset($this->_structure->parts)) {
+                for ($i = 0; $i < count($this->_structure->parts); $i++) { //for all parts...
+                    if (isset($this->_structure->parts[$i]->bytes)) {
+                        $totalbytes += $this->_structure->parts[$i]->bytes;
                     }
                 }
             }
@@ -239,15 +184,10 @@ class NVLL_MailStructure
      */
     public function getDisposition()
     {
-        if (! $this->_ishorde) {
-            if ($this->_structure->ifdisposition) {
-                return $this->_structure->disposition;
-            }
-        } else {
-            if ($this->_structure != null) {
-                return $this->_structure->getDisposition();
-            }
+        if ($this->_structure->ifdisposition) {
+            return $this->_structure->disposition;
         }
+
         return '';
     }
 
@@ -272,20 +212,15 @@ class NVLL_MailStructure
     public function getValueFromDparameters($attribute, $defaultvalue = '')
     {
         $attribute = strtolower($attribute);
-        if (! $this->_ishorde) {
-            if ($this->_structure->ifdparameters) {
-                foreach ($this->_structure->dparameters as $parameter) { //for all parameters...
-                    if (strtolower($parameter->attribute) == $attribute) {
-                        return $parameter->value;
-                    }
+
+        if ($this->_structure->ifdparameters) {
+            foreach ($this->_structure->dparameters as $parameter) { //for all parameters...
+                if (strtolower($parameter->attribute) == $attribute) {
+                    return $parameter->value;
                 }
             }
-        } else {
-            if ($this->_structure != null) {
-                $value = $this->_structure->getDispositionParameter($attribute);
-                return ($value == null ? '' : $value);
-            }
         }
+
         return $defaultvalue;
     }
 
@@ -310,20 +245,15 @@ class NVLL_MailStructure
     public function getValueFromParameters($attribute, $defaultvalue = '')
     {
         $attribute = strtolower($attribute);
-        if (! $this->_ishorde) {
-            if ($this->_structure->ifparameters) {
-                foreach ($this->_structure->parameters as $parameter) { //for all parameters...
-                    if (strtolower($parameter->attribute) == $attribute) {
-                        return $parameter->value;
-                    }
+
+        if ($this->_structure->ifparameters) {
+            foreach ($this->_structure->parameters as $parameter) { //for all parameters...
+                if (strtolower($parameter->attribute) == $attribute) {
+                    return $parameter->value;
                 }
             }
-        } else {
-            if ($this->_structure != null) {
-                $value = $this->_structure->getContentTypeParameter($attribute);
-                return ($value == null ? '' : $value);
-            }
         }
+
         return $defaultvalue;
     }
 
@@ -333,20 +263,12 @@ class NVLL_MailStructure
      */
     public function hasParts()
     {
-        if (! $this->_ishorde) {
-            if (isset($this->_structure->parts)) {
-                if (count($this->_structure->parts) > 0) {
-                    return true;
-                }
-            }
-        } else {
-            if ($this->_structure != null) {
-                $all_parts = $this->_structure->getParts();
-                if (count($all_parts) > 0) {
-                    return true;
-                }
+        if (isset($this->_structure->parts)) {
+            if (count($this->_structure->parts) > 0) {
+                return true;
             }
         }
+
         return false;
     }
 
@@ -357,14 +279,9 @@ class NVLL_MailStructure
     public function getParts()
     {
         if ($this->hasParts()) {
-            if (! $this->_ishorde) {
-                return $this->_structure->parts;
-            } else {
-                if ($this->_structure != null) {
-                    return $this->_structure->getParts();
-                }
-            }
+            return $this->_structure->parts;
         }
+
         return array();
     }
 
@@ -434,111 +351,28 @@ class NVLL_MailStructure
     /**
      * ...
      * @param object $structure imap_fetchstructure() object
-     * @param bool $ishorde true if we are using Horde/Imap library
      * @return NVLL_InternetMediaType ...
      */
-    public static function getInternetMediaTypeFromStructure($structure, $ishorde = false)
+    public static function getInternetMediaTypeFromStructure($structure)
     {
-        if (! $ishorde) {
-            if (isset($structure->type) && isset($structure->subtype)) {
-                return new NVLL_InternetMediaType($structure->type, $structure->subtype);
-            }
-        } else {
-            if ($structure != null) {
-                $type = $structure->getPrimaryType();
-                $type_code = -1;
-                switch ($type) {
-                    case (1 == preg_match("/^text/i", $type)):
-                        $type_code = 0;
-                        break;
-                    case (1 == preg_match("/^multipart/i", $type)):
-                        $type_code = 1;
-                        break;
-                    case (1 == preg_match("/^message/i", $type)):
-                        $type_code = 2;
-                        break;
-                    case (1 == preg_match("/^application/i", $type)):
-                        $type_code = 3;
-                        break;
-                    case (1 == preg_match("/^audio/i", $type)):
-                        $type_code = 4;
-                        break;
-                    case (1 == preg_match("/^image/i", $type)):
-                        $type_code = 5;
-                        break;
-                    case (1 == preg_match("/^video/i", $type)):
-                        $type_code = 6;
-                        break;
-                    case (1 == preg_match("/^model/i", $type)):
-                        $type_code = 7;
-                        break;
-                    case (1 == preg_match("/^other/i", $type)):
-                        $type_code = 8;
-                        break;
-                    default:
-                        break;
-                }
-                if ($type_code >= 0) {
-                    $subtype = $structure->getSubType();
-                    return new NVLL_InternetMediaType($type_code, $subtype);
-                }
-            }
+        if (isset($structure->type) && isset($structure->subtype)) {
+            return new NVLL_InternetMediaType($structure->type, $structure->subtype);
         }
+
         return new NVLL_InternetMediaType();
     }
 
     /**
      * ...
      * @param object $structure imap_fetchstructure() object
-     * @param bool $ishorde true if we are using Horde/Imap library
      * @return NVLL_Encoding ...
      */
-    public static function getEncodingFromStructure($structure, $ishorde = false, $parts_info = array())
+    public static function getEncodingFromStructure($structure, $parts_info = array())
     {
-        if (! $ishorde) {
-            if (isset($structure->encoding)) {
-                return new NVLL_Encoding($structure->encoding);
-            }
-        } else {
-            $ne = 0;
-            $encoding = "";
-            $mimeID = $structure->getMimeId();
-            if (isset($parts_info[$mimeID]) && isset($parts_info[$mimeID]['encoding'])) {
-                $encoding = $parts_info[$mimeID]['encoding'];
-            }
-            switch ($encoding) {
-                case ("7bit"):
-                    $ne = 0;
-                    break;
-                case ("8bit"):
-                    $ne = 1;
-                    break;
-                case ("binary"):
-                    $ne = 2;
-                    break;
-                case ("base64"):
-                    $ne = 3;
-                    break;
-                case ("quoted-printable"):
-                    $ne = 4;
-                    break;
-                default:
-                    return new NVLL_Encoding();
-                    break;
-            }
-            return new NVLL_Encoding($ne);
-
-            //		//does not exist in Horde/Imap
-            //		if( $structure->isAttachment() && $structure->getType() != "message/rfc822" ) {
-            //			return new NVLL_Encoding(3);  //base64
-            //		}
-            //		else if( $structure->getType() == "text/html" ) {
-            //			return new NVLL_Encoding(4);  //quoted-printable
-            //		}
-            //		else {
-            //			return new NVLL_Encoding(0);  //7bit default
-            //		}
+        if (isset($structure->encoding)) {
+            return new NVLL_Encoding($structure->encoding);
         }
+
         return new NVLL_Encoding();
     }
 }

@@ -18,7 +18,7 @@ $msgnum = $content['msgnum'];
       <a href="action.php?<?php echo $url_session ?>&action=reply_all&amp;mail=<?php echo $msgnum ?>&amp;display_images=<?php echo $display_images ?>"><?php echo convertLang2Html($html_reply_all) ?></a>
     </li>
     <li>
-      <a href="delete.php?<?php echo $url_session ?>&mark_mode=unread&amp;mail=<?php echo $msgnum ?>&amp;only_one=1"><?php echo convertLang2Html($html_unread) ?></a>
+      <a href="delete.php?<?php echo $url_session ?>&mark_mode=unseen&amp;mail=<?php echo $msgnum ?>&amp;only_one=1"><?php echo convertLang2Html($html_unseen) ?></a>
     </li>
     <li>
       <a href="delete.php?<?php echo $url_session ?>&mark_mode=flag&amp;mail=<?php echo $msgnum ?>&amp;only_one=1"><?php echo convertLang2Html($html_flag) ?></a>

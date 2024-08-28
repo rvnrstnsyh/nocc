@@ -45,19 +45,11 @@ class NVLL_Header
     private $_status;
 
     /**
-     * we are using Horde/Imap library
-     * @var bool
-     * @access private
-     */
-    private $_ishorde;
-
-    /**
      * Initialize the wrapper
      * @param string $header imap_fetchheader() string
      */
-    public function __construct($header, $is_horde = false)
+    public function __construct($header)
     {
-        $this->_ishorde = $is_horde;
         $this->_header = $header;
         $this->_priority = 3;
         $this->_contenttype = '';

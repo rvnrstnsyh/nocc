@@ -2,16 +2,16 @@
 if (!isset($conf->loaded)) die('Hacking attempt');
 
 $even_odd_class = ($tmp['index'] % 2) ? 'even' : 'odd';
-$unread_class = '';
+$unseen_class = '';
 
 if ($_SESSION['ucb_pop_server'] || $pop->is_imap()) {
-  if ($tmp['unread'] == true) { //if unread...
-    $unread_class = ' unread';
+  if ($tmp['unseen'] == true) { //if unseen...
+    $unseen_class = ' unseen';
   }
 }
 
 // Merge flagged classes if the item is flagged.
-$row_class = $even_odd_class . $unread_class . $spam_class;
+$row_class = $even_odd_class . $unseen_class . $spam_class;
 
 //if Flagged...
 if ($tmp['flagged']) $row_class .= ' flagged';
@@ -55,14 +55,14 @@ foreach ($conf->column_order as $column) { //For all columns...
     case '5': //Size...
       echo $tmp['size'] . $html_kb;
       break;
-    case '6': //Read/Unread...
-      if ($tmp['unread'] == true) { //if unread...
+    case '6': //Seen/Unseen...
+      if ($tmp['unseen'] == true) { //if unseen...
         if ($conf->use_icon) {
-          echo '<img src="themes/' . $_SESSION['nvll_theme'] . '/img/svg/unread.svg" alt="" />';
+          echo '<img src="themes/' . $_SESSION['nvll_theme'] . '/img/svg/unseen.svg" alt="" />';
         } else {
           echo '+U';
         }
-      } else { //if read...
+      } else { //if Seen...
         echo '';
       }
       break;

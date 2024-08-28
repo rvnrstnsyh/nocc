@@ -23,6 +23,7 @@ class NVLL_Body
     {
         $placeholder = md5($body);
         $matches = array();
+
         if ($count = preg_match_all("/\[cid:.*?\]/", $body, $matches)) {
             for ($i = 0; $i < $count; $i++) {
                 $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
@@ -30,12 +31,12 @@ class NVLL_Body
         }
         $body = preg_replace("|href=\"mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)\"|i", "href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&amp;action=write&amp;mail_to=$1\"", $body);
         $body = preg_replace("|href=mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)|i", "href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&amp;action=write&amp;mail_to=$1\"", $body);
-        for ($i = 0; $i < $count; $i++) {
-            $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
-        }
+
+        for ($i = 0; $i < $count; $i++) $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
 
         $body = preg_replace("|href=\"([a-zA-Z0-9\+\/\;\-=%&:_.~\?]+[#a-zA-Z0-9\+]*)\"|i", "href=\"$1\" target=\"_blank\"", $body);
         $body = preg_replace("|href=([a-zA-Z0-9\+\/\;\-=%&:_.~\?]+[#a-zA-Z0-9\+]*)|i", "href=\"$1\" target=\"_blank\"", $body);
+
         return $body;
     }
 
@@ -61,12 +62,9 @@ class NVLL_Body
         }
 
         $body = preg_replace("/([0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,})/", "<a href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&amp;action=write&amp;mail_to=\\1\">\\1</a>", $body);
-
-        for ($i = 0; $i < $count; $i++) {
-            $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
-        }
-
+        for ($i = 0; $i < $count; $i++) $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
         $body = str_replace($nvllEntities, $htmlEntities, $body);
+
         return $body;
     }
 
@@ -83,6 +81,7 @@ class NVLL_Body
         $body = preg_replace('/^(&gt; *&gt; *&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel3">\\1\\2</span>\\3', $body);
         $body = preg_replace('/^(&gt; *&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel2">\\1\\2</span>\\3', $body);
         $body = preg_replace('/^(&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel1">\\1\\2</span>\\3', $body);
+
         return $body;
     }
 
@@ -100,6 +99,7 @@ class NVLL_Body
         $body = preg_replace('/(\s)(\/)([^\s\/]+[^\/\r\n<>]+)(\/)/', '\\1<em>\\2\\3\\4</em>', $body); // /emphasis/
         $body = preg_replace('/(\s)(_)([^\s_]+[^_\r\n]+)(_)/', '\\1<span style="text-decoration:underline">\\2\\3\\4</span>', $body); // _underline_
         $body = preg_replace('/(\s)(\|)([^\s\|]+[^\|\r\n]+)(\|)/', '\\1<code>\\2\\3\\4</code>', $body); // |code|
+
         return $body;
     }
 }

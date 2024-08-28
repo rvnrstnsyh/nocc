@@ -6,6 +6,7 @@
   <fieldset>
     <legend><?php echo strtoupper(convertLang2Html($html_manage_filters)); ?></legend>
   </fieldset>
+
   <?php if ($html_filter_select) { ?>
     <form class="managefilterLists" method="POST" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
       <div>
@@ -88,7 +89,7 @@
             <label for="filtername"><?php echo convertLang2Html($html_filter_name) ?>:</label>
           </td>
           <td class="prefsData">
-            <input class="button" type="text" id="filtername" name="filtername" size="40" maxlength="80" />
+            <input class="button" type="text" id="filtername" name="filtername" size="28" maxlength="80" style="margin-left:1.5px;" />
           </td>
         </tr>
         <tr>
@@ -118,13 +119,13 @@
         </div>
       <?php } ?>
       <br>
-      <p class="prefsSubmitButtonsLeft">
+      <div class="prefsSubmitButtonsLeft">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;
         <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
         </a>
-      </p>
+      </div>
     </div>
   </form>
 </div>

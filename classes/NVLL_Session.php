@@ -8,7 +8,6 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'Horde_AutoLoader.php';
 require_once 'NVLL_UserPrefs.php';
 
 /**
@@ -48,7 +47,7 @@ class NVLL_Session
 					$_SESSION['_vmbox'] = $_vmbox;
 					//
 					// The currently provided RSS URL (right next to INBOX) allows to view list of emails without authentification.
-					// With the following if/then/else switch one can read/answer/... the email
+					// With the following if/then/else switch one can seen/answer/... the email
 					//   without authentication and with the result of a complete logged in NVLL session.
 					// This mechanism would allow complete sessions only using the RSS URL and without athentication.
 					// Unclear what the RSS URL should be used for and what should be possible with it.
@@ -388,7 +387,6 @@ class NVLL_Session
 			$save_string .= " " . $_SESSION['creation_time'];
 			$save_string .= " " . $_SESSION['persistent'];
 			$save_string .= " " . $_SESSION['remote_addr'];
-			$save_string .= " " . $_SESSION['is_horde'];
 
 			// encode string to base64
 			$save_string = base64_encode($save_string);
@@ -479,8 +477,7 @@ class NVLL_Session
 			$_SESSION['quota_type'],
 			$_SESSION['creation_time'],
 			$_SESSION['persistent'],
-			$_SESSION['remote_addr'],
-			$_SESSION['is_horde']
+			$_SESSION['remote_addr']
 		) = explode(" ", base64_decode($line));
 		$_SESSION['nvll_folder'] = isset($_REQUEST['nvll_folder']) ? $_REQUEST['nvll_folder'] : 'INBOX';
 

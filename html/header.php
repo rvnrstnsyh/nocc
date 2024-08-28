@@ -62,7 +62,6 @@ if (file_exists($custom_header)) {
 				$rss_url .= '&amp;ucb_pop_server=' . base64_encode($_SESSION['ucb_pop_server']);
 				$rss_url .= '&amp;quota_enable=' . base64_encode($_SESSION['quota_enable']);
 				$rss_url .= '&amp;quota_type=' . base64_encode($_SESSION['quota_type']);
-				$rss_url .= '&amp;is_horde=' . base64_encode($_SESSION['is_horde']);
 			}
 		}
 		if (isset($rss_url)): ?>
