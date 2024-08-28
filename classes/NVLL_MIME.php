@@ -274,7 +274,7 @@ class NVLL_MIME
             if ($ev != true)
                 return (new NVLL_Exception('unable to send message, SMTP server unreachable'));
         } else { //if use SMTP server...
-            $smtp = new smtp();
+            $smtp = new NVLL_SMTP();
             if (!empty($smtp)) {
                 $smtp->smtp_server = $this->smtp_server;
                 $smtp->port = $this->smtp_port;
