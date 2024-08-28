@@ -1,31 +1,28 @@
 <?php
+
 /**
  * Class for reading a mail
  *
  * Copyright 2009-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_mailreader.php 2373 2011-01-04 15:06:58Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'class_local.php';
-require_once 'nocc_mailstructure.php';
-require_once 'nocc_mailpart.php';
-require_once 'nocc_mailparts.php';
-require_once 'nocc_headerinfo.php';
-require_once 'nocc_header.php';
+require_once 'NVLL_SMTP.php';
+require_once 'NVLL_MailStructure.php';
+require_once 'NVLL_MailPart.php';
+require_once 'NVLL_MailParts.php';
+require_once 'NVLL_HeaderInfo.php';
+require_once 'NVLL_Header.php';
 
 /**
  * Reading details from a mail
- *
- * @package    NOCC
  */
-class NOCC_MailReader {
+class NVLL_MailReader
+{
     /**
      * Message Number
      * @var integer
@@ -35,7 +32,7 @@ class NOCC_MailReader {
 
     /**
      * Mail parts
-     * @var NOCC_MailParts
+     * @var NVLL_MailParts
      * @access private
      */
     private $_mailparts;
@@ -116,7 +113,7 @@ class NOCC_MailReader {
 
     /**
      * Header
-     * @var NOCC_Header
+     * @var NVLL_Header
      * @access private
      */
     private $_header;
@@ -124,20 +121,21 @@ class NOCC_MailReader {
     /**
      * Initialize the mail reader
      * @param integer $msgno Message number
-     * @param nocc_imap $pop IMAP/POP3 class
+     * @param NVLL_IMAP $pop IMAP/POP3 class
      * @param bool $fullDetails Read full details?
      */
-    public function __construct($msgno, &$pop, $fullDetails = true) {
+    public function __construct($msgno, &$pop, $fullDetails = true)
+    {
         $this->_messageNumber = $msgno;
 
         //--------------------------------------------------------------------------------
         // Get values from structure...
         //--------------------------------------------------------------------------------
         $mailstructure = $pop->fetchstructure($msgno);
-        
+
         $this->_mailparts = null;
         if ($fullDetails == true) { //if read full details...
-            $this->_mailparts = new NOCC_MailParts($mailstructure);
+            $this->_mailparts = new NVLL_MailParts($mailstructure);
         }
 
         $this->_charset = $mailstructure->getCharset('ISO-8859-1');
@@ -150,12 +148,12 @@ class NOCC_MailReader {
             }
         }
         //--------------------------------------------------------------------------------
-        
+
         //--------------------------------------------------------------------------------
         // Get values from header info...
         //--------------------------------------------------------------------------------
         $mailheaderinfo = $pop->headerinfo($msgno, $this->_charset);
-        
+
         $this->_messageid = $mailheaderinfo->getMessageId();
         $this->_subject = $mailheaderinfo->getSubject();
         $this->_fromaddress = $mailheaderinfo->getFromAddress();
@@ -163,7 +161,7 @@ class NOCC_MailReader {
         $this->_ccaddress = $mailheaderinfo->getCcAddress();
         $this->_replytoaddress = $mailheaderinfo->getReplyToAddress();
         $this->_timestamp = $mailheaderinfo->getTimestamp();
-        
+
         $this->_isunread = false;
         $this->_isflagged = false;
         if ($pop->is_imap()) {
@@ -183,15 +181,17 @@ class NOCC_MailReader {
      * Get the message number
      * @return integer Message number
      */
-    public function getMessageNumber() {
+    public function getMessageNumber()
+    {
         return $this->_messageNumber;
     }
 
     /**
      * Get the body part
-     * @return NOCC_MailPart Body part
+     * @return NVLL_MailPart Body part
      */
-    public function getBodyPart() {
+    public function getBodyPart()
+    {
         if (!empty($this->_mailparts)) { //if mail parts exists...
             return $this->_mailparts->getBodyPart();
         }
@@ -202,7 +202,8 @@ class NOCC_MailReader {
      * Get the attachment parts
      * @return array Attachment parts
      */
-    public function getAttachmentParts() {
+    public function getAttachmentParts()
+    {
         if (!empty($this->_mailparts)) { //if mail parts exists...
             return $this->_mailparts->getAttachmentParts();
         }
@@ -213,90 +214,101 @@ class NOCC_MailReader {
      * Get the charset from the mail
      * @return string Charset
      */
-    public function getCharset() {
+    public function getCharset()
+    {
         return $this->_charset;
     }
-    
+
     /**
      * Get the size from the mail in kilobyte
      * @return integer Size in kilobyte
      */
-    public function getSize() {
+    public function getSize()
+    {
         return $this->_size;
     }
-    
+
     /**
      * Has the mail attachments?
      * @return boolean Has attachments?
      */
-    public function hasAttachments() {
+    public function hasAttachments()
+    {
         return $this->_hasAttachments;
     }
-    
+
     /**
      * Get the message id from the mail
      * @return string Message id
      */
-    public function getMessageId() {
+    public function getMessageId()
+    {
         return $this->_messageid;
     }
-    
+
     /**
      * Get the subject from the mail
      * @return string Subject
      */
-    public function getSubject() {
+    public function getSubject()
+    {
         return $this->_subject;
     }
-    
+
     /**
      * Get the "From" address from the mail
      * @return string "From" address
      */
-    public function getFromAddress() {
+    public function getFromAddress()
+    {
         return $this->_fromaddress;
     }
-    
+
     /**
      * Get the "To" address from the mail
      * @return string "To" address
      */
-    public function getToAddress() {
+    public function getToAddress()
+    {
         return $this->_toaddress;
     }
-    
+
     /**
      * Get the "Cc" address from the mail
      * @return string "Cc" address
      */
-    public function getCcAddress() {
+    public function getCcAddress()
+    {
         return $this->_ccaddress;
     }
-    
+
     /**
      * Get the "Reply-To" address from the mail
      * @return string "Reply-To" address
      */
-    public function getReplyToAddress() {
+    public function getReplyToAddress()
+    {
         return $this->_replytoaddress;
     }
-    
+
     /**
      * Get the date (in Unix time) from the mail
      * @return integer Date in Unix time
      */
-    public function getTimestamp() {
+    public function getTimestamp()
+    {
         return $this->_timestamp;
     }
-    
+
     /**
      * Is the mail unread?
      * @return boolean Is unread?
      */
-    public function isUnread() {
+    public function isUnread()
+    {
         return $this->_isunread;
     }
-    
+
     /**
      * Is the mail unread on a UCB POP Server?
      * 
@@ -305,7 +317,8 @@ class NOCC_MailReader {
      *
      * @return boolean Is unread on a UCB POP Server?
      */
-    public function isUnreadUcb() {
+    public function isUnreadUcb()
+    {
         if ($this->_header->getStatus() == '') {
             return true;
         }
@@ -316,49 +329,54 @@ class NOCC_MailReader {
      * Is the mail flagged?
      * @return boolean Is flagged?
      */
-    public function isFlagged() {
+    public function isFlagged()
+    {
         return $this->_isflagged;
     }
-    
+
     /**
      * Get the RFC2822 format header from the mail
      * @return string RFC2822 format header
      */
-    public function getHeader() {
+    public function getHeader()
+    {
         return $this->_header->getHeader();
     }
-    
+
     /**
      * Get the priority from the mail
      * @return integer Priority
      */
-    public function getPriority() {
+    public function getPriority()
+    {
         return $this->_header->getPriority();
     }
-    
+
     /**
      * Get the (translated) priority text from the mail
      * @return string Priority text
      */
-    public function getPriorityText() {
+    public function getPriorityText()
+    {
         return $this->_header->getPriorityText();
     }
-    
+
     /**
      * Is the mail a HTML mail?
      * @todo Drop property, if we have a getContentType() or getFullMimeType() property
      * @return bool Is HTML mail?
      */
-    public function isHtmlMail() {
+    public function isHtmlMail()
+    {
         return preg_match('|text/html|i', $this->_header->getHeader());
     }
-    
+
     /**
      * Is the mail a SPAM mail?
      * @return bool Is SPAM mail?
      */
-    public function isSpam() {
+    public function isSpam()
+    {
         return $this->_header->hasSpamFlag();
     }
 }
-?>
