@@ -24,7 +24,7 @@ require_once 'NVLL_Exception.php';
 require_once './utils/detect_cyr_charset.php';
 require_once './utils/crypt.php';
 
-require_once 'horde_autoloader.php';
+require_once 'Horde_Autoloader.php';
 
 class result
 {
