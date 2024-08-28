@@ -104,19 +104,6 @@ if (file_exists($custom_header)) {
 					}
 					echo '  <li>[<span title="' . $title . '"><a href="logout.php?' . NVLL_Session::getUrlGetSession() . '">' . convertLang2Html($html_logout) . '</a></span>]</li>';
 				}
-
-				// echo "<li>";
-				// $v = version();
-				// if ($v === 0) {
-				// 	echo 'NVLL v' . $conf->nvll_version;
-				// } else if ($v === 1) {
-				// 	echo '<span title="' . convertLang2Html($html_version_message1) . '">NVLL v' . $conf->nvll_version . '</span>';
-				// } else if ($v === 2) {
-				// 	echo '<span title="' . convertLang2Html($html_version_message2) . '"><a href="update.php?' . NVLL_Session::getUrlGetSession() . '">NVLL v' . $conf->nvll_version . '</a></span>';
-				// } else {
-				// 	echo '<span class="new-version" title="' . convertLang2Html($html_version_message3) . ': ' . $v . '"><a href="update.php?' . NVLL_Session::getUrlGetSession() . '">NVLL v' . $conf->nvll_version . '</a></span>';
-				// }
-				// echo "</li>\n";
 				echo "</ul>\n";
 			} ?>
 		</div>

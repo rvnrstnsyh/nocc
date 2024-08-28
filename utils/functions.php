@@ -37,51 +37,6 @@ function recursive_directory($dir = "", $regExpression = "/.*/")
 }
 
 /**
- * handle NVLL version
- * @return 0,1,2 or new version string
- */
-function version()
-{
-    global $conf;
-    if (isset($_SESSION['auto_update']) && $_SESSION['auto_update']) {
-        if (isset($_SESSION['auto_update_new'])) {
-            return $_SESSION['auto_update_new'];
-        } else {
-            if (ini_get("allow_url_fopen") == 1) {
-                $news = file_get_contents('http://nvll.sourceforge.net/docs/NEWS?v=' . $conf->nvll_version);
-                $matches[] = array();
-                if (preg_match("/Latest version is (.*)\R/", $news, $matches)) {
-                    $new_version = str_ireplace("-dev", "", trim($matches[1]));
-                    $new_v = explode('.', $new_version);
-                    $old_v = explode('.', str_ireplace("-dev", "", $conf->nvll_version));
-                    $old_dev_version = false;
-                    if (preg_match("/-dev/", $conf->nvll_version)) {
-                        $old_dev_version = true;
-                    }
-                    if (
-                        ($old_dev_version && $old_v[0] == $new_v[0] && $old_v[1] == $new_v[1] && $old_v[2] <= $new_v[2]) ||
-                        ($old_v[0] == $new_v[0] && $old_v[1] == $new_v[1] && $old_v[2] < $new_v[2]) ||
-                        ($old_v[0] == $new_v[0] && $old_v[1] < $new_v[1]) ||
-                        ($old_v[0] < $new_v[0]) ||
-                        0
-                    ) {
-                        $_SESSION['auto_update_new'] = $new_version;
-                        return $_SESSION['auto_update_new'];
-                    } else {
-                        $_SESSION['auto_update_new'] = 1;
-                        return $_SESSION['auto_update_new'];
-                    }
-                }
-            }
-            $_SESSION['auto_update_new'] = 2;
-            return $_SESSION['auto_update_new'];
-        }
-    } else {
-        return 0;
-    }
-}
-
-/**
  * Get UTF-8 string length
  * @param string $string UTF-8 string
  * @return int UTF-8 string length
