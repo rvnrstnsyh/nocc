@@ -13,8 +13,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'exception.php';
-require_once 'nocc_mailaddress.php';
+require_once 'NVLL_Exception.php';
+require_once 'NVLL_MailAddress.php';
 
 /**
  * Handling user preferences
@@ -169,8 +169,6 @@ class NVLL_UserPrefs
      */
     function __construct($key)
     {
-        global $conf;
-
         $this->key = preg_replace("/(\\\|\/)/", "_", $key);
         $this->key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
         $this->_fullName = '';
@@ -186,12 +184,12 @@ class NVLL_UserPrefs
         $this->_useSignatureSeparator = false;
         $this->_sendHtmlMail = false;
         $this->_useGraphicalSmilies = false;
-        $this->_useSentFolder = $conf->use_default_folders;
-        $this->_sentFolderName = $conf->default_sent_folder;
-        $this->_useTrashFolder = $conf->use_default_folders;
-        $this->_trashFolderName = $conf->default_trash_folder;
-        $this->_useInboxFolder = $conf->use_default_folders;
-        $this->_inboxFolderName = $conf->default_inbox_folder;
+        $this->_useSentFolder = true;
+        $this->_sentFolderName = 'Sent';
+        $this->_useTrashFolder = true;
+        $this->_trashFolderName = 'Trash';
+        $this->_useInboxFolder = true;
+        $this->_inboxFolderName = 'INBOX';
         $this->_collect = 0;
         $this->dirty_flag = 1;
     }
@@ -240,11 +238,11 @@ class NVLL_UserPrefs
 
     /**
      * Get mail address from user preferences
-     * @return NOCC_MailAddress Mail address
+     * @return NVLL_MailAddress Mail address
      */
     public function getMailAddress()
     {
-        return new NOCC_MailAddress($this->_emailAddress, $this->_fullName);
+        return new NVLL_MailAddress($this->_emailAddress, $this->_fullName);
     }
 
     /**
@@ -612,7 +610,7 @@ class NVLL_UserPrefs
         $prefs = new NVLL_UserPrefs($key);
 
         if (empty($conf->prefs_dir)) {
-            //$ev = new NoccException("User preferences are disabled");
+            //$ev = new NVLL_Exception("User preferences are disabled");
             $prefs->dirty_flag = 0;
             return $prefs;
         }
@@ -636,12 +634,12 @@ class NVLL_UserPrefs
     {
         /* Open the preferences file */
         if (!file_exists($filename)) {
-            error_log("NOCC: $filename does not exist");
+            error_log("NVLL: $filename does not exist");
             return $prefs;
         }
         $file = fopen($filename, 'r');
         if (!$file) {
-            $ev = new NoccException("Could not open $filename for reading user preferences");
+            $ev = new NVLL_Exception("Could not open $filename for reading user preferences");
             return;
         }
 
@@ -753,7 +751,7 @@ class NVLL_UserPrefs
 
         // Check it passes validation
         $this->validate($ev);
-        if (NoccException::isException($ev)) return;
+        if (NVLL_Exception::isException($ev)) return;
 
         // Do we need to write?
         if (!$this->dirty_flag) return;
@@ -762,16 +760,16 @@ class NVLL_UserPrefs
         //TODO: Check key value! Not empty?
         $filename = $conf->prefs_dir . '/' . $this->key . '.pref';
         if (file_exists($filename) && !is_writable($filename)) {
-            $ev = new NoccException($html_prefs_file_error);
+            $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
         if (!is_writable($conf->prefs_dir)) {
-            $ev = new NoccException($html_prefs_file_error);
+            $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
         $file = fopen($filename, 'w');
         if (!$file) {
-            $ev = new NoccException($html_prefs_file_error);
+            $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
 
@@ -825,12 +823,12 @@ class NVLL_UserPrefs
         global $html_invalid_wrap_msg;
 
         $allow_address_change = (
-            (isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change)
-            || (! isset($conf->domains[$_SESSION['nocc_domainnum']]->allow_address_change) && $conf->allow_address_change)
+            (isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domains']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->allow_address_change)
         );
         if ($allow_address_change) {
-            if (strlen($this->_emailAddress) > 0 && !NOCC_MailAddress::isValidAddress($this->_emailAddress)) {
-                $ev = new NoccException($html_invalid_email_address);
+            if (strlen($this->_emailAddress) > 0 && !NVLL_MailAddress::isValidAddress($this->_emailAddress)) {
+                $ev = new NVLL_Exception($html_invalid_email_address);
                 return;
             }
         } else {
@@ -838,12 +836,12 @@ class NVLL_UserPrefs
         }
 
         if (isset($this->msg_per_page) && !is_numeric($this->msg_per_page)) {
-            $ev = new NoccException($html_invalid_msg_per_page);
+            $ev = new NVLL_Exception($html_invalid_msg_per_page);
             return;
         }
 
         if (isset($this->_wrapMessages) && !preg_match("/^(0|72|80)$/", $this->_wrapMessages)) {
-            $ev = new NoccException($html_invalid_wrap_msg);
+            $ev = new NVLL_Exception($html_invalid_wrap_msg);
             return;
         }
 

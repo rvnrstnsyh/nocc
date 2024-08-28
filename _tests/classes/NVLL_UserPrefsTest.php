@@ -1,35 +1,31 @@
 <?php
+
 /**
- * Test cases for NOCCUserPrefs.
+ * Test cases for NVLL_UserPrefs.
  *
  * Copyright 2010-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @subpackage Tests
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: NOCCUserPrefsTest.php 2488 2011-06-17 22:05:25Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'PHPUnit/Framework.php';
-
-require_once dirname(__FILE__).'/../../classes/user_prefs.php';
-require_once dirname(__FILE__).'/../../classes/nocc_mailaddress.php';
+require_once dirname(__FILE__) . '/../../classes/NVLL_UserPrefs.php';
+require_once dirname(__FILE__) . '/../../classes/NVLL_MailAddress.php';
 
 /**
- * Test class for NOCCUserPrefs.
+ * Test class for NVLL_UserPrefs.
  */
-class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
+class NVLL_UserPrefsTest extends PHPUnit\Framework\TestCase
+{
     /**
      * @var string
      */
     protected $rootPath;
 
     /**
-     * @var NOCCUserPrefs
+     * @var NVLL_UserPrefs
      */
     protected $userPrefs1;
 
@@ -37,24 +33,26 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->rootPath = dirname(__FILE__) . '/../';
-
-        $this->userPrefs1 = new NOCCUserPrefs('');
+        $this->userPrefs1 = new NVLL_UserPrefs('');
     }
 
     /**
      * Test case for getFullName().
      */
-    public function testGetFullName() {
+    public function testGetFullName()
+    {
         $this->assertEquals('', $this->userPrefs1->getFullName());
     }
 
     /**
      * Test case for setFullName().
      */
-    public function testSetFullName() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetFullName()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertEquals('', $userPrefs->getFullName(), 'default');
         $userPrefs->setFullName(true);
@@ -68,15 +66,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getEmailAddress().
      */
-    public function testGetEmailAddress() {
+    public function testGetEmailAddress()
+    {
         $this->assertEquals('', $this->userPrefs1->getEmailAddress());
     }
 
     /**
      * Test case for getEmailAddress().
      */
-    public function testSetEmailAddress() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetEmailAddress()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertEquals('', $userPrefs->getEmailAddress(), 'default');
         $userPrefs->setEmailAddress(true);
@@ -90,9 +90,10 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getMailAddress().
      */
-    public function testGetMailAddress() {
+    public function testGetMailAddress()
+    {
         $mailAddress = $this->userPrefs1->getMailAddress();
-        
+
         $this->assertEquals('', $mailAddress->getName(), 'getName()');
         $this->assertEquals('', $mailAddress->getAddress(), 'getAddress()');
     }
@@ -100,15 +101,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getBccSelf().
      */
-    public function testgetBccSelf() {
+    public function testgetBccSelf()
+    {
         $this->assertFalse($this->userPrefs1->getBccSelf());
     }
 
     /**
      * Test case for setBccSelf().
      */
-    public function testsetBccSelf() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testsetBccSelf()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertFalse($userPrefs->getBccSelf(), 'default');
         $userPrefs->setBccSelf(true);
@@ -136,15 +139,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getHideAddresses().
      */
-    public function testGetHideAddresses() {
+    public function testGetHideAddresses()
+    {
         $this->assertFalse($this->userPrefs1->getHideAddresses());
     }
 
     /**
      * Test case for setHideAddresses().
      */
-    public function testSetHideAddresses() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetHideAddresses()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertFalse($userPrefs->getHideAddresses(), 'default');
         $userPrefs->setHideAddresses(true);
@@ -172,15 +177,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getOutlookQuoting().
      */
-    public function testGetOutlookQuoting() {
+    public function testGetOutlookQuoting()
+    {
         $this->assertFalse($this->userPrefs1->getOutlookQuoting());
     }
 
     /**
      * Test case for setOutlookQuoting().
      */
-    public function testSetOutlookQuoting() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetOutlookQuoting()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertFalse($userPrefs->getOutlookQuoting(), 'default');
         $userPrefs->setOutlookQuoting(true);
@@ -208,15 +215,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getColoredQuotes().
      */
-    public function testGetColoredQuotes() {
+    public function testGetColoredQuotes()
+    {
         $this->assertTrue($this->userPrefs1->getColoredQuotes());
     }
 
     /**
      * Test case for setColoredQuotes().
      */
-    public function testSetColoredQuotes() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetColoredQuotes()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertTrue($userPrefs->getColoredQuotes(), 'default');
         $userPrefs->setColoredQuotes(false);
@@ -244,15 +253,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getDisplayStructuredText().
      */
-    public function testGetDisplayStructuredText() {
+    public function testGetDisplayStructuredText()
+    {
         $this->assertFalse($this->userPrefs1->getDisplayStructuredText());
     }
 
     /**
      * Test case for setDisplayStructuredText().
      */
-    public function testSetDisplayStructuredText() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetDisplayStructuredText()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertFalse($userPrefs->getDisplayStructuredText(), 'default');
         $userPrefs->setDisplayStructuredText(true);
@@ -280,15 +291,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getWrapMessages().
      */
-    public function testGetWrapMessages() {
+    public function testGetWrapMessages()
+    {
         $this->assertEquals(0, $this->userPrefs1->getWrapMessages());
     }
 
     /**
      * Test case for setWrapMessages().
      */
-    public function testSetWrapMessages() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetWrapMessages()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertEquals(0, $userPrefs->getWrapMessages(), 'default');
         $userPrefs->setWrapMessages(true);
@@ -304,15 +317,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getSignature().
      */
-    public function testGetSignature() {
+    public function testGetSignature()
+    {
         $this->assertEquals('', $this->userPrefs1->getSignature());
     }
 
     /**
      * Test case for getSignature().
      */
-    public function testSetSignature() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetSignature()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertEquals('', $userPrefs->getSignature(), 'default');
         $userPrefs->setSignature(true);
@@ -326,15 +341,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getUseSignatureSeparator().
      */
-    public function testGetUseSignatureSeparator() {
+    public function testGetUseSignatureSeparator()
+    {
         $this->assertFalse($this->userPrefs1->getUseSignatureSeparator());
     }
 
     /**
      * Test case for setUseSignatureSeparator().
      */
-    public function testSetUseSignatureSeparator() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetUseSignatureSeparator()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertFalse($userPrefs->getUseSignatureSeparator(), 'default');
         $userPrefs->setUseSignatureSeparator(true);
@@ -362,15 +379,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getSendHtmlMail().
      */
-    public function testGetSendHtmlMail() {
+    public function testGetSendHtmlMail()
+    {
         $this->assertFalse($this->userPrefs1->getSendHtmlMail());
     }
 
     /**
      * Test case for setSendHtmlMail().
      */
-    public function testSetSendHtmlMail() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetSendHtmlMail()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertFalse($userPrefs->getSendHtmlMail(), 'default');
         $userPrefs->setSendHtmlMail(true);
@@ -398,15 +417,17 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getUseGraphicalSmilies().
      */
-    public function testGetUseGraphicalSmilies() {
+    public function testGetUseGraphicalSmilies()
+    {
         $this->assertFalse($this->userPrefs1->getUseGraphicalSmilies());
     }
 
     /**
      * Test case for setUseGraphicalSmilies().
      */
-    public function testSetUseGraphicalSmilies() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetUseGraphicalSmilies()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
         $this->assertFalse($userPrefs->getUseGraphicalSmilies(), 'default');
         $userPrefs->setUseGraphicalSmilies(true);
@@ -434,17 +455,19 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getUseSentFolder().
      */
-    public function testGetUseSentFolder() {
-        $this->assertFalse($this->userPrefs1->getUseSentFolder());
+    public function testGetUseSentFolder()
+    {
+        $this->assertTrue($this->userPrefs1->getUseSentFolder());
     }
 
     /**
      * Test case for setUseSentFolder().
      */
-    public function testSetUseSentFolder() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetUseSentFolder()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
-        $this->assertFalse($userPrefs->getUseSentFolder(), 'default');
+        $this->assertTrue($userPrefs->getUseSentFolder(), 'default');
         $userPrefs->setUseSentFolder(true);
         $this->assertTrue($userPrefs->getUseSentFolder(), 'true');
         $userPrefs->setUseSentFolder(false);
@@ -470,17 +493,19 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getSentFolderName().
      */
-    public function testGetSentFolderName() {
-        $this->assertEquals('', $this->userPrefs1->getSentFolderName());
+    public function testGetSentFolderName()
+    {
+        $this->assertEquals('Sent', $this->userPrefs1->getSentFolderName());
     }
 
     /**
      * Test case for setSentFolderName().
      */
-    public function testSetSentFolderName() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetSentFolderName()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
-        $this->assertEquals('', $userPrefs->getSentFolderName(), 'default');
+        $this->assertEquals('Sent', $userPrefs->getSentFolderName(), 'default');
         $userPrefs->setSentFolderName(true);
         $this->assertEquals('', $userPrefs->getSentFolderName(), 'true');
         $userPrefs->setSentFolderName(1);
@@ -492,17 +517,19 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getUseTrashFolder().
      */
-    public function testGetUseTrashFolder() {
-        $this->assertFalse($this->userPrefs1->getUseTrashFolder());
+    public function testGetUseTrashFolder()
+    {
+        $this->assertTrue($this->userPrefs1->getUseTrashFolder());
     }
 
     /**
      * Test case for setUseTrashFolder().
      */
-    public function testSetUseTrashFolder() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetUseTrashFolder()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
-        $this->assertFalse($userPrefs->getUseTrashFolder(), 'default');
+        $this->assertTrue($userPrefs->getUseTrashFolder(), 'default');
         $userPrefs->setUseTrashFolder(true);
         $this->assertTrue($userPrefs->getUseTrashFolder(), 'true');
         $userPrefs->setUseTrashFolder(false);
@@ -528,17 +555,19 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for getTrashFolderName().
      */
-    public function testGetTrashFolderName() {
-        $this->assertEquals('', $this->userPrefs1->getTrashFolderName());
+    public function testGetTrashFolderName()
+    {
+        $this->assertEquals('Trash', $this->userPrefs1->getTrashFolderName());
     }
 
     /**
      * Test case for setTrashFolderName().
      */
-    public function testSetTrashFolderName() {
-        $userPrefs = new NOCCUserPrefs('');
+    public function testSetTrashFolderName()
+    {
+        $userPrefs = new NVLL_UserPrefs('');
 
-        $this->assertEquals('', $userPrefs->getTrashFolderName(), 'default');
+        $this->assertEquals('Trash', $userPrefs->getTrashFolderName(), 'default');
         $userPrefs->setTrashFolderName(true);
         $this->assertEquals('', $userPrefs->getTrashFolderName(), 'true');
         $userPrefs->setTrashFolderName(1);
@@ -550,21 +579,23 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * @todo Implement testRead().
      */
-    public function testRead() {
+    public function testRead()
+    {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(
-                'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
     }
 
     /**
      * Test case for readFromFile().
      */
-    public function testReadFromFile() {
-        $defaultUserPrefs = new NOCCUserPrefs('');
+    public function testReadFromFile()
+    {
+        $ev = '';
+        $defaultUserPrefs = new NVLL_UserPrefs('');
+        $userPrefs1 = NVLL_UserPrefs::readFromFile($defaultUserPrefs, $this->rootPath . './prefs/test1.pref', $ev);
 
-        $userPrefs1 = NOCCUserPrefs::readFromFile($defaultUserPrefs, $this->rootPath . './prefs/test1.pref', $ev);
-        
         $this->assertEquals('Full Name', $userPrefs1->getFullName(), 'getFullName()');
         $this->assertEquals('foo@bar.org', $userPrefs1->getEmailAddress(), 'getEmailAddress()');
         $this->assertEquals(30, $userPrefs1->msg_per_page, 'msg_per_page');
@@ -588,7 +619,7 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('newlook', $userPrefs1->theme, 'theme');
         $this->assertEquals(0, $userPrefs1->dirty_flag, 'dirty_flag');
 
-        $userPrefs2 = NOCCUserPrefs::readFromFile($defaultUserPrefs, $this->rootPath . './prefs/test2.pref', $ev);
+        $userPrefs2 = NVLL_UserPrefs::readFromFile($defaultUserPrefs, $this->rootPath . './prefs/test2.pref', $ev);
 
         $this->assertEquals('Name Full', $userPrefs2->getFullName(), 'getFullName()');
         $this->assertEquals('bar@foo.org', $userPrefs2->getEmailAddress(), 'getEmailAddress()');
@@ -596,7 +627,7 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($userPrefs2->getBccSelf(), 'getBccSelf()');
         $this->assertFalse($userPrefs2->getHideAddresses(), 'getHideAddresses()');
         $this->assertFalse($userPrefs2->getOutlookQuoting(), 'getOutlookQuoting()');
-        $this->assertFalse($userPrefs2->getColoredQuotes(), 'getColoredQuotes()');
+        $this->assertTrue($userPrefs2->getColoredQuotes(), 'getColoredQuotes()');
         $this->assertFalse($userPrefs2->getDisplayStructuredText(), 'getDisplayStructuredText()');
         $this->assertFalse($userPrefs2->seperate_msg_win, 'seperate_msg_win');
         $this->assertEquals('', $userPrefs2->reply_leadin, 'reply_leadin');
@@ -617,31 +648,33 @@ class NOCCUserPrefsTest extends PHPUnit_Framework_TestCase {
     /**
      * @todo Implement testCommit().
      */
-    public function testCommit() {
+    public function testCommit()
+    {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(
-                'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
     }
 
     /**
      * @todo Implement testValidate().
      */
-    public function testValidate() {
+    public function testValidate()
+    {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(
-                'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
     }
 
     /**
      * @todo Implement testParseLeadin().
      */
-    public function testParseLeadin() {
+    public function testParseLeadin()
+    {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(
-                'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
     }
 }
-?>

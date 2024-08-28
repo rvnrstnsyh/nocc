@@ -1,8 +1,10 @@
 <?php
+
 /**
  * Very simplistic version of PEAR.php
  */
-class NoccException {
+class NVLL_Exception
+{
     /**
      * Message
      * @var string
@@ -13,7 +15,8 @@ class NoccException {
      * Initialize the exception
      * @param string $message Message
      */
-    public function __construct($message = 'unknown error') {
+    public function __construct($message = 'unknown error')
+    {
         $this->message = $message;
     }
 
@@ -21,7 +24,8 @@ class NoccException {
      * Get the message from the exception
      * @return string Message
      */
-    public function getMessage() {
+    public function getMessage()
+    {
         return $this->message;
     }
 
@@ -30,9 +34,10 @@ class NoccException {
      * @param object $data Data
      * @return boolean Is exception?
      */
-    public static function isException($data) {
+    public static function isException($data)
+    {
         return (bool)(is_object($data) &&
-                      ((get_class($data) == "NoccException") ||
-               (get_class($data) == "noccexception")));
+            ((get_class($data) == "NVLL_Exception") ||
+                (get_class($data) == "nvllexception")));
     }
 }
