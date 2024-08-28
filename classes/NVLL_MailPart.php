@@ -1,29 +1,26 @@
 <?php
+
 /**
  * Class for wrapping a mail part
  *
  * Copyright 2010-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_mailpart.php 2861 2020-04-07 13:40:41Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'nocc_mailstructure.php';
+require_once 'NVLL_MailStructure.php';
 
 /**
  * Wrapping a mail part
- *
- * @package    NOCC
  */
-class NOCC_MailPart {
+class NVLL_MailPart
+{
     /**
      * Part structure
-     * @var NOCC_MailStructure
+     * @var NVLL_MailStructure
      * @access private
      */
     private $partStructure;
@@ -41,27 +38,29 @@ class NOCC_MailPart {
      * @access private
      */
     private $mimeId;
-    
+
     /**
      * Initialize the wrapper
-     * @param NOCC_MailStructure $partStructure Part structure
+     * @param NVLL_MailStructure $partStructure Part structure
      * @param string $partNumber Part number
      * @todo Throw exception, if no vaild mail structure?
      */
-    public function __construct($partStructure, $partNumber, $isHorde = false) {
+    public function __construct($partStructure, $partNumber, $isHorde = false)
+    {
         $this->partStructure = $partStructure;
         $this->partNumber = $partNumber;
-	$this->mimeId = "";
-	if( $isHorde ) {
-		$this->mimeId = $partStructure->getStructure()->getMimeId();
-	}
+        $this->mimeId = "";
+        if ($isHorde) {
+            $this->mimeId = $partStructure->getStructure()->getMimeId();
+        }
     }
 
     /**
      * Get the part structure
-     * @return NOCC_MailStructure Part structure
+     * @return NVLL_MailStructure Part structure
      */
-    public function getPartStructure() {
+    public function getPartStructure()
+    {
         return $this->partStructure;
     }
 
@@ -69,7 +68,8 @@ class NOCC_MailPart {
      * Get the part number
      * @return string Part number
      */
-    public function getMimeId() {
+    public function getMimeId()
+    {
         return $this->mimeId;
     }
 
@@ -77,23 +77,26 @@ class NOCC_MailPart {
      * Get the part number
      * @return string Part number
      */
-    public function getPartNumber() {
+    public function getPartNumber()
+    {
         return $this->partNumber;
     }
 
     /**
      * Get the internet media type (MIME type)
-     * @return NOCC_InternetMediaType Internet media type
+     * @return NVLL_InternetMediaType Internet media type
      */
-    public function getInternetMediaType() {
+    public function getInternetMediaType()
+    {
         return $this->partStructure->getInternetMediaType();
     }
 
     /**
      * Get the transfer encoding
-     * @return NOCC_Encoding Transfer encoding
+     * @return NVLL_Encoding Transfer encoding
      */
-    public function getEncoding() {
+    public function getEncoding()
+    {
         return $this->partStructure->getEncoding();
     }
 
@@ -101,8 +104,8 @@ class NOCC_MailPart {
      * Get the size from the part in kilobyte
      * @return integer Size in kilobyte
      */
-    public function getSize() {
+    public function getSize()
+    {
         return $this->partStructure->getSize();
     }
 }
-?>
