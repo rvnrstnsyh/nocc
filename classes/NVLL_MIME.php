@@ -1,29 +1,25 @@
 <?php
+
 /**
  * Class for building and sending a mail
  *
  * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
  * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
  * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: class_send.php 2871 2020-04-13 14:16:02Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'exception.php';
+require_once 'NVLL_Exception.php';
 
 /**
  * Building and sending a mail
- *
- * @package    NOCC
- * @todo Rename to NOCC_MimeMail?
  */
-class mime_mail {
+class NVLL_MIME
+{
     /**
      * Parts
      * @var array
@@ -98,11 +94,12 @@ class mime_mail {
     /**
      * Initialize the mail object
      */
-    public function __construct() {
-        $this->parts = Array();
-        $this->to =  Array();
-        $this->cc = Array();
-        $this->bcc = Array();
+    public function __construct()
+    {
+        $this->parts = array();
+        $this->to =  array();
+        $this->cc = array();
+        $this->bcc = array();
         $this->from =  null;
         $this->headers = null;
         $this->subject =  null;
@@ -125,8 +122,9 @@ class mime_mail {
      * @param string $charset 
      * @todo Rename to addAttachment()?
      */
-    public function add_attachment($message, $name, $ctype, $encoding, $charset) {
-        $this->parts[] = array (
+    public function add_attachment($message, $name, $ctype, $encoding, $charset)
+    {
+        $this->parts[] = array(
             'ctype' => $ctype,
             'message' => $message,
             'encoding' => $encoding,
@@ -141,12 +139,13 @@ class mime_mail {
      * @param array $part
      * @return string
      * @access private
-     */ 
-    private function _buildMessage($part) {
+     */
+    private function _buildMessage($part)
+    {
         $message = $part['message'];
         $encoding = $part['encoding'];
         $charset = $part['charset'];
-        switch($encoding) {
+        switch ($encoding) {
             case 'base64':
                 $message = chunk_split(base64_encode($message));
                 break;
@@ -160,7 +159,7 @@ class mime_mail {
         $val .= $this->crlf . 'Content-Transfer-Encoding: ' . $encoding;
         $val .= ($part['name'] ? $this->crlf . 'Content-Disposition: attachment;' . $this->crlf . "\tfilename=\"" . $part['name'] . '"' : '');
         $val .= $this->crlf . $this->crlf . $message . $this->crlf;
-        return($val);
+        return ($val);
     }
 
     /**
@@ -168,13 +167,14 @@ class mime_mail {
      *
      * @return string
      * @access private
-     */ 
-    private function _buildMultipart() {
-        $boundary = 'NextPart'.md5(uniqid(rand(),true));
+     */
+    private function _buildMultipart()
+    {
+        $boundary = 'NextPart' . md5(uniqid(rand(), true));
         $multipart = 'Content-Type: multipart/mixed;' . $this->crlf . "\tboundary=\"$boundary\"" . $this->crlf . $this->crlf . 'This is a MIME encoded message.' . $this->crlf . $this->crlf . '--' . $boundary;
-        
-        for($i = sizeof($this->parts) - 1; $i >= 0; $i--) 
-            $multipart .= $this->crlf . $this->_buildMessage($this->parts[$i]) . '--'.$boundary;
+
+        for ($i = sizeof($this->parts) - 1; $i >= 0; $i--)
+            $multipart .= $this->crlf . $this->_buildMessage($this->parts[$i]) . '--' . $boundary;
         return ($multipart .= '--' . $this->crlf);
     }
 
@@ -184,7 +184,8 @@ class mime_mail {
      * @return string
      * @access private
      */
-    private function _buildNoneMultipart() {
+    private function _buildNoneMultipart()
+    {
         if (sizeof($this->parts) == 1)
             $part = $this->_buildMessage($this->parts[0]);
         else
@@ -197,8 +198,9 @@ class mime_mail {
      *
      * @param $conf
      * @return mixed
-     */ 
-    public function send(&$conf) {
+     */
+    public function send(&$conf)
+    {
         $mime = '';
         if ($this->useSmtpServer()) { //if use SMTP server...
             if ($this->to[0] != '')
@@ -215,7 +217,7 @@ class mime_mail {
             $mime .= 'Bcc: ' . join(', ', $this->bcc) . $this->crlf;
         $mime .= 'Date: ' . date('r') . $this->crlf;
         if (!empty($this->from))
-            $mime .= 'Reply-To: ' . $this->from . $this->crlf . 'Errors-To: '.$this->from . $this->crlf;
+            $mime .= 'Reply-To: ' . $this->from . $this->crlf . 'Errors-To: ' . $this->from . $this->crlf;
         if ($this->receipt != false)
             $mime .= 'Disposition-Notification-To: ' . $this->from . $this->crlf;
         $mime .= 'X-Priority: ' . $this->priority . $this->crlf;
@@ -226,23 +228,21 @@ class mime_mail {
         $mime = str_replace("\r\n.\r\n", "\r\n..\r\n", $mime);
 
         $mail_format = '';
-        if (NOCC_Session::getSendHtmlMail()) {
+        if (NVLL_Session::getSendHtmlMail()) {
             $mail_format = 'text/html';
-        }
-        else {
+        } else {
             $mail_format = 'text/plain';
         }
 
         if (sizeof($this->parts) >= 1) {
             $this->add_attachment($this->body, '', $mail_format, 'quoted-printable', $this->charset);
             $mime .= 'MIME-Version: 1.0' . $this->crlf . $this->_buildMultipart();
-        }
-        else {
+        } else {
             $this->add_attachment($this->body, '', $mail_format, '8bit', $this->charset);
             $mime .= 'MIME-Version: 1.0' . $this->crlf . $this->_buildNoneMultipart();
         }
 
-        // We enforce $conf->crlf option as mixed "\r\n" (coming from NOCC
+        // We enforce $conf->crlf option as mixed "\r\n" (coming from NVLL
         // textarea while writing mail)  and "\n" line break may confuse some
         // MTA or mail() PHP function.
         $mime = str_replace("\r\n", $conf->crlf, $mime);
@@ -252,30 +252,28 @@ class mime_mail {
         if (!$this->useSmtpServer()) { //if use sendmail...
             $rcpt_to = join(', ', $this->to);
             $ev = @mail($rcpt_to, $this->subject, '', $mime, '-f' . $this->strip_comment($this->from));
-                
-            $user_prefs = NOCC_Session::getUserPrefs();
+
+            $user_prefs = NVLL_Session::getUserPrefs();
             if ($user_prefs->getUseSentFolder() && $user_prefs->getSentFolderName() != '') {
                 // Copy email to Sent folder
                 //TODO: Optimize try block!
                 try {
-                    $pop = new nocc_imap();
-                }
-                catch (Exception $ex) {
-                    $ev = new NoccException($ex->getMessage());
-                    return($ev);
+                    $pop = new NVLL_IMAP();
+                } catch (Exception $ex) {
+                    $ev = new NVLL_Exception($ex->getMessage());
+                    return ($ev);
                 }
                 if ($pop->is_imap()) {
                     $mime = "To: $rcpt_to" . $conf->crlf . "Subject: " . $this->subject . $conf->crlf . $mime;
                     $copy_return = $pop->copytosentfolder($mime, $ev, $user_prefs->getSentFolderName());
-                    if (NoccException::isException($ev)) {
-                        return($ev);
+                    if (NVLL_Exception::isException($ev)) {
+                        return ($ev);
                     }
                 }
             }
             if ($ev != true)
-                return (new NoccException('unable to send message, SMTP server unreachable'));
-        }
-        else { //if use SMTP server...
+                return (new NVLL_Exception('unable to send message, SMTP server unreachable'));
+        } else { //if use SMTP server...
             $smtp = new smtp();
             if (!empty($smtp)) {
                 $smtp->smtp_server = $this->smtp_server;
@@ -287,31 +285,29 @@ class mime_mail {
                 $smtp->subject = $this->subject;
                 $smtp->data = $mime;
                 $smtp_return = $smtp->send();
-                if (NoccException::isException($smtp_return)) {
-                    return($smtp_return);
+                if (NVLL_Exception::isException($smtp_return)) {
+                    return ($smtp_return);
                 }
                 $copy_return = 1;
-                $user_prefs = NOCC_Session::getUserPrefs();
+                $user_prefs = NVLL_Session::getUserPrefs();
                 if ($user_prefs->getUseSentFolder() && $user_prefs->getSentFolderName() != "") {
                     // Copy email to Sent folder
                     //TODO: Optimize try block!
                     try {
-                        $pop = new nocc_imap();
-                    }
-                    catch (Exception $ex) {
-                        $ev = new NoccException($ex->getMessage());
-                        return($ev);
+                        $pop = new NVLL_IMAP();
+                    } catch (Exception $ex) {
+                        $ev = new NVLL_Exception($ex->getMessage());
+                        return ($ev);
                     }
                     if ($pop->is_imap()) {
                         $copy_return = $pop->copytosentfolder($smtp->data, $ev, $user_prefs->getSentFolderName());
-                        if (NoccException::isException($ev)) {
-                            return($ev);
+                        if (NVLL_Exception::isException($ev)) {
+                            return ($ev);
                         }
                     }
                 }
                 return ($smtp_return && $copy_return);
-            }
-            else
+            } else
                 return (0);
         }
     }
@@ -320,7 +316,8 @@ class mime_mail {
      * Use SMTP server to send the mail?
      * @return boolean Use SMTP server?
      */
-    public function useSmtpServer() {
+    public function useSmtpServer()
+    {
         if (($this->smtp_server != '' && $this->smtp_port != '')) {
             return true;
         }
@@ -335,7 +332,8 @@ class mime_mail {
      * @access private
      * @todo Rename!
      */
-    private function strip_comment_array($array) {
+    private function strip_comment_array($array)
+    {
         for ($i = 0; $i < count($array); $i++) {
             $array[$i] = $this->strip_comment($array[$i]);
         }
@@ -350,12 +348,12 @@ class mime_mail {
      * @access private
      * @todo Rename!
      */
-    private function strip_comment($address) {
+    private function strip_comment($address)
+    {
         $pos = strrpos($address, '<');
         if ($pos === false) {
-            return '<'.$address.'>';
-        }
-        else {
+            return '<' . $address . '>';
+        } else {
             return substr($address, $pos);
         }
     }
