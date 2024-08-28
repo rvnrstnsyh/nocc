@@ -54,7 +54,7 @@ class NVLL_LanguagesTest extends PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->rootPath = dirname(__FILE__) . '/../../';
+        $this->rootPath = dirname(__FILE__) . '/../';
 
         $this->languages1 = new NVLL_Languages('');
         $this->languages2 = new NVLL_Languages($this->rootPath . './languages', 'de', ['de']);
@@ -79,9 +79,9 @@ class NVLL_LanguagesTest extends PHPUnit\Framework\TestCase
     {
         $this->assertEquals(0, $this->languages1->count());
         $this->assertEquals(2, $this->languages2->count(), './languages, de');
-        $this->assertEquals(4, $this->languages3->count(), './languages/, DE');
+        $this->assertEquals(3, $this->languages3->count(), './languages/, DE');
         $this->assertEquals(0, $this->languages4->count(), 'array(bug)');
-        $this->assertEquals(68, $this->languages5->count(), './languages/, array(bug)');
+        $this->assertEquals(3, $this->languages5->count(), './languages/, array(bug)');
     }
 
     /**
