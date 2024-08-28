@@ -1,24 +1,21 @@
 <?php
+
 /**
  * Class for wrapping the internet media type (MIME type) from a imap_fetchstructure() object
  *
  * Copyright 2010-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_internetmediatype.php 2408 2011-03-17 20:14:10Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 /**
  * Wrapping the internet media type (MIME type) from a imap_fetchstructure() object
- * 
- * @package    NOCC
  */
-class NOCC_InternetMediaType {
+class NVLL_InternetMediaType
+{
     /**
      * Type
      * @var integer
@@ -38,7 +35,8 @@ class NOCC_InternetMediaType {
      * @param integer $type Type
      * @param string $subtype Subtype
      */
-    public function __construct($type = null, $subtype = null) {
+    public function __construct($type = null, $subtype = null)
+    {
         $this->_type = -1;
         $this->_subtype = '';
         if (is_int($type) && is_string($subtype)) { //if valid types...
@@ -53,7 +51,8 @@ class NOCC_InternetMediaType {
      * Get the internet media subtype
      * @return string Internet media subtype
      */
-    public function getSubtype() {
+    public function getSubtype()
+    {
         return $this->_subtype;
     }
 
@@ -61,7 +60,8 @@ class NOCC_InternetMediaType {
      * Is text?
      * @return bool Is text?
      */
-    public function isText() {
+    public function isText()
+    {
         if ($this->_type == 0) { //if text...
             return true;
         }
@@ -72,7 +72,8 @@ class NOCC_InternetMediaType {
      * Is plain text?
      * @return bool Is plain text?
      */
-    public function isPlainText() {
+    public function isPlainText()
+    {
         if ($this->isText()) { //if text...
             if ($this->_subtype == 'plain') { //if plain text...
                 return true;
@@ -85,7 +86,8 @@ class NOCC_InternetMediaType {
      * Is HTML text?
      * @return bool Is HTML text?
      */
-    public function isHtmlText() {
+    public function isHtmlText()
+    {
         if ($this->isText()) { //if text...
             if ($this->_subtype == 'html') { //if HTML text...
                 return true;
@@ -98,7 +100,8 @@ class NOCC_InternetMediaType {
      * Is plain or HTML text?
      * @return bool Is plain or HTML text?
      */
-    public function isPlainOrHtmlText() {
+    public function isPlainOrHtmlText()
+    {
         if ($this->isText()) { //if text...
             if ($this->_subtype == 'plain' || $this->_subtype == 'html') { //if plain or HTML text...
                 return true;
@@ -111,7 +114,8 @@ class NOCC_InternetMediaType {
      * Is multipart?
      * @return bool Is multipart?
      */
-    public function isMultipart() {
+    public function isMultipart()
+    {
         if ($this->_type == 1) { //if multipart...
             return true;
         }
@@ -122,7 +126,8 @@ class NOCC_InternetMediaType {
      * Is alternative multipart?
      * @return bool Is alternative multipart?
      */
-    public function isAlternativeMultipart() {
+    public function isAlternativeMultipart()
+    {
         if ($this->isMultipart()) { //if multipart...
             if ($this->isAlternative()) { //if alternative multipart...
                 return true;
@@ -135,7 +140,8 @@ class NOCC_InternetMediaType {
      * Is related multipart?
      * @return bool Is related multipart?
      */
-    public function isRelatedMultipart() {
+    public function isRelatedMultipart()
+    {
         if ($this->isMultipart()) { //if multipart...
             if ($this->isRelated()) { //if related multipart...
                 return true;
@@ -148,7 +154,8 @@ class NOCC_InternetMediaType {
      * Is message?
      * @return bool Is message?
      */
-    public function isMessage() {
+    public function isMessage()
+    {
         if ($this->_type == 2) { //if message...
             return true;
         }
@@ -159,7 +166,8 @@ class NOCC_InternetMediaType {
      * Is RFC822 message?
      * @return bool Is RFC822 message?
      */
-    public function isRfc822Message() {
+    public function isRfc822Message()
+    {
         if ($this->isMessage()) { //if message...
             if ($this->_subtype == 'rfc822') { //if RFC822 message...
                 return true;
@@ -172,7 +180,8 @@ class NOCC_InternetMediaType {
      * Is application?
      * @return bool Is application?
      */
-    public function isApplication() {
+    public function isApplication()
+    {
         if ($this->_type == 3) { //if application...
             return true;
         }
@@ -183,7 +192,8 @@ class NOCC_InternetMediaType {
      * Is audio?
      * @return bool Is audio?
      */
-    public function isAudio() {
+    public function isAudio()
+    {
         if ($this->_type == 4) { //if audio...
             return true;
         }
@@ -194,7 +204,8 @@ class NOCC_InternetMediaType {
      * Is image?
      * @return bool Is image?
      */
-    public function isImage() {
+    public function isImage()
+    {
         if ($this->_type == 5) { //if image...
             return true;
         }
@@ -205,7 +216,8 @@ class NOCC_InternetMediaType {
      * Is video?
      * @return bool Is video?
      */
-    public function isVideo() {
+    public function isVideo()
+    {
         if ($this->_type == 6) { //if video...
             return true;
         }
@@ -216,7 +228,8 @@ class NOCC_InternetMediaType {
      * Is other?
      * @return bool Is other?
      */
-    public function isOther() {
+    public function isOther()
+    {
         if ($this->_type == 7) { //if other...
             return true;
         }
@@ -227,7 +240,8 @@ class NOCC_InternetMediaType {
      * Is alternative?
      * @return bool Is alternative?
      */
-    public function isAlternative() {
+    public function isAlternative()
+    {
         if ($this->_subtype == 'alternative') { //if alternative...
             return true;
         }
@@ -238,7 +252,8 @@ class NOCC_InternetMediaType {
      * Is related?
      * @return bool Is related?
      */
-    public function isRelated() {
+    public function isRelated()
+    {
         if ($this->_subtype == 'related') { //if related...
             return true;
         }
@@ -249,18 +264,26 @@ class NOCC_InternetMediaType {
      * ...
      * @return string Internet media type text
      */
-    public function __toString() {
-        switch($this->_type) {
-            case 0: return 'text/' . $this->_subtype;
-            case 1: return 'multipart/' . $this->_subtype;
-            case 2: return 'message/' . $this->_subtype;
-            case 3: return 'application/' . $this->_subtype;
-            case 4: return 'audio/' . $this->_subtype;
-            case 5: return 'image/' . $this->_subtype;
-            case 6: return 'video/' . $this->_subtype;
-            case 7: return 'other/' . $this->_subtype;
+    public function __toString()
+    {
+        switch ($this->_type) {
+            case 0:
+                return 'text/' . $this->_subtype;
+            case 1:
+                return 'multipart/' . $this->_subtype;
+            case 2:
+                return 'message/' . $this->_subtype;
+            case 3:
+                return 'application/' . $this->_subtype;
+            case 4:
+                return 'audio/' . $this->_subtype;
+            case 5:
+                return 'image/' . $this->_subtype;
+            case 6:
+                return 'video/' . $this->_subtype;
+            case 7:
+                return 'other/' . $this->_subtype;
         }
         return '';
     }
 }
-?>

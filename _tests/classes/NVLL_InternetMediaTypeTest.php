@@ -1,74 +1,70 @@
 <?php
+
 /**
- * Test cases for NOCC_InternetMediaType.
+ * Test cases for NVLL_InternetMediaType.
  *
  * Copyright 2010-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @subpackage Tests
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: NOCC_InternetMediaTypeTest.php 2373 2011-01-04 15:06:58Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'PHPUnit/Framework.php';
-
-require_once dirname(__FILE__).'/../../classes/nocc_internetmediatype.php';
+require_once dirname(__FILE__) . '/../../classes/NVLL_InternetMediaType.php';
 
 /**
- * Test class for NOCC_InternetMediaType.
+ * Test class for NVLL_InternetMediaType.
  */
-class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
+class NVLL_InternetMediaTypeTest extends PHPUnit\Framework\TestCase
+{
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaTypeNull;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaTypeBug;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType0;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType1;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType2;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType3;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType4;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType5;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType6;
 
     /**
-     * @var NOCC_InternetMediaType
+     * @var NVLL_InternetMediaType
      */
     protected $internetMediaType7;
 
@@ -76,23 +72,25 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp() {
-        $this->internetMediaTypeNull = new NOCC_InternetMediaType(null, null);
-        $this->internetMediaTypeBug = new NOCC_InternetMediaType('bug', 'bug');
-        $this->internetMediaType0 = new NOCC_InternetMediaType(0, 'plain');
-        $this->internetMediaType1 = new NOCC_InternetMediaType(1, 'ALTERNATIVE');
-        $this->internetMediaType2 = new NOCC_InternetMediaType(2, 'RFC822');
-        $this->internetMediaType3 = new NOCC_InternetMediaType(3, 'Pdf');
-        $this->internetMediaType4 = new NOCC_InternetMediaType(4, 'mpeg');
-        $this->internetMediaType5 = new NOCC_InternetMediaType(5, 'PNG');
-        $this->internetMediaType6 = new NOCC_InternetMediaType(6, 'quicktime');
-        $this->internetMediaType7 = new NOCC_InternetMediaType(7, 'Test');
+    protected function setUp(): void
+    {
+        $this->internetMediaTypeNull = new NVLL_InternetMediaType(null, null);
+        $this->internetMediaTypeBug = new NVLL_InternetMediaType('bug', 'bug');
+        $this->internetMediaType0 = new NVLL_InternetMediaType(0, 'plain');
+        $this->internetMediaType1 = new NVLL_InternetMediaType(1, 'ALTERNATIVE');
+        $this->internetMediaType2 = new NVLL_InternetMediaType(2, 'RFC822');
+        $this->internetMediaType3 = new NVLL_InternetMediaType(3, 'Pdf');
+        $this->internetMediaType4 = new NVLL_InternetMediaType(4, 'mpeg');
+        $this->internetMediaType5 = new NVLL_InternetMediaType(5, 'PNG');
+        $this->internetMediaType6 = new NVLL_InternetMediaType(6, 'quicktime');
+        $this->internetMediaType7 = new NVLL_InternetMediaType(7, 'Test');
     }
 
     /**
      * Test case for getSubtype().
      */
-    public function test__GetSubtype() {
+    public function test__GetSubtype()
+    {
         $this->assertEquals('', $this->internetMediaTypeNull->getSubtype(), 'null, null');
         $this->assertEquals('', $this->internetMediaTypeBug->getSubtype(), 'bug, bug');
         $this->assertEquals('plain', $this->internetMediaType0->getSubtype(), '0, plain');
@@ -108,8 +106,9 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isText().
      */
-    public function testIsText() {
-        $htmlText = new NOCC_InternetMediaType(0, 'HTML');
+    public function testIsText()
+    {
+        $htmlText = new NVLL_InternetMediaType(0, 'HTML');
 
         $this->assertFalse($this->internetMediaTypeNull->isText(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isText(), 'bug, bug');
@@ -128,8 +127,9 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isPlainText().
      */
-    public function testIsPlainText() {
-        $htmlText = new NOCC_InternetMediaType(0, 'HTML');
+    public function testIsPlainText()
+    {
+        $htmlText = new NVLL_InternetMediaType(0, 'HTML');
 
         $this->assertFalse($this->internetMediaTypeNull->isPlainText(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isPlainText(), 'bug, bug');
@@ -148,8 +148,9 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isHtmlText().
      */
-    public function testIsHtmlText() {
-        $htmlText = new NOCC_InternetMediaType(0, 'HTML');
+    public function testIsHtmlText()
+    {
+        $htmlText = new NVLL_InternetMediaType(0, 'HTML');
 
         $this->assertFalse($this->internetMediaTypeNull->isHtmlText(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isHtmlText(), 'bug, bug');
@@ -168,8 +169,9 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isPlainOrHtmlText().
      */
-    public function testIsPlainOrHtmlText() {
-        $htmlText = new NOCC_InternetMediaType(0, 'HTML');
+    public function testIsPlainOrHtmlText()
+    {
+        $htmlText = new NVLL_InternetMediaType(0, 'HTML');
 
         $this->assertFalse($this->internetMediaTypeNull->isPlainOrHtmlText(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isPlainOrHtmlText(), 'bug, bug');
@@ -188,7 +190,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isMultipart().
      */
-    public function testIsMultipart() {
+    public function testIsMultipart()
+    {
         $this->assertFalse($this->internetMediaTypeNull->isMultipart(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isMultipart(), 'bug, bug');
         $this->assertFalse($this->internetMediaType0->isMultipart(), '0, plain');
@@ -204,8 +207,9 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isAlternativeMultipart().
      */
-    public function testIsAlternativeMultipart() {
-        $relatedMultipart = new NOCC_InternetMediaType(1, 'related');
+    public function testIsAlternativeMultipart()
+    {
+        $relatedMultipart = new NVLL_InternetMediaType(1, 'related');
 
         $this->assertFalse($this->internetMediaTypeNull->isAlternativeMultipart(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isAlternativeMultipart(), 'bug, bug');
@@ -224,8 +228,9 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isRelatedMultipart().
      */
-    public function testIsRelatedMultipart() {
-        $relatedMultipart = new NOCC_InternetMediaType(1, 'related');
+    public function testIsRelatedMultipart()
+    {
+        $relatedMultipart = new NVLL_InternetMediaType(1, 'related');
 
         $this->assertFalse($this->internetMediaTypeNull->isRelatedMultipart(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isRelatedMultipart(), 'bug, bug');
@@ -244,7 +249,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isMessage().
      */
-    public function testIsMessage() {
+    public function testIsMessage()
+    {
         $this->assertFalse($this->internetMediaTypeNull->isMessage(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isMessage(), 'bug, bug');
         $this->assertFalse($this->internetMediaType0->isMessage(), '0, plain');
@@ -260,8 +266,9 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isRfc822Message().
      */
-    public function testIsRfc822Message() {
-        $testMessage = new NOCC_InternetMediaType(2, 'test');
+    public function testIsRfc822Message()
+    {
+        $testMessage = new NVLL_InternetMediaType(2, 'test');
 
         $this->assertFalse($this->internetMediaTypeNull->isRfc822Message(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isRfc822Message(), 'bug, bug');
@@ -280,7 +287,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isApplication().
      */
-    public function testIsApplication() {
+    public function testIsApplication()
+    {
         $this->assertFalse($this->internetMediaTypeNull->isApplication(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isApplication(), 'bug, bug');
         $this->assertFalse($this->internetMediaType0->isApplication(), '0, plain');
@@ -296,7 +304,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isAudio().
      */
-    public function testIsAudio() {
+    public function testIsAudio()
+    {
         $this->assertFalse($this->internetMediaTypeNull->isAudio(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isAudio(), 'bug, bug');
         $this->assertFalse($this->internetMediaType0->isAudio(), '0, plain');
@@ -312,7 +321,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isImage().
      */
-    public function testIsImage() {
+    public function testIsImage()
+    {
         $this->assertFalse($this->internetMediaTypeNull->isImage(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isImage(), 'bug, bug');
         $this->assertFalse($this->internetMediaType0->isImage(), '0, plain');
@@ -328,7 +338,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isVideo().
      */
-    public function testIsVideo() {
+    public function testIsVideo()
+    {
         $this->assertFalse($this->internetMediaTypeNull->isVideo(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isVideo(), 'bug, bug');
         $this->assertFalse($this->internetMediaType0->isVideo(), '0, plain');
@@ -344,7 +355,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isOther().
      */
-    public function testIsOther() {
+    public function testIsOther()
+    {
         $this->assertFalse($this->internetMediaTypeNull->isOther(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isOther(), 'bug, bug');
         $this->assertFalse($this->internetMediaType0->isOther(), '0, plain');
@@ -360,10 +372,11 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isAlternative().
      */
-    public function testIsAlternative() {
-        $relatedMultipart = new NOCC_InternetMediaType(1, 'related');
-        $alternativeOther = new NOCC_InternetMediaType(7, 'alternative');
-        $relatedOther = new NOCC_InternetMediaType(7, 'RELATED');
+    public function testIsAlternative()
+    {
+        $relatedMultipart = new NVLL_InternetMediaType(1, 'related');
+        $alternativeOther = new NVLL_InternetMediaType(7, 'alternative');
+        $relatedOther = new NVLL_InternetMediaType(7, 'RELATED');
 
         $this->assertFalse($this->internetMediaTypeNull->isAlternative(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isAlternative(), 'bug, bug');
@@ -384,10 +397,11 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for isRelated().
      */
-    public function testIsRelated() {
-        $relatedMultipart = new NOCC_InternetMediaType(1, 'related');
-        $alternativeOther = new NOCC_InternetMediaType(7, 'alternatvie');
-        $relatedOther = new NOCC_InternetMediaType(7, 'RELATED');
+    public function testIsRelated()
+    {
+        $relatedMultipart = new NVLL_InternetMediaType(1, 'related');
+        $alternativeOther = new NVLL_InternetMediaType(7, 'alternatvie');
+        $relatedOther = new NVLL_InternetMediaType(7, 'RELATED');
 
         $this->assertFalse($this->internetMediaTypeNull->isRelated(), 'null, null');
         $this->assertFalse($this->internetMediaTypeBug->isRelated(), 'bug, bug');
@@ -408,7 +422,8 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
     /**
      * Test case for __toString().
      */
-    public function test__toString() {
+    public function test__toString()
+    {
         $this->assertEquals('', $this->internetMediaTypeNull->__toString(), 'null, null');
         $this->assertEquals('', $this->internetMediaTypeBug->__toString(), 'bug, bug');
         $this->assertEquals('text/plain', $this->internetMediaType0->__toString(), '0, plain');
@@ -421,4 +436,3 @@ class NOCC_InternetMediaTypeTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('other/test', $this->internetMediaType7->__toString(), '7, Test');
     }
 }
-?>
