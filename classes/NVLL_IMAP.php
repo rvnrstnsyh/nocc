@@ -10,21 +10,17 @@
  * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
  * Copyright 2002 Mike Rylander <mrylander@mail.com>
  * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: class_local.php 3068 2023-03-07 14:57:08Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-
-require_once 'nocc_mailstructure.php';
-require_once 'nocc_headerinfo.php';
-require_once 'nocc_header.php';
-require_once 'exception.php';
+require_once 'NVLL_MailStructure.php';
+require_once 'NVLL_HeaderInfo.php';
+require_once 'NVLL_Header.php';
+require_once 'NVLL_Exception.php';
 require_once './utils/detect_cyr_charset.php';
 require_once './utils/crypt.php';
 
@@ -37,7 +33,7 @@ class result
 }
 
 //TODO: Use mail or message as name?
-class nocc_imap
+class NVLL_IMAP
 {
 	private $server;
 	private $login;
@@ -51,7 +47,7 @@ class nocc_imap
 	 * ...
 	 * @global object $conf
 	 * @global string $lang_could_not_connect
-	 * @return nocc_imap Me!
+	 * @return NVLL_IMAP Me!
 	 */
 	public function __construct()
 	{
@@ -60,19 +56,19 @@ class nocc_imap
 		global $err_user_empty;
 		global $err_passwd_empty;
 
-		if (!isset($_SESSION['nocc_servr']) || !isset($_SESSION['nocc_folder']) || !isset($_SESSION['nocc_login']) || !isset($_SESSION['nocc_passwd'])) {
+		if (!isset($_SESSION['nvll_servr']) || !isset($_SESSION['nvll_folder']) || !isset($_SESSION['nvll_login']) || !isset($_SESSION['nvll_passwd'])) {
 			throw new Exception($lang_could_not_connect . "(0)");
 		}
 
-		$this->server = $_SESSION['nocc_servr'];
+		$this->server = $_SESSION['nvll_servr'];
 		if (isset($_SESSION['ajxfolder'])) {
 			$this->folder = $_SESSION['ajxfolder'];
 		} else {
-			$this->folder = $_SESSION['nocc_folder'];
+			$this->folder = $_SESSION['nvll_folder'];
 		}
-		$this->login = $_SESSION['nocc_login'];
+		$this->login = $_SESSION['nvll_login'];
 		/* decrypt password */
-		$this->passwd = decpass($_SESSION['nocc_passwd'], $conf->master_key);
+		$this->passwd = decpass($_SESSION['nvll_passwd'], $conf->master_key);
 
 		$this->namespace = $_SESSION['imap_namespace'];
 
@@ -143,10 +139,10 @@ class nocc_imap
 				//  If authcid is something like "ad\user" the "ad\" must be stripped from authzid
 				//  For Details about PLAIN SASL see https://www.rfc-editor.org/rfc/rfc4616.html
 				if (
-					isset($conf->domains[$_SESSION['nocc_domainnum']]->from_part) &&
-					strlen($conf->domains[$_SESSION['nocc_domainnum']]->from_part) > 0
+					isset($conf->domains[$_SESSION['nvll_domains']]->from_part) &&
+					strlen($conf->domains[$_SESSION['nvll_domains']]->from_part) > 0
 				) {
-					$reg = $conf->domains[$_SESSION['nocc_domainnum']]->from_part;
+					$reg = $conf->domains[$_SESSION['nvll_domains']]->from_part;
 					$reg = preg_replace("/\\\/", '\\\\\\', $reg);
 					$tmp_username = preg_replace("/^" . $reg . "$/", "$1", $tmp_username);
 				}
@@ -206,7 +202,7 @@ class nocc_imap
 						$_SESSION['is_imap'] = $this->_isImap;
 					}
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: open imap connection to ' . $host . ' failed with: "' . $e->raw_msg . '", trying pop3';
+					$log_string = 'NVLL: open imap connection to ' . $host . ' failed with: "' . $e->raw_msg . '", trying pop3';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -229,7 +225,7 @@ class nocc_imap
 							$_SESSION['is_imap'] = $this->_isImap;
 						}
 					} catch (Horde_Imap_Client_Exception $e) {
-						$log_string = 'NOCC: open pop3 connection to ' . $host . ' failed with: "' . $e->raw_msg . '", giving up';
+						$log_string = 'NVLL: open pop3 connection to ' . $host . ' failed with: "' . $e->raw_msg . '", giving up';
 						error_log($log_string);
 						$error = "";
 						if (strlen($this->login) == 0) {
@@ -247,7 +243,7 @@ class nocc_imap
 			//php.log,syslog message to be used against brute force attempts e.g. with fail2ban
 			//don't change text or rules may fail
 			if (isset($_REQUEST['enter'])) {
-				$log_string = 'NOCC: failed login from rhost=' . $_SERVER['REMOTE_ADDR'] . ' to server=' . $this->server . ' as user=' . $_SESSION['nocc_login'] . '';
+				$log_string = 'NVLL: failed login from rhost=' . $_SERVER['REMOTE_ADDR'] . ' to server=' . $this->server . ' as user=' . $_SESSION['nvll_login'] . '';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -268,7 +264,7 @@ class nocc_imap
 		}
 
 		if (isset($_REQUEST['enter'])) {
-			$log_string = 'NOCC: successful login from rhost=' . $_SERVER['REMOTE_ADDR'] . ' to server=' . $_SESSION['nocc_servr'] . ' as user=' . $_SESSION['nocc_login'] . '';
+			$log_string = 'NVLL: successful login from rhost=' . $_SERVER['REMOTE_ADDR'] . ' to server=' . $_SESSION['nvll_servr'] . ' as user=' . $_SESSION['nvll_login'] . '';
 			error_log($log_string);
 			if (isset($conf->syslog) && $conf->syslog) {
 				syslog(LOG_INFO, $log_string);
@@ -438,7 +434,7 @@ class nocc_imap
 					$messages = $horde_search['match']->ids;
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: search failed';
+				$log_string = 'NVLL: search failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -451,7 +447,7 @@ class nocc_imap
 	/**
 	 * Fetch mail structure
 	 * @param integer $msgnum Message number
-	 * @return NOCC_MailStructure Mail structure
+	 * @return NVLL_MailStructure Mail structure
 	 */
 	public function fetchstructure($msgnum)
 	{
@@ -471,7 +467,7 @@ class nocc_imap
 					$structure = $fetch_result->first()->getStructure();
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: fetching structure failed';
+				$log_string = 'NVLL: fetching structure failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -519,13 +515,13 @@ class nocc_imap
 		if (!is_object($structure)) {
 			throw new Exception('imap_fetchstructure() did not return an object.');
 		}
-		return new NOCC_MailStructure($structure, $this->is_horde(), $parts_info);
+		return new NVLL_MailStructure($structure, $this->is_horde(), $parts_info);
 	}
 
 	/**
 	 * Fetch header
 	 * @param integer $msgnum Message number
-	 * @return NOCC_Header Header
+	 * @return NVLL_Header Header
 	 * @todo Throw exceptions?
 	 */
 	public function fetchheader($msgnum)
@@ -548,14 +544,14 @@ class nocc_imap
 					$header = $header_fetch->first()->getHeaderText();
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: fetching header failed';
+				$log_string = 'NVLL: fetching header failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
 				}
 			}
 		}
-		return new NOCC_Header($header, $this->is_horde());
+		return new NVLL_Header($header, $this->is_horde());
 	}
 
 	/**
@@ -652,7 +648,7 @@ class nocc_imap
 					}
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: fetching body text failed';
+				$log_string = 'NVLL: fetching body text failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -688,7 +684,7 @@ class nocc_imap
 					$size = $fetch_result->first()->getSize();
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: fetching message size failed';
+				$log_string = 'NVLL: fetching message size failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -722,7 +718,7 @@ class nocc_imap
 					$fullText = $fetch_result->first()->getFullMsg();
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: fetching message size failed';
+				$log_string = 'NVLL: fetching message size failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -747,7 +743,7 @@ class nocc_imap
 			try {
 				$status = $this->conn->status($this->folder, Horde_Imap_Client::STATUS_MESSAGES);
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: getting number of messages from folder ' . $this->folder . ' failed';
+				$log_string = 'NVLL: getting number of messages from folder ' . $this->folder . ' failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -832,7 +828,7 @@ class nocc_imap
 					}
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: getting sequence numbers of messages from folder ' . $this->folder . ' failed';
+				$log_string = 'NVLL: getting sequence numbers of messages from folder ' . $this->folder . ' failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -846,7 +842,7 @@ class nocc_imap
 	 * Get header info
 	 * @param integer $msgnum Message number
 	 * @param string $defaultcharset Default charset
-	 * @return NOCC_HeaderInfo Header info
+	 * @return NVLL_HeaderInfo Header info
 	 */
 	public function headerinfo($msgnum, $defaultcharset = 'ISO-8859-1')
 	{
@@ -866,7 +862,7 @@ class nocc_imap
 				$queryflags->flags();
 				$horde_flags = $this->conn->fetch($this->folder, $queryflags, $options);
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: fetching headerinfo failed';
+				$log_string = 'NVLL: fetching headerinfo failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -877,7 +873,7 @@ class nocc_imap
 		if (!is_object($headerinfo)) {
 			throw new Exception('imap_headerinfo() did not return an object.');
 		}
-		return new NOCC_HeaderInfo($headerinfo, $defaultcharset, $horde_flags, $this->is_horde());
+		return new NVLL_HeaderInfo($headerinfo, $defaultcharset, $horde_flags, $this->is_horde());
 	}
 
 	/**
@@ -895,7 +891,7 @@ class nocc_imap
 				$this->conn->deleteMailbox($mailbox);
 				return true;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: deleting mailbox ' . $mailbox . ' failed';
+				$log_string = 'NVLL: deleting mailbox ' . $mailbox . ' failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -910,8 +906,6 @@ class nocc_imap
 	 * @param string $head_search header to find
 	 * @param string $temp_header find in headers
 	 * @return string header content 
-	 *
-	 * credits go to rklrkl, https://sourceforge.net/p/nocc/patches/149/, 2009-08-16
 	 */
 	function find_email_header($head_search, &$temp_header)
 	{
@@ -950,9 +944,6 @@ class nocc_imap
 	/**
 	 * Create a tmp file for downloading a complete mailbox folder
 	 * @param string $download_box name of the folder to download
-	 *
-	 *
-	 * credits go to rklrkl, https://sourceforge.net/p/nocc/patches/149/, 2009-08-16
 	 */
 	function downloadmailbox(&$download_box, &$ev)
 	{
@@ -965,13 +956,13 @@ class nocc_imap
 		$filename = preg_replace('/[\\/:\*\?"<>\|;]/', '_', str_replace('&nbsp;', ' ', $download_box)) . ".mbox";
 		$_SESSION['fd_message'][] = $filename;
 
-		$remember_folder = $_SESSION['nocc_folder'];
-		$_SESSION['nocc_folder'] = $download_box;
+		$remember_folder = $_SESSION['nvll_folder'];
+		$_SESSION['nvll_folder'] = $download_box;
 
 		$ev = '';
-		$pop = new nocc_imap($ev);
-		if (NoccException::isException($ev)) {
-			$_SESSION['nocc_folder'] = $remember_folder;
+		$pop = new NVLL_IMAP($ev);
+		if (NVLL_Exception::isException($ev)) {
+			$_SESSION['nvll_folder'] = $remember_folder;
 			unset($_SESSION['fd_message']);
 			require('./html/header.php');
 			require('./html/error.php');
@@ -989,14 +980,14 @@ class nocc_imap
 		}
 
 		if (strlen($conf->tmpdir) == 0) {
-			$_SESSION['nocc_folder'] = $remember_folder;
+			$_SESSION['nvll_folder'] = $remember_folder;
 			unset($_SESSION['fd_message']);
-			$ev = new NoccException("tmp folder tmpdir is not set in config/php.conf.");
+			$ev = new NVLL_Exception("tmp folder tmpdir is not set in config/php.conf.");
 			return;
 		} else if (! is_writable($conf->tmpdir)) {
-			$_SESSION['nocc_folder'] = $remember_folder;
+			$_SESSION['nvll_folder'] = $remember_folder;
 			unset($_SESSION['fd_message']);
-			$ev = new NoccException("tmp folder " . $conf->tmpdir . " is not writeable.");
+			$ev = new NVLL_Exception("tmp folder " . $conf->tmpdir . " is not writeable.");
 			return;
 		}
 
@@ -1059,7 +1050,7 @@ class nocc_imap
 			fclose($mbox);
 		}
 		$pop->close();
-		$_SESSION['nocc_folder'] = $remember_folder;
+		$_SESSION['nvll_folder'] = $remember_folder;
 
 		if (is_file($tmpFile)) {
 			$file_size = filesize($tmpFile);
@@ -1067,15 +1058,13 @@ class nocc_imap
 			$_SESSION['fd_message'][] = $mail_skipped;
 		} else {
 			unset($_SESSION['fd_message']);
-			$ev = new NoccException("folder download failed.");
+			$ev = new NVLL_Exception("folder download failed.");
 			return;
 		}
 	}
 
 	/**
 	 * Download the tmp file for a complete mailbox folder
-	 *
-	 * credits go to rklrkl, https://sourceforge.net/p/nocc/patches/149/, 2009-08-16
 	 */
 	function downloadtmpfile(&$ev)
 	{
@@ -1155,7 +1144,7 @@ class nocc_imap
 				exit; // Don't fall into HTML page - we're downloading and need to exit
 			} else {
 				unset($_SESSION['fd_tmpfile']);
-				$ev = new NoccException("download file does not exits.");
+				$ev = new NVLL_Exception("download file does not exits.");
 				return;
 			}
 		}
@@ -1179,7 +1168,7 @@ class nocc_imap
 				$this->conn->renameMailbox($oldMailbox, $newMailbox);
 				return true;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: renaming mailbox ' . $oldMailbox . ' to ' . $newMailbox . 'failed';
+				$log_string = 'NVLL: renaming mailbox ' . $oldMailbox . ' to ' . $newMailbox . 'failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1203,7 +1192,7 @@ class nocc_imap
 				$this->conn->createMailbox($mailbox);
 				return true;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: creating mailbox failed';
+				$log_string = 'NVLL: creating mailbox failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1227,23 +1216,23 @@ class nocc_imap
 		if (preg_match("/:/", $mailbox)) {
 			$remote = explode(":", $mailbox);
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
-				if (preg_match("/^NOCCLI_/", $cookie_key)) {
+				if (preg_match("/^NVLL_/", $cookie_key)) {
 					$_nvkey = $cookie_key;
-					if ($line = NOCC_Session::load_session_file($_nvkey)) {
+					if ($line = NVLL_Session::load_session_file($_nvkey)) {
 						list(
 							$session_id,
-							$TMP_SESSION['nocc_user'],
-							$TMP_SESSION['nocc_passwd'],
-							$TMP_SESSION['nocc_login'],
-							$TMP_SESSION['nocc_lang'],
-							$TMP_SESSION['nocc_smtp_server'],
-							$TMP_SESSION['nocc_smtp_port'],
-							$TMP_SESSION['nocc_theme'],
-							$TMP_SESSION['nocc_domain'],
-							$TMP_SESSION['nocc_domainnum'],
+							$TMP_SESSION['nvll_user'],
+							$TMP_SESSION['nvll_passwd'],
+							$TMP_SESSION['nvll_login'],
+							$TMP_SESSION['nvll_lang'],
+							$TMP_SESSION['nvll_smtp_server'],
+							$TMP_SESSION['nvll_smtp_port'],
+							$TMP_SESSION['nvll_theme'],
+							$TMP_SESSION['nvll_domain'],
+							$TMP_SESSION['nvll_domains'],
 							$TMP_SESSION['imap_namespace'],
-							$TMP_SESSION['nocc_servr'],
-							$TMP_SESSION['nocc_folder'],
+							$TMP_SESSION['nvll_servr'],
+							$TMP_SESSION['nvll_folder'],
 							$TMP_SESSION['smtp_auth'],
 							$TMP_SESSION['ucb_pop_server'],
 							$TMP_SESSION['quota_enable'],
@@ -1260,7 +1249,7 @@ class nocc_imap
 									strlen($conf->domains[$index]->show_as) > 0 &&
 									$conf->domains[$index]->show_as == $remote[0] &&
 									isset($conf->domains[$index]->in) &&
-									$TMP_SESSION['nocc_servr'] == $conf->domains[$index]->in &&
+									$TMP_SESSION['nvll_servr'] == $conf->domains[$index]->in &&
 									true
 								) {
 									$is_mb_local = false;
@@ -1268,7 +1257,7 @@ class nocc_imap
 								} elseif (
 									isset($conf->domains[$index]->in) &&
 									preg_match("/" . $remote[0] . "/", $conf->domains[$index]->in) &&
-									$TMP_SESSION['nocc_servr'] == $conf->domains[$index]->in &&
+									$TMP_SESSION['nvll_servr'] == $conf->domains[$index]->in &&
 									true
 								) {
 									$is_mb_local = false;
@@ -1299,15 +1288,15 @@ class nocc_imap
 		$success = false;
 		if (! $TMP_SESSION['is_horde']) {
 			$conn = @imap_open(
-				'{' . $TMP_SESSION['nocc_servr'] . '}' . mb_convert_encoding($TMP_SESSION['nocc_folder'], 'UTF7-IMAP', 'UTF-8'),
-				$TMP_SESSION['nocc_login'],
-				decpass($TMP_SESSION['nocc_passwd'], $conf->master_key),
+				'{' . $TMP_SESSION['nvll_servr'] . '}' . mb_convert_encoding($TMP_SESSION['nvll_folder'], 'UTF7-IMAP', 'UTF-8'),
+				$TMP_SESSION['nvll_login'],
+				decpass($TMP_SESSION['nvll_passwd'], $conf->master_key),
 				0
 			);
 			if ($conn) {
 				$success = imap_append(
 					$conn,
-					'{' . $TMP_SESSION['nocc_servr'] . '}' . mb_convert_encoding($TMP_SESSION['nocc_folder'], 'UTF7-IMAP', 'UTF-8'),
+					'{' . $TMP_SESSION['nvll_servr'] . '}' . mb_convert_encoding($TMP_SESSION['nvll_folder'], 'UTF7-IMAP', 'UTF-8'),
 					$msg,
 					'\Seen'
 				);
@@ -1316,7 +1305,7 @@ class nocc_imap
 		} else {
 			$conn = null;
 
-			$spec = explode("/", $TMP_SESSION['nocc_servr']);
+			$spec = explode("/", $TMP_SESSION['nvll_servr']);
 			$host_port = explode(":", $spec[0]);
 			$host = $host_port[0];
 			$port = $host_port[1];
@@ -1341,7 +1330,7 @@ class nocc_imap
 				}
 			}
 
-			$tmp_username = $TMP_SESSION['nocc_login'];
+			$tmp_username = $TMP_SESSION['nvll_login'];
 			if (preg_match("/^ssl/", $secure)) {
 				//With SSL we most probably run into PLAIN SASL AUTH
 				// strip domain part from login user name
@@ -1350,10 +1339,10 @@ class nocc_imap
 				//  If authcid is something like "ad\user" the "ad\" must be stripped from authzid
 				//  For Details about PLAIN SASL see https://www.rfc-editor.org/rfc/rfc4616.html
 				if (
-					isset($conf->domains[$TMP_SESSION['nocc_domainnum']]->from_part) &&
-					strlen($conf->domains[$TMP_SESSION['nocc_domainnum']]->from_part) > 0
+					isset($conf->domains[$TMP_SESSION['nvll_domains']]->from_part) &&
+					strlen($conf->domains[$TMP_SESSION['nvll_domains']]->from_part) > 0
 				) {
-					$reg = $conf->domains[$TMP_SESSION['nocc_domainnum']]->from_part;
+					$reg = $conf->domains[$TMP_SESSION['nvll_domains']]->from_part;
 					$reg = preg_replace("/\\\/", '\\\\\\', $reg);
 					$tmp_username = preg_replace("/^" . $reg . "$/", "$1", $tmp_username);
 				}
@@ -1362,32 +1351,32 @@ class nocc_imap
 			if ($pop3) {
 				$conn = new Horde_Imap_Client_Socket_Pop3(array(
 					'username' => $tmp_username,
-					'authusername' => $TMP_SESSION['nocc_login'],
-					'password' => decpass($TMP_SESSION['nocc_passwd'], $conf->master_key),
+					'authusername' => $TMP_SESSION['nvll_login'],
+					'password' => decpass($TMP_SESSION['nvll_passwd'], $conf->master_key),
 					'hostspec' => $host,
 					'port' => $port,
 					'secure' => $secure
 				));
 				if ($conn != null) {
-					$conn->openMailbox($TMP_SESSION['nocc_folder']);
+					$conn->openMailbox($TMP_SESSION['nvll_folder']);
 				}
 			} else {
 				$conn = new Horde_Imap_Client_Socket(array(
 					'username' => $tmp_username,
-					'authusername' => $TMP_SESSION['nocc_login'],
-					'password' => decpass($TMP_SESSION['nocc_passwd'], $conf->master_key),
+					'authusername' => $TMP_SESSION['nvll_login'],
+					'password' => decpass($TMP_SESSION['nvll_passwd'], $conf->master_key),
 					'hostspec' => $host,
 					'port' => $port,
 					'secure' => $secure
 				));
 				if ($conn != null) {
-					$conn->openMailbox($TMP_SESSION['nocc_folder']);
+					$conn->openMailbox($TMP_SESSION['nvll_folder']);
 				}
 			}
 			if ($conn != null) {
 				try {
 					$data = array(array('data' => $msg, 'flags' => ['\Seen']));
-					$ids = $conn->append($TMP_SESSION['nocc_folder'], $data);
+					$ids = $conn->append($TMP_SESSION['nvll_folder'], $data);
 					if (! $ids->isEmpty()) {
 						$success = true;
 					}
@@ -1422,7 +1411,7 @@ class nocc_imap
 					$this->conn->copy($this->folder, $mailbox, $options);
 					return true;
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: copying mail failed';
+					$log_string = 'NVLL: copying mail failed';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -1456,7 +1445,7 @@ class nocc_imap
 				$this->conn->subscribeMailbox($mailbox, true);
 				return true;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: subscribing to mailbox failed';
+				$log_string = 'NVLL: subscribing to mailbox failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1480,7 +1469,7 @@ class nocc_imap
 				$this->conn->subscribeMailbox($mailbox, false);
 				return true;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: unsubscribing from mailbox failed';
+				$log_string = 'NVLL: unsubscribing from mailbox failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1513,7 +1502,7 @@ class nocc_imap
 					);
 					$this->conn->copy($this->folder, $mailbox, $options);
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: move mail to folder ' . $mailbox . ' failed';
+					$log_string = 'NVLL: move mail to folder ' . $mailbox . ' failed';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -1545,7 +1534,7 @@ class nocc_imap
 				$this->conn->expunge($this->folder);
 				return true;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: expunge of folder ' . $this->folder . ' failed';
+				$log_string = 'NVLL: expunge of folder ' . $this->folder . ' failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1576,7 +1565,7 @@ class nocc_imap
 					);
 					$this->conn->store($this->folder, $options);
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: deleting message failed';
+					$log_string = 'NVLL: deleting message failed';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -1600,7 +1589,7 @@ class nocc_imap
 				$this->conn->close($options);
 				return;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: close failed';
+				$log_string = 'NVLL: close failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1667,7 +1656,7 @@ class nocc_imap
 	//        //Since PHP 5.2.5 returns imap_utf8() only capital letters!
 	//        //See bug #44098 for details: http://bugs.php.net/44098
 	//        if (version_compare(PHP_VERSION, '5.2.5', '>=')) { //if PHP 5.2.5 or newer...
-	//            return nocc_imap::decode_mime_string($mime_encoded_text);
+	//            return NVLL_IMAP::decode_mime_string($mime_encoded_text);
 	//        }
 	//        else { //if PHP 5.2.4 or older...
 	//            return imap_utf8($mime_encoded_text);
@@ -1723,7 +1712,7 @@ class nocc_imap
 				}
 				return $allmailboxes;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: failed to get mailbox names';
+				$log_string = 'NVLL: failed to get mailbox names';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1789,7 +1778,7 @@ class nocc_imap
 					$subscribed[] = $obj;
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: list subscribed mailboxes failed';
+				$log_string = 'NVLL: list subscribed mailboxes failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -1848,7 +1837,7 @@ class nocc_imap
 					);
 					$this->conn->store($this->folder, $options);
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: setting mail as read failed';
+					$log_string = 'NVLL: setting mail as read failed';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -1880,7 +1869,7 @@ class nocc_imap
 					);
 					$this->conn->store($this->folder, $options);
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: setting mail as read failed';
+					$log_string = 'NVLL: setting mail as read failed';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -1912,7 +1901,7 @@ class nocc_imap
 					);
 					$this->conn->store($this->folder, $options);
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: flagging mail failed';
+					$log_string = 'NVLL: flagging mail failed';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -1944,7 +1933,7 @@ class nocc_imap
 					);
 					$this->conn->store($this->folder, $options);
 				} catch (Horde_Imap_Client_Exception $e) {
-					$log_string = 'NOCC: unflagging mail failed';
+					$log_string = 'NVLL: unflagging mail failed';
 					error_log($log_string);
 					if (isset($conf->syslog) && $conf->syslog) {
 						syslog(LOG_INFO, $log_string);
@@ -1958,7 +1947,7 @@ class nocc_imap
 	{
 		if (! $this->is_horde()) {
 			if (!(imap_append($this->conn, '{' . $this->server . '}' . $this->namespace . mb_convert_encoding($sent_folder_name, 'UTF7-IMAP', 'UTF-8'), $maildata, "\\Seen"))) {
-				$ev = new NoccException("could not copy mail into $sent_folder_name folder: " . $this->last_error());
+				$ev = new NVLL_Exception("could not copy mail into $sent_folder_name folder: " . $this->last_error());
 				return false;
 			}
 		} else {
@@ -1971,11 +1960,11 @@ class nocc_imap
 				);
 				$ids = $this->conn->append($sent_folder_name, $data);
 				if ($ids->isEmpty()) {
-					$ev = new NoccException("could not copy mail into $sent_folder_name folder, ids empty");
+					$ev = new NVLL_Exception("could not copy mail into $sent_folder_name folder, ids empty");
 					return false;
 				}
 			} catch (Horde_Imap_Client_Exception $e) {
-				$ev = new NoccException("could not copy mail into $sent_folder_name folder");
+				$ev = new NVLL_Exception("could not copy mail into $sent_folder_name folder");
 				return false;
 			}
 		}
@@ -1984,7 +1973,7 @@ class nocc_imap
 
 	//    /*
 	//     * These functions are static, but if we could re-implement them without
-	//     * requiring PHP IMAP support, more people can use NOCC.
+	//     * requiring PHP IMAP support, more people can use NVLL.
 	//     */
 	//    public static function base64($file) {
 	//        return imap_base64($file);
@@ -2146,23 +2135,23 @@ class nocc_imap
 		}
 
 		foreach ($_COOKIE as $cookie_key => $cookie_value) {
-			if (preg_match("/^NOCCLI_/", $cookie_key)) {
+			if (preg_match("/^NVLL_/", $cookie_key)) {
 				$_nvkey = $cookie_key;
-				if ($line = NOCC_Session::load_session_file($_nvkey)) {
+				if ($line = NVLL_Session::load_session_file($_nvkey)) {
 					list(
 						$session_id,
-						$TMP_SESSION['nocc_user'],
-						$TMP_SESSION['nocc_passwd'],
-						$TMP_SESSION['nocc_login'],
-						$TMP_SESSION['nocc_lang'],
-						$TMP_SESSION['nocc_smtp_server'],
-						$TMP_SESSION['nocc_smtp_port'],
-						$TMP_SESSION['nocc_theme'],
-						$TMP_SESSION['nocc_domain'],
-						$TMP_SESSION['nocc_domainnum'],
+						$TMP_SESSION['nvll_user'],
+						$TMP_SESSION['nvll_passwd'],
+						$TMP_SESSION['nvll_login'],
+						$TMP_SESSION['nvll_lang'],
+						$TMP_SESSION['nvll_smtp_server'],
+						$TMP_SESSION['nvll_smtp_port'],
+						$TMP_SESSION['nvll_theme'],
+						$TMP_SESSION['nvll_domain'],
+						$TMP_SESSION['nvll_domains'],
 						$TMP_SESSION['imap_namespace'],
-						$TMP_SESSION['nocc_servr'],
-						$TMP_SESSION['nocc_folder'],
+						$TMP_SESSION['nvll_servr'],
+						$TMP_SESSION['nvll_folder'],
 						$TMP_SESSION['smtp_auth'],
 						$TMP_SESSION['ucb_pop_server'],
 						$TMP_SESSION['quota_enable'],
@@ -2174,16 +2163,16 @@ class nocc_imap
 					) = explode(" ", base64_decode($line));
 
 					//unclear if INBOX is always the best default, but we don't have available folders of another server session
-					$TMP_SESSION['nocc_folder'] = 'INBOX';
+					$TMP_SESSION['nvll_folder'] = 'INBOX';
 
-					if ($session_id == $cookie_value && $TMP_SESSION['nocc_servr'] != $_SESSION['nocc_servr']) {
+					if ($session_id == $cookie_value && $TMP_SESSION['nvll_servr'] != $_SESSION['nvll_servr']) {
 						foreach ($conf->domains as $index => $domain) {
-							if (isset($conf->domains[$index]->in) && $conf->domains[$index]->in == $TMP_SESSION['nocc_servr']) {
+							if (isset($conf->domains[$index]->in) && $conf->domains[$index]->in == $TMP_SESSION['nvll_servr']) {
 								if (isset($conf->domains[$index]->show_as) && strlen($conf->domains[$index]->show_as) > 0) {
-									$folder = $conf->domains[$index]->show_as . ":" . $TMP_SESSION['nocc_folder'];
+									$folder = $conf->domains[$index]->show_as . ":" . $TMP_SESSION['nvll_folder'];
 									$html_select .= "\t<option " . ($folder == $selected ? "selected=\"selected\"" : "") . " value=\"$folder\">" . $folder . "</option>\n";
 								} else {
-									$folder = explode(":", $TMP_SESSION['nocc_servr'])[0] . ":" . $TMP_SESSION['nocc_folder'];
+									$folder = explode(":", $TMP_SESSION['nvll_servr'])[0] . ":" . $TMP_SESSION['nvll_folder'];
 									$html_select .= "\t<option " . ($folder == $selected ? "selected=\"selected\"" : "") . " value=\"$folder\">" . $folder . "</option>\n";
 								}
 								break;
@@ -2237,7 +2226,7 @@ class nocc_imap
 				$quota = $this->conn->getQuotaRoot($quotaRoot);
 				return $quota;
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: getting quotaroot failed';
+				$log_string = 'NVLL: getting quotaroot failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -2269,7 +2258,7 @@ class nocc_imap
 				$mailbox = str_replace('{' . $this->server . '}', '', $mailbox);
 				$status = $this->conn->status($mailbox, Horde_Imap_Client::STATUS_ALL);
 			} catch (Horde_Imap_Client_Exception $e) {
-				$log_string = 'NOCC: getting status failed';
+				$log_string = 'NVLL: getting status failed';
 				error_log($log_string);
 				if (isset($conf->syslog) && $conf->syslog) {
 					syslog(LOG_INFO, $log_string);
@@ -2291,8 +2280,8 @@ class nocc_imap
 		if (isset($conf->horde_imap_client) && $conf->horde_imap_client) {
 			$r = true;
 		}
-		if (isset($conf->domains[$_SESSION['nocc_domainnum']]->horde_imap_client)) {
-			if ($conf->domains[$_SESSION['nocc_domainnum']]->horde_imap_client) {
+		if (isset($conf->domains[$_SESSION['nvll_domains']]->horde_imap_client)) {
+			if ($conf->domains[$_SESSION['nvll_domains']]->horde_imap_client) {
 				$r = true;
 			} else {
 				$r = false;

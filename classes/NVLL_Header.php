@@ -1,24 +1,21 @@
 <?php
+
 /**
  * Class for wrapping a imap_fetchheader() string
  *
  * Copyright 2009-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_header.php 2861 2020-04-07 13:40:41Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 /**
  * Wrapping a imap_fetchheader() string
- *
- * @package    NOCC
  */
-class NOCC_Header {
+class NVLL_Header
+{
     /**
      * imap_fetchheader() string
      * @var string
@@ -61,8 +58,9 @@ class NOCC_Header {
      * Initialize the wrapper
      * @param string $header imap_fetchheader() string
      */
-    public function __construct($header, $is_horde = false) {
-	$this->_ishorde = $is_horde;
+    public function __construct($header, $is_horde = false)
+    {
+        $this->_ishorde = $is_horde;
         $this->_header = $header;
         $this->_priority = 3;
         $this->_contenttype = '';
@@ -103,7 +101,8 @@ class NOCC_Header {
      * Get the RFC2822 format header from the mail
      * @return string RFC2822 format header
      */
-    public function getHeader() {
+    public function getHeader()
+    {
         return $this->_header;
     }
 
@@ -111,7 +110,8 @@ class NOCC_Header {
      * Get the priority from the mail
      * @return integer Priority
      */
-    public function getPriority() {
+    public function getPriority()
+    {
         return $this->_priority;
     }
 
@@ -119,16 +119,28 @@ class NOCC_Header {
      * Get the (translated) priority text from the mail
      * @return string Priority text
      */
-    public function getPriorityText() {
+    public function getPriorityText()
+    {
         global $html_highest, $html_high, $html_normal, $html_low, $html_lowest;
 
         switch ($this->_priority) {
-            case 1: return $html_highest; break;
-            case 2: return $html_high; break;
-            case 3: return $html_normal; break;
-            case 4: return $html_low; break;
-            case 5: return $html_lowest; break;
-            default: return '';
+            case 1:
+                return $html_highest;
+                break;
+            case 2:
+                return $html_high;
+                break;
+            case 3:
+                return $html_normal;
+                break;
+            case 4:
+                return $html_low;
+                break;
+            case 5:
+                return $html_lowest;
+                break;
+            default:
+                return '';
         }
     }
 
@@ -136,7 +148,8 @@ class NOCC_Header {
      * Get the Content-Type from the mail
      * @return string Content-Type
      */
-    public function getContentType() {
+    public function getContentType()
+    {
         return $this->_contenttype;
     }
 
@@ -144,7 +157,8 @@ class NOCC_Header {
      * Has SPAM flag?
      * @return bool Has SPAM flag?
      */
-    public function hasSpamFlag() {
+    public function hasSpamFlag()
+    {
         return $this->_spamflag;
     }
 
@@ -152,7 +166,8 @@ class NOCC_Header {
      * Get the status (UCB POP Server) from the mail
      * @return string Status (UCB POP Server)
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->_status;
     }
 
@@ -170,21 +185,21 @@ class NOCC_Header {
      * @copyright &copy; 2003-2007 The SquirrelMail Project Team
      * @license http://opensource.org/licenses/gpl-license.php GNU Public License
      */
-    private function _parsePriority($sValue) {
+    private function _parsePriority($sValue)
+    {
         // don't use function call inside array_shift.
         $aValue = preg_split('/\s/', trim($sValue));
         $value = strtolower(array_shift($aValue));
 
-        if ( is_numeric($value) ) {
+        if (is_numeric($value)) {
             return $value;
         }
-        if ( $value == 'urgent' || $value == 'high' ) {
+        if ($value == 'urgent' || $value == 'high') {
             return 2;
-        } elseif ( $value == 'non-urgent' || $value == 'low' ) {
+        } elseif ($value == 'non-urgent' || $value == 'low') {
             return 4;
         }
         // default is normal priority
         return 3;
     }
 }
-?>
