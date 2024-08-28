@@ -6,14 +6,11 @@
  * Copyright 2001 Nicolas Chalanset <nicocha@free.fr>
  * Copyright 2001 Olivier Cahagne <cahagn_o@epita.fr>
  * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: user_prefs.php 3060 2023-03-05 19:06:00Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 require_once 'exception.php';
@@ -21,13 +18,11 @@ require_once 'nocc_mailaddress.php';
 
 /**
  * Handling user preferences
- *
- * @package    NOCC
- * @todo Rename to NOCC_UserPrefs!
+ * 
  * @todo Hide all preferenes behind getter/setter!
  * @todo Rewrite to avoid global variables!
  */
-class NOCCUserPrefs
+class NVLL_UserPrefs
 {
     // TODO: Hide behind get/setKey()?
     var $key;
@@ -603,7 +598,7 @@ class NOCCUserPrefs
      * @global object $conf
      * @param string $key Key
      * @param object $ev Exception
-     * @return NOCCUserPrefs User profile
+     * @return NVLL_UserPrefs User profile
      * @static
      * @todo Rewrite to throw exception!
      */
@@ -614,7 +609,7 @@ class NOCCUserPrefs
         $key = preg_replace("/(\\\|\/)/", "_", $key);
         $key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
 
-        $prefs = new NOCCUserPrefs($key);
+        $prefs = new NVLL_UserPrefs($key);
 
         if (empty($conf->prefs_dir)) {
             //$ev = new NoccException("User preferences are disabled");
@@ -625,15 +620,15 @@ class NOCCUserPrefs
         /* Open the preferences file */
         $filename = $conf->prefs_dir . '/' . $key . '.pref';
 
-        return NOCCUserPrefs::readFromFile($prefs, $filename, $ev);
+        return NVLL_UserPrefs::readFromFile($prefs, $filename, $ev);
     }
 
     /**
-     * Helper function for NOCCUserPrefs::read()
-     * @param NOCCUserPrefs $prefs Default user preferences
+     * Helper function for NVLL_UserPrefs::read()
+     * @param NVLL_UserPrefs $prefs Default user preferences
      * @param string $filename File path
      * @param object $ev Exception
-     * @return NOCCUserPrefs User profile
+     * @return NVLL_UserPrefs User profile
      * @static
      * @todo Rewrite to throw exception!
      */

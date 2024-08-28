@@ -4,24 +4,20 @@
  * Class for wrapping the $_SESSION array
  *
  * Copyright 2009-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_session.php 2985 2021-12-27 10:05:54Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
+
 require_once 'horde_autoloader.php';
-require_once 'user_prefs.php';
+require_once 'NVLL_UserPrefs.php';
 
 /**
  * Wrapping the $_SESSION array
- *
- * @package    NOCC
  */
-class NOCC_Session
+class NVLL_Session
 {
 
 	/**
@@ -33,17 +29,20 @@ class NOCC_Session
 		global $conf;
 
 		$cookie_lifetime = 0;
+
 		if ($persistent == 1) {
 			$cookie_lifetime = 60 * 60 * 24 * 7 * 4; //4weeks
 			if (isset($conf->max_session_lifetime)) {
 				$cookie_lifetime = $conf->max_session_lifetime;
 			}
 		}
+
 		$session_has_expired = 0;
-		NOCC_Session::remove_old_sessions();
-		if (! isset($_REQUEST['_nvkey']) || (strlen($_REQUEST['_nvkey']) > 0 && preg_match("/^NOCC_/", $_REQUEST['_nvkey']))) {
+		NVLL_Session::remove_old_sessions();
+
+		if (!isset($_REQUEST['_nvkey']) || (strlen($_REQUEST['_nvkey']) > 0 && preg_match("/^NVLL_/", $_REQUEST['_nvkey']))) {
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
-				if (preg_match("/^NOCC_/", $cookie_key)) {
+				if (preg_match("/^NVLL_/", $cookie_key)) {
 					$_nvkey = $cookie_key;
 					session_name($_nvkey);
 					session_set_cookie_params($cookie_lifetime, '/', '', false);
@@ -53,7 +52,7 @@ class NOCC_Session
 					//
 					// The currently provided RSS URL (right next to INBOX) allows to view list of emails without authentification.
 					// With the following if/then/else switch one can read/answer/... the email
-					//   without authentication and with the result of a complete logged in NOCC session.
+					//   without authentication and with the result of a complete logged in NVLL session.
 					// This mechanism would allow complete sessions only using the RSS URL and without athentication.
 					// Unclear what the RSS URL should be used for and what should be possible with it.
 					// This is here and elsewhere tagged with
@@ -65,9 +64,9 @@ class NOCC_Session
 					if (isset($_SESSION['send_backup']) && ! isset($_GET['discard'])) {
 						$send_backup = $_SESSION['send_backup'];
 						session_write_close();
-						NOCC_Session::new_session($persistent);
+						NVLL_Session::new_session($persistent);
 					}
-					NOCC_Session::destroy();
+					NVLL_Session::destroy();
 					//}
 				}
 			}
@@ -95,28 +94,28 @@ class NOCC_Session
 
 			if ($_SESSION['_nvkey'] == "RSS") {
 				$found_session = true;
-			} else if (isset($_SESSION['nocc_loggedin']) && $_SESSION['nocc_loggedin']) {
+			} else if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
 				$_SESSION['restart_session'] = true;
 				$found_session = true;
-			} else if (NOCC_Session::load_session()) {
+			} else if (NVLL_Session::load_session()) {
 				$_SESSION['restart_session'] = true;
 				$found_session = true;
 			} else {
-				NOCC_Session::destroy();
-				if (preg_match("/^NOCCLI_/", $_nvkey)) {
+				NVLL_Session::destroy();
+				if (preg_match("/^NVLL_/", $_nvkey)) {
 					$session_has_expired = 1;
 				}
 			}
 			if (isset($_SESSION['_nvkey']) && $_SESSION['_nvkey'] == "RSS") {
 			} else {
-				if ($found_session && NOCC_Session::check_session_age()) {
-					NOCC_Session::destroy();
+				if ($found_session && NVLL_Session::check_session_age()) {
+					NVLL_Session::destroy();
 					$session_has_expired = 1;
 					$found_session = false;
 				}
 				if ($found_session && isset($conf->check_client_ip) && $conf->check_client_ip) {
 					if ($_SESSION['remote_addr'] != $_SERVER['REMOTE_ADDR']) {
-						NOCC_Session::destroy();
+						NVLL_Session::destroy();
 						$found_session = false;
 						$session_has_expired = 2;
 					}
@@ -124,7 +123,7 @@ class NOCC_Session
 			}
 		} else {
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
-				if (preg_match("/^NOCCLI_/", $cookie_key)) {
+				if (preg_match("/^NVLL_/", $cookie_key)) {
 					$_nvkey = $cookie_key;
 					session_name($_nvkey);
 					session_set_cookie_params($cookie_lifetime, '/', '', false);
@@ -137,25 +136,25 @@ class NOCC_Session
 					$_SESSION['_nvvalue'] = $_nvvalue;
 					$_SESSION['restart_session'] = true;
 
-					if (isset($_SESSION['nocc_loggedin']) && $_SESSION['nocc_loggedin']) {
+					if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
 						$found_session = true;
 						break;
-					} else if (NOCC_Session::load_session()) {
+					} else if (NVLL_Session::load_session()) {
 						$found_session = true;
 						break;
 					} else {
-						NOCC_Session::destroy();
+						NVLL_Session::destroy();
 					}
 				}
 			}
-			if ($found_session && NOCC_Session::check_session_age()) {
-				NOCC_Session::destroy();
+			if ($found_session && NVLL_Session::check_session_age()) {
+				NVLL_Session::destroy();
 				$session_has_expired = 1;
 				$found_session = false;
 			}
 			if ($found_session && isset($conf->check_client_ip) && $conf->check_client_ip) {
 				if ($_SESSION['remote_addr'] != $_SERVER['REMOTE_ADDR']) {
-					NOCC_Session::destroy();
+					NVLL_Session::destroy();
 					$found_session = false;
 					$session_has_expired = 2;
 				}
@@ -166,7 +165,7 @@ class NOCC_Session
 		//
 		//}
 		if (! $found_session) {
-			NOCC_Session::new_session($persistent);
+			NVLL_Session::new_session($persistent);
 			if (isset($send_backup)) {
 				$_SESSION['send_backup'] = $send_backup;
 			}
@@ -177,7 +176,7 @@ class NOCC_Session
 		if ($persistent == 1) {
 			$_SESSION['persistent'] = 1;
 		}
-		NOCC_Session::remove_old_session_tmp_file();
+		NVLL_Session::remove_old_session_tmp_file();
 
 		$_SESSION['remote_addr'] = $_SERVER['REMOTE_ADDR'];
 
@@ -226,7 +225,7 @@ class NOCC_Session
 		}
 		if (! isset($conf->prune_sessions) || ! $conf->prune_sessions == 0) {
 			if (!empty($conf->prefs_dir)) {
-				$old_session_files = glob($conf->prefs_dir . '/' . "NOCCLI_*");
+				$old_session_files = glob($conf->prefs_dir . '/' . "NVLL_*");
 				if (is_array($old_session_files) && count($old_session_files) > 0) {
 					foreach ($old_session_files as $filename) {
 						$last_mod = filemtime($filename);
@@ -262,7 +261,7 @@ class NOCC_Session
 			}
 		}
 		if (!empty($conf->tmpdir)) {
-			$old_session_files = glob($conf->tmpdir . '/' . "NOCCLI_*");
+			$old_session_files = glob($conf->tmpdir . '/' . "NVLL_*");
 			if (is_array($old_session_files) && count($old_session_files) > 0) {
 				foreach ($old_session_files as $filename) {
 					$last_mod = filemtime($filename);
@@ -297,7 +296,7 @@ class NOCC_Session
 		$set_next = false;
 		$next_name = "";
 		foreach ($_COOKIE as $cookie_key => $cookie_value) {
-			if (preg_match("/^NOCCLI_/", $cookie_key)) {
+			if (preg_match("/^NVLL_/", $cookie_key)) {
 				if ($set_next) {
 					$next_name = $cookie_key;
 					break;
@@ -308,7 +307,7 @@ class NOCC_Session
 			}
 		}
 		if (strlen($next_name) == 0) {
-			$next_name = 'NOCC_' . md5(uniqid(rand(), true));
+			$next_name = 'NVLL_' . md5(uniqid(rand(), true));
 		}
 		$next_name = "_nvkey=" . $next_name;
 		return $next_name;
@@ -321,8 +320,8 @@ class NOCC_Session
 	public static function rename_session()
 	{
 		$old_nvkey = session_name();
-		if (preg_match("/^NOCC_/", $old_nvkey)) {
-			$_nvkey = 'NOCCLI_' . md5(uniqid(rand(), true));
+		if (preg_match("/^NVLL_/", $old_nvkey)) {
+			$_nvkey = 'NVLL_' . md5(uniqid(rand(), true));
 			//session_name($_nvkey);
 			session_regenerate_id(true);
 			$_nvvalue = session_id();
@@ -352,7 +351,7 @@ class NOCC_Session
 				$cookie_lifetime = $conf->max_session_lifetime;
 			}
 		}
-		$_nvkey = 'NOCC_' . md5(uniqid(rand(), true));
+		$_nvkey = 'NVLL_' . md5(uniqid(rand(), true));
 		session_name($_nvkey);
 		session_set_cookie_params($cookie_lifetime, '/', '', false);
 		session_start();
@@ -373,18 +372,18 @@ class NOCC_Session
 
 			// generate string with session information
 			$save_string = session_id();
-			$save_string .= " " . $_SESSION['nocc_user'];
-			$save_string .= " " . $_SESSION['nocc_passwd'];
-			$save_string .= " " . $_SESSION['nocc_login'];
-			$save_string .= " " . $_SESSION['nocc_lang'];
-			$save_string .= " " . $_SESSION['nocc_smtp_server'];
-			$save_string .= " " . $_SESSION['nocc_smtp_port'];
-			$save_string .= " " . $_SESSION['nocc_theme'];
-			$save_string .= " " . $_SESSION['nocc_domain'];
-			$save_string .= " " . $_SESSION['nocc_domainnum'];
+			$save_string .= " " . $_SESSION['nvll_user'];
+			$save_string .= " " . $_SESSION['nvll_passwd'];
+			$save_string .= " " . $_SESSION['nvll_login'];
+			$save_string .= " " . $_SESSION['nvll_lang'];
+			$save_string .= " " . $_SESSION['nvll_smtp_server'];
+			$save_string .= " " . $_SESSION['nvll_smtp_port'];
+			$save_string .= " " . $_SESSION['nvll_theme'];
+			$save_string .= " " . $_SESSION['nvll_domain'];
+			$save_string .= " " . $_SESSION['nvll_domains'];
 			$save_string .= " " . $_SESSION['imap_namespace'];
-			$save_string .= " " . $_SESSION['nocc_servr'];
-			$save_string .= " " . $_SESSION['nocc_folder'];
+			$save_string .= " " . $_SESSION['nvll_servr'];
+			$save_string .= " " . $_SESSION['nvll_folder'];
 			$save_string .= " " . $_SESSION['smtp_auth'];
 			$save_string .= " " . $_SESSION['ucb_pop_server'];
 			$save_string .= " " . $_SESSION['quota_enable'];
@@ -401,16 +400,16 @@ class NOCC_Session
 			$filename = $conf->prefs_dir . '/' . $_SESSION['_nvkey'] . '.session';
 
 			if (file_exists($filename) && !is_writable($filename)) {
-				// $ev = new NoccException($html_session_file_error);
+				// $ev = new NVLL_Exception($html_session_file_error);
 				return false;
 			}
 			if (!is_writable($conf->prefs_dir)) {
-				// $ev = new NoccException($html_session_file_error);
+				// $ev = new NVLL_Exception($html_session_file_error);
 				return false;
 			}
 			$file = fopen($filename, 'w');
 			if (!$file) {
-				// $ev = new NoccException($html_session_file_error);
+				// $ev = new NVLL_Exception($html_session_file_error);
 				return false;
 			}
 			fwrite($file, $save_string . "\n");
@@ -459,24 +458,24 @@ class NOCC_Session
 		}
 
 		$_nvkey = session_name();
-		$line = NOCC_Session::load_session_file($_nvkey);
+		$line = NVLL_Session::load_session_file($_nvkey);
 		if (! $line) {
 			return false;
 		}
 		list(
 			$session_id,
-			$_SESSION['nocc_user'],
-			$_SESSION['nocc_passwd'],
-			$_SESSION['nocc_login'],
-			$_SESSION['nocc_lang'],
-			$_SESSION['nocc_smtp_server'],
-			$_SESSION['nocc_smtp_port'],
-			$_SESSION['nocc_theme'],
-			$_SESSION['nocc_domain'],
-			$_SESSION['nocc_domainnum'],
+			$_SESSION['nvll_user'],
+			$_SESSION['nvll_passwd'],
+			$_SESSION['nvll_login'],
+			$_SESSION['nvll_lang'],
+			$_SESSION['nvll_smtp_server'],
+			$_SESSION['nvll_smtp_port'],
+			$_SESSION['nvll_theme'],
+			$_SESSION['nvll_domain'],
+			$_SESSION['nvll_domains'],
 			$_SESSION['imap_namespace'],
-			$_SESSION['nocc_servr'],
-			$_SESSION['nocc_folder'],
+			$_SESSION['nvll_servr'],
+			$_SESSION['nvll_folder'],
 			$_SESSION['smtp_auth'],
 			$_SESSION['ucb_pop_server'],
 			$_SESSION['quota_enable'],
@@ -486,7 +485,7 @@ class NOCC_Session
 			$_SESSION['remote_addr'],
 			$_SESSION['is_horde']
 		) = explode(" ", base64_decode($line));
-		$_SESSION['nocc_folder'] = isset($_REQUEST['nocc_folder']) ? $_REQUEST['nocc_folder'] : 'INBOX';
+		$_SESSION['nvll_folder'] = isset($_REQUEST['nvll_folder']) ? $_REQUEST['nvll_folder'] : 'INBOX';
 
 		if (session_id() == $session_id) {
 			return true;
@@ -518,12 +517,12 @@ class NOCC_Session
 	 */
 	public static function destroy($forceSessionStart = false)
 	{
-		$_nvkey = 'NOCCSESSID';
+		$_nvkey = 'NVLLSESSID';
 		if (isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
 			$_nvkey = $_SESSION['_nvkey'];
 		}
 		//session_name($_nvkey);
-		NOCC_Session::remove_session_file();
+		NVLL_Session::remove_session_file();
 		if ($forceSessionStart) {
 			session_set_cookie_params(0, '/', '', false);
 			session_start();
@@ -548,7 +547,7 @@ class NOCC_Session
 				$cookie_lifetime = time() + $conf->max_session_lifetime;
 			}
 		}
-		$_nvkey = 'NOCCSESSID';
+		$_nvkey = 'NVLLSESSID';
 		if (isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
 			$_nvkey = $_SESSION['_nvkey'];
 		}
@@ -562,7 +561,7 @@ class NOCC_Session
 	 */
 	public static function deleteCookie()
 	{
-		$_nvkey = 'NOCCSESSID';
+		$_nvkey = 'NVLLSESSID';
 		if (isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
 			$_nvkey = $_SESSION['_nvkey'];
 		}
@@ -597,7 +596,7 @@ class NOCC_Session
 	 */
 	public static function getUserKey()
 	{
-		return $_SESSION['nocc_user'] . '@' . $_SESSION['nocc_domain'];
+		return $_SESSION['nvll_user'] . '@' . $_SESSION['nvll_domain'];
 	}
 
 	/**
@@ -607,8 +606,8 @@ class NOCC_Session
 	 */
 	public static function getSmtpServer()
 	{
-		if (isset($_SESSION['nocc_smtp_server'])) {
-			return $_SESSION['nocc_smtp_server'];
+		if (isset($_SESSION['nvll_smtp_server'])) {
+			return $_SESSION['nvll_smtp_server'];
 		}
 		return '';
 	}
@@ -620,7 +619,7 @@ class NOCC_Session
 	 */
 	public static function setSmtpServer($value)
 	{
-		$_SESSION['nocc_smtp_server'] = $value;
+		$_SESSION['nvll_smtp_server'] = $value;
 	}
 
 	/**
@@ -678,8 +677,8 @@ class NOCC_Session
 	 */
 	public static function existsUserPrefs()
 	{
-		if (isset($_SESSION['nocc_user_prefs'])) {
-			if ($_SESSION['nocc_user_prefs'] instanceof NOCCUserPrefs) {
+		if (isset($_SESSION['nvll_userprefs'])) {
+			if ($_SESSION['nvll_userprefs'] instanceof NVLL_UserPrefs) {
 				return true;
 			}
 		}
@@ -688,26 +687,26 @@ class NOCC_Session
 
 	/**
 	 * Get user preferences from the session
-	 * @return NOCCUserPrefs User preferences
+	 * @return NVLL_UserPrefs User preferences
 	 * @static
 	 */
 	public static function getUserPrefs()
 	{
-		if (NOCC_Session::existsUserPrefs()) {
-			return $_SESSION['nocc_user_prefs'];
+		if (NVLL_Session::existsUserPrefs()) {
+			return $_SESSION['nvll_userprefs'];
 		}
-		return new NOCCUserPrefs('');
+		return new NVLL_UserPrefs('');
 	}
 
 	/**
 	 * Set user preferences from the session
-	 * @param NOCCUserPrefs $value User preferences
+	 * @param NVLL_UserPrefs $value User preferences
 	 * @static
-	 * @todo Check for NOCCUserPrefs?
+	 * @todo Check for NVLL_UserPrefs?
 	 */
 	public static function setUserPrefs($value)
 	{
-		$_SESSION['nocc_user_prefs'] = $value;
+		$_SESSION['nvll_userprefs'] = $value;
 	}
 
 	/**
