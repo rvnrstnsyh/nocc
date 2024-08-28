@@ -1,24 +1,21 @@
 <?php
+
 /**
  * Class for wrapping the RSS feed
  *
  * Copyright 2009-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_rssfeed.php 2580 2013-08-19 21:57:33Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 /**
  * Wrapping the RSS feed
- * 
- * @package    NOCC
  */
-class NOCC_RssFeed {
+class NVLL_RSSFeed
+{
     /**
      * Title
      * @var string
@@ -50,7 +47,8 @@ class NOCC_RssFeed {
     /**
      * Initialize the RSS feed wrapper
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->_title = '';
         $this->_description = '';
         $this->_link = '';
@@ -61,7 +59,8 @@ class NOCC_RssFeed {
      * ...
      * @return string Title
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->_title;
     }
 
@@ -69,7 +68,8 @@ class NOCC_RssFeed {
      * ...
      * @param string $title Title
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->_title = $title;
     }
 
@@ -77,7 +77,8 @@ class NOCC_RssFeed {
      * ...
      * @return string Description
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->_description;
     }
 
@@ -85,7 +86,8 @@ class NOCC_RssFeed {
      * ...
      * @param string $description Description
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->_description = $description;
     }
 
@@ -93,7 +95,8 @@ class NOCC_RssFeed {
      * ...
      * @return string Link
      */
-    public function getLink() {
+    public function getLink()
+    {
         return $this->_link;
     }
 
@@ -101,22 +104,25 @@ class NOCC_RssFeed {
      * ...
      * @param string $link Link
      */
-    public function setLink($link) {
+    public function setLink($link)
+    {
         $this->_link = $link;
     }
 
     /**
      * ...
-     * @param NOCC_RssFeed_Item $item Item
+     * @param NVLL_RSSFeed_Item $item Item
      */
-    public function addItem($item) {
+    public function addItem($item)
+    {
         $this->_items[] = $item;
     }
 
     /**
      * ...
      */
-    public function sendToBrowser() {
+    public function sendToBrowser()
+    {
         $date = $this->getIso8601Date();
         header('Content-Type: application/rss+xml; charset=UTF-8');
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
@@ -135,7 +141,7 @@ class NOCC_RssFeed {
         echo "    <dc:creator></dc:creator>\n";
         echo "    <dc:rights></dc:rights>\n";
         echo "    <dc:date>" . $date . "</dc:date>\n";
-        echo "    <admin:generatorAgent rdf:resource=\"http://nocc.sourceforge.net/\" />\n";
+        echo "    <admin:generatorAgent rdf:resource=\"http://nvll.sourceforge.net/\" />\n";
         echo "    <sy:updatePeriod>hourly</sy:updatePeriod>\n";
         echo "    <sy:updateFrequency>1</sy:updateFrequency>\n";
         echo "    <sy:updateBase>" . $date . "</sy:updateBase>\n";
@@ -177,7 +183,8 @@ class NOCC_RssFeed {
      * @return string ISO 8601 date
      * @static
      */
-    public static function getIso8601Date($timestamp = null) {
+    public static function getIso8601Date($timestamp = null)
+    {
         if (!isset($timestamp)) { //if timestamp exists...
             $timestamp = time();
         }
@@ -187,10 +194,9 @@ class NOCC_RssFeed {
 
 /**
  * Wrapping a RSS feed item
- *
- * @package    NOCC
  */
-class NOCC_RssFeed_Item {
+class NVLL_RSSFeed_Item
+{
     /**
      * Title
      * @var string
@@ -236,7 +242,8 @@ class NOCC_RssFeed_Item {
     /**
      * Initialize the RSS feed item wrapper
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->_title = '';
         $this->_description = '';
         $this->_timestamp = 0;
@@ -249,7 +256,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @return string Title
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->_title;
     }
 
@@ -257,7 +265,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @param string $title Title
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->_title = $title;
     }
 
@@ -265,7 +274,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @return string Description
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->_description;
     }
 
@@ -273,7 +283,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @param string $description Description
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->_description = $description;
     }
 
@@ -281,7 +292,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @return integer Timestamp
      */
-    public function getTimestamp() {
+    public function getTimestamp()
+    {
         return $this->_timestamp;
     }
 
@@ -289,7 +301,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @param integer $timestamp Timestamp
      */
-    public function setTimestamp($timestamp) {
+    public function setTimestamp($timestamp)
+    {
         $this->_timestamp = $timestamp;
     }
 
@@ -297,7 +310,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @return string Content
      */
-    public function getContent() {
+    public function getContent()
+    {
         return $this->_content;
     }
 
@@ -305,7 +319,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @param string $content Content
      */
-    public function setContent($content) {
+    public function setContent($content)
+    {
         $this->_content = $content;
     }
 
@@ -313,7 +328,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @return string Link
      */
-    public function getLink() {
+    public function getLink()
+    {
         return $this->_link;
     }
 
@@ -321,7 +337,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @param string $link Link
      */
-    public function setLink($link) {
+    public function setLink($link)
+    {
         $this->_link = $link;
     }
 
@@ -329,7 +346,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @return string Creator
      */
-    public function getCreator() {
+    public function getCreator()
+    {
         return $this->_creator;
     }
 
@@ -337,7 +355,8 @@ class NOCC_RssFeed_Item {
      * ...
      * @param string $creator Creator
      */
-    public function setCreator($creator) {
+    public function setCreator($creator)
+    {
         $this->_creator = $creator;
     }
 }
