@@ -216,40 +216,7 @@ $mail_from = get_default_from_address();
       ?>
       <td>&nbsp;</td>
       <td class="sendData">
-        <?php
-        //if (!NVLL_Session::getSendHtmlMail() || !file_exists('ckeditor.php')) {
-        if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
-          // use ckeditor4
-          include 'ckeditor.php';
-          $oCKEditor = new CKEditor();
-          $oCKEditor->basePath = 'ckeditor/';
-          $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
-          $oCKEditor->editor('mail_body', isset($mail_body) ? $mail_body : '');
-        } else if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
-          // use ckeditor5
-          print('<textarea id="mail_body" name="mail_body" cols="59" rows="20">');
-          $ckeditor5_mb = '';
-          if (isset($mail_body)) {
-            //(isset($mail_body) ? htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE) : '');
-            //print( htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE) );
-            //$ckeditor5_mb=htmlspecialchars($mail_body,ENT_COMPAT | ENT_SUBSTITUTE);
-            $ckeditor5_mb = $mail_body;
-            $ckeditor5_mb = preg_replace("/<pre style=\"overflow:auto\">/", "<pre data-language=\"Plain text\" spellcheck=\"false\"><code class=\"language-plaintext\">", $ckeditor5_mb);
-            $ckeditor5_mb = preg_replace("/<\/pre>/", "</code></pre>", $ckeditor5_mb);
-            $ckeditor5_mb = str_replace("\r", "\\r", $ckeditor5_mb);
-            $ckeditor5_mb = str_replace("\n", "\\n", $ckeditor5_mb);
-            $ckeditor5_mb = str_replace("'", "\'", $ckeditor5_mb);
-            //$ckeditor5_mb=str_replace("\r","",$ckeditor5_mb);
-            //$ckeditor5_mb=str_replace("\n","<br />",$ckeditor5_mb);
-          }
-          print('</textarea>');
-
-          include "ckeditor5.php";
-        } else {
-          // simple textarea
-        ?>
-          <textarea name="mail_body" cols="59" rows="20" placeholder="..."><?php echo (isset($mail_body) ? htmlspecialchars($mail_body, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?></textarea>
-        <?php } ?>
+        <textarea name="mail_body" cols="59" rows="20" placeholder="..."><?php echo (isset($mail_body) ? htmlspecialchars($mail_body, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?></textarea>
       </td>
       </tr>
       <tr>

@@ -92,21 +92,7 @@ if (count($big_list) > 1) {
           <tr>
             <td class="prefsLabel"><label for="signature"><?php echo convertLang2Html($html_signature_label) ?></label></td>
             <td class="prefsData">
-              <?php if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor.php') && ! $conf->ckeditor5) {
-                include 'ckeditor.php';
-                $oCKEditor = new CKEditor();
-                $oCKEditor->basePath = 'ckeditor/';
-                $oCKEditor->config['customConfig'] = $conf->base_url . 'config/ckeditor_config.js';
-                $oCKEditor->editor('signature', $user_prefs->getSignature());
-              } else if (NVLL_Session::getSendHtmlMail() && file_exists('ckeditor5/ckeditor.js') && file_exists('ckeditor5.php') && $conf->ckeditor5) {
-                // use ckeditor5
-                print('<textarea id="mail_body" name="mail_body" cols="82" rows="20">');
-                $ckeditor5_mb = $user_prefs->getSignature();
-                print('</textarea>');
-                include "ckeditor5.php";
-              } else { ?>
-                <textarea class="button" name="signature" id="signature" rows="5" cols="42"><?php echo $user_prefs->getSignature(); ?></textarea>
-              <?php } ?>
+              <textarea class="button" name="signature" id="signature" rows="5" cols="42"><?php echo $user_prefs->getSignature(); ?></textarea>
             </td>
           </tr>
           <?php if (!$user_prefs->getSendHtmlMail()) { ?>
@@ -200,19 +186,10 @@ if (count($big_list) > 1) {
       <fieldset>
         <legend><?php echo strtoupper(convertLang2Html($html_new_msg)); ?></legend>
         <table>
-          <?php if (file_exists('ckeditor.php') && $conf->use_ckeditor) { ?>
-            <tr>
-              <td class="prefsLabel">&nbsp;</td>
-              <td class="prefsData">
-                <input type="checkbox" name="html_mail_send" id="html_mail_send" value="on" <?php if ($user_prefs->getSendHtmlMail()) echo 'checked="checked"'; ?> /><label for="html_mail_send"><?php echo convertLang2Html($html_send_html_mail) ?></label>
-              </td>
-            </tr>
-          <?php } else { ?>
-            <tr>
-              <td class="prefsLabel"><label>Content-Type:</label></td>
-              <td class="prefsData">text/plain</td>
-            </tr>
-          <?php } ?>
+          <tr>
+            <td class="prefsLabel"><label>Content-Type:</label></td>
+            <td class="prefsData">text/plain</td>
+          </tr>
           <tr>
             <td class="prefsLabel">&nbsp;</td>
             <td class="prefsData">

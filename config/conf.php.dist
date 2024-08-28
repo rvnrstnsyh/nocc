@@ -541,12 +541,6 @@ $conf->msg_per_page = '25';
 // the theme name you want to use
 // Theme handling: allows users to choose a theme on the login page
 $conf->use_theme = false;
-
-// Use ckeditor5 for composing html mail if set to true
-// otherwise use ckeditor4
-//   this is an experimental feature
-$conf->use_ckeditor = false;
-$conf->ckeditor5 = false;
 $conf->use_graphical_smilies = false;
 
 // Allow RSS feeds globally if set to true, default is false

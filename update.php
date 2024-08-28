@@ -25,7 +25,6 @@ require './html/header.php';
 require './html/menu_inbox.php';
 
 $state_ok = true;
-
 $start_time = time();
 
 echo '<div class="messageList">';
@@ -54,31 +53,34 @@ if ($state_ok && (!isset($_SESSION['auto_update_new']) || $_SESSION['auto_update
 }
 
 $nvll_update_running = false;
+
 if ($state_ok && is_file("NVLL_UPDATE_RUNNING")) {
 	$nvll_update_running = true;
+
 	echo '<p class="new-version-update-missing">Another update process is running!</p>';
 	echo '<p class="new-version-update-missing">Please wait some minutes to make sure that a running process can finish.</p>';
 	echo '<p class="new-version-update-missing">Then, if possible, delete the file NVLL_UPDATE_RUNNING in your NVLL root directory if it still exists or contact your system administrator.</p>';
 	echo '<p class="new-version-update-missing">Go back into NVLL and check if an update is still needed.</p>';
+
 	$state_ok = false;
 }
 
 $new_version = "undefined";
+
 if ($state_ok) {
 	$new_version = $_SESSION['auto_update_new'];
 	$new_version = str_ireplace("-dev", "", $new_version);
 	$new_v = explode('.', $new_version);
 	$old_v = explode('.', str_ireplace("-dev", "", $conf->nvll_version));
 	$old_dev_version = false;
-	if (preg_match("/-dev/", $conf->nvll_version)) {
-		$old_dev_version = true;
-	}
+
+	if (preg_match("/-dev/", $conf->nvll_version)) $old_dev_version = true;
+
 	if (
 		($old_dev_version && $old_v[0] == $new_v[0] && $old_v[1] == $new_v[1] && $old_v[2] <= $new_v[2]) ||
 		($old_v[0] == $new_v[0] && $old_v[1] == $new_v[1] && $old_v[2] < $new_v[2]) ||
 		($old_v[0] == $new_v[0] && $old_v[1] < $new_v[1]) ||
-		($old_v[0] < $new_v[0]) ||
-		0
+		($old_v[0] < $new_v[0]) || 0
 	) {
 		echo '<p class="new-version-update-info">Udate from ' . $conf->nvll_version . ' to ' . $new_version . ' possible.</p>';
 	} else {
@@ -93,6 +95,7 @@ if ($state_ok) {
 	echo '<h2 class="new-version-update-info">Checking environment</h2>';
 
 	$nvll_root = dirname(__FILE__);
+
 	chdir($nvll_root);
 
 	if (is_writable(".")) {
@@ -103,7 +106,8 @@ if ($state_ok) {
 	}
 
 	$target_extract_dir = "nvll-" . $new_version;
-	if (! file_exists($target_extract_dir)) {
+
+	if (!file_exists($target_extract_dir)) {
 		echo '<p class="new-version-update-ok">Directory ' . $target_extract_dir . ' does not exist. Good.</p>';
 	} else {
 		echo '<p class="new-version-update-missing">Directory ' . $target_extract_dir . ' should not exist.</p>';
@@ -127,10 +131,6 @@ if ($state_ok) {
 	try {
 		$file_list = array(
 			'action.php',
-			'ckeditor.php',
-			'ckeditor5.php',
-			//'ckeditor_php4.php',
-			//'ckeditor_php5.php',
 			'addcgipath.sh',
 			'common.php',
 			'contacts_manager.php',
@@ -148,12 +148,9 @@ if ($state_ok) {
 			'send.php',
 			'update.php'
 		);
+
 		$file_list = array_merge($file_list, recursive_directory("htmlpurifier", "/^.*(?<!\.$)(?<!\.\.$)(?<!~)(?<!\.htaccess)$/i"));
 		$file_list = array_merge($file_list, ["htmlpurifier"]);
-		$file_list = array_merge($file_list, recursive_directory("ckeditor5", "/^.*(?<!\.$)(?<!\.\.$)(?<!~)(?<!\.htaccess)$/i"));
-		$file_list = array_merge($file_list, ["ckeditor5"]);
-		$file_list = array_merge($file_list, recursive_directory("ckeditor", "/^.*(?<!\.$)(?<!\.\.$)(?<!~)(?<!\.htaccess)$/i"));
-		$file_list = array_merge($file_list, ["ckeditor"]);
 		$file_list = array_merge($file_list, recursive_directory("classes", "/^.*(?<!\.$)(?<!\.\.$)(?<!~)(?<!\.htaccess)$/i"));
 		$file_list = array_merge($file_list, ["classes"]);
 		$file_list = array_merge($file_list, recursive_directory("config", "/^.*(?<!\.$)(?<!\.\.$)(?<!~)(?<!\.htaccess)(?<!conf.php)$/i"));
@@ -187,21 +184,24 @@ if ($state_ok) {
 			$state_ok = false;
 		}
 	}
-	$number_of_files = count($file_list);
-	if ($state_ok) {
-		echo '<p class="new-version-update-ok">All ' . $number_of_files . ' files are writable.</p>';
-	}
-	$max_execution_time = ini_get("max_execution_time");
 
+	$number_of_files = count($file_list);
+
+	if ($state_ok) echo '<p class="new-version-update-ok">All ' . $number_of_files . ' files are writable.</p>';
+
+	$max_execution_time = ini_get("max_execution_time");
 	$end_time = time();
 	$diff_time = $end_time - $start_time;
+
 	if ($diff_time >= 1) {
 		echo '<p class="new-version-update-info">Environment check took ' . $diff_time . ' seconds.</p>';
 	} else {
 		$diff_time = 1;
 		echo '<p class="new-version-update-info">Environment check took less than 1 second.</p>';
 	}
+
 	$min_execution_time = 30 * $diff_time + 60;
+
 	if ($max_execution_time > $min_execution_time) {
 		echo '<p class="new-version-update-ok">Your php max_execution_time of ' . $max_execution_time . ' seconds seems to be sufficient.</p>';
 	} else {
@@ -211,7 +211,7 @@ if ($state_ok) {
 	}
 }
 
-if (! isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
+if (!isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
 	if ($state_ok) {
 		//creating zip files with Phar has performance issues under windows
 		if (strncasecmp(PHP_OS, "win", 3) == 0) {
@@ -303,6 +303,7 @@ if (! isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
 				//the following fails in php 8.2 with Allowed memory size exhausted
 				//$archive->compress(Phar::GZ);
 				//doing it manually:
+
 				$gzfile = gzcompressfile($archive_name);
 				unset($archive);
 				echo '<p class="new-version-update-info">Removing file: ' . $archive_name . '</p>';
@@ -310,8 +311,8 @@ if (! isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
 
 				$archive_name = gzdecompressfile($gzfile);
 				$archive = new PharData($archive_name);
-
 				$number_of_files_check = $archive->count();
+
 				unset($archive);
 				unlink($archive_name);
 
@@ -341,7 +342,7 @@ if (! isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
 			$archive_name = 'nvll-' . $new_version . '.tar.gz';
 			$download_link = 'http://downloads.sourceforge.net/project/nvll/NVLL/' . $new_version . '/nvll-' . $new_version . '.tar.gz';
 		}
-		if (! is_file($archive_name)) {
+		if (!is_file($archive_name)) {
 			$fpc = file_put_contents($archive_name, fopen($download_link, 'r'));
 			if ($fpc != false) {
 				echo '<p class="new-version-update-ok">Downloaded new version archive successful.</p>';
@@ -423,10 +424,10 @@ if (! isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
 					$new_htaccess = file_get_contents($target_extract_dir . DIRECTORY_SEPARATOR . $file);
 					$old_htaccess = file_get_contents($file);
 					if ($new_htaccess != $old_htaccess) {
-						if (! is_dir(dirname($file . ".nvll-" . $new_version))) {
+						if (!is_dir(dirname($file . ".nvll-" . $new_version))) {
 							mkdir(dirname($file . ".nvll-" . $new_version), 0777, true);
 						}
-						if (! copy($target_extract_dir . DIRECTORY_SEPARATOR . $file, $file . ".nvll-" . $new_version)) {
+						if (!copy($target_extract_dir . DIRECTORY_SEPARATOR . $file, $file . ".nvll-" . $new_version)) {
 							echo '<p class="new-version-update-missing">Failed creating file: ' . $file . '.nvll-' . $new_version . '. Try manually.</p>';
 						}
 						echo '<p class="new-version-update-missing">Important:<br />';
@@ -436,20 +437,20 @@ if (! isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
 					}
 					unlink($target_extract_dir . DIRECTORY_SEPARATOR . $file);
 				} else {
-					if (! is_dir(dirname($file))) {
+					if (!is_dir(dirname($file))) {
 						mkdir(dirname($file), 0777, true);
 					}
-					if (! copy($target_extract_dir . DIRECTORY_SEPARATOR . $file, $file)) {
+					if (!copy($target_extract_dir . DIRECTORY_SEPARATOR . $file, $file)) {
 						echo '<p class="new-version-update-missing">Failed to copy file: ' . $file . '. Try manually.</p>';
 					}
 					unlink($target_extract_dir . DIRECTORY_SEPARATOR . $file);
 				}
 			} else {
 				if (is_file($target_extract_dir . DIRECTORY_SEPARATOR . $file)) {
-					if (! is_dir(dirname($file))) {
+					if (!is_dir(dirname($file))) {
 						mkdir(dirname($file), 0777, true);
 					}
-					if (! copy($target_extract_dir . DIRECTORY_SEPARATOR . $file, $file)) {
+					if (!copy($target_extract_dir . DIRECTORY_SEPARATOR . $file, $file)) {
 						echo '<p class="new-version-update-missing">Failed to copy file: ' . $file . '. Try manually.</p>';
 					}
 					unlink($target_extract_dir . DIRECTORY_SEPARATOR . $file);
@@ -461,34 +462,19 @@ if (! isset($_GET['doUpdate']) || $_GET['doUpdate'] != 1) {
 		rmdir($target_extract_dir);
 	}
 
-	if ($state_ok) {
-		echo '<h2 class="new-version-update-info">Removing deprecated files</h2>';
-		$file_list = array(
-			'ckeditor_php4.php',
-			'ckeditor_php5.php',
-		);
-		foreach ($file_list as $file) {
-			if (file_exists($file)) {
-				if (! unlink($file)) {
-					echo '<p class="new-version-update-missing">Failed to remove deprecated file: ' . $file . '. Try manually.</p>';
-				} else {
-					echo '<p class="new-version-update-ok">File ' . $file . ' removed.</p>';
-				}
-			}
-		}
-	}
+	if ($state_ok) echo '<h2 class="new-version-update-info">Removing deprecated files</h2>';
 
 	$end_time = time();
 	$diff_time = $end_time - $start_time;
 
-	if (! $state_ok) {
+	if (!$state_ok) {
 		echo '<h2 class="new-version-update-missing">Update failed.</h2>';
 	} else {
 		echo '<h2 class="new-version-update-info">Update took ' . $diff_time . ' seconds to finish successfully.</p>';
 		unset($_SESSION['auto_update_new']);
 	}
 
-	if (! $nvll_update_running && is_file("NVLL_UPDATE_RUNNING")) {
+	if (!$nvll_update_running && is_file("NVLL_UPDATE_RUNNING")) {
 		unlink("NVLL_UPDATE_RUNNING");
 	}
 }
@@ -541,7 +527,6 @@ function gzdecompressfile(string $file_name): string
 	// Raising this value may increase performance
 	$buffer_size = 4096; // read 4kb at a time
 	$out_file_name = str_replace('.gz', '', $file_name);
-
 	// Open our files (in binary mode)
 	$file = gzopen($file_name, 'rb');
 	$out_file = fopen($out_file_name, 'wb');
