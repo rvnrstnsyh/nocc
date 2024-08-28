@@ -1,24 +1,21 @@
 <?php
+
 /**
  * Class for wrapping a mail address
  *
  * Copyright 2009-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_mailaddress.php 2619 2014-05-30 20:26:23Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 /**
  * Wrapping a mail address
- *
- * @package    NOCC
  */
-class NOCC_MailAddress {
+class NVLL_MailAddress
+{
     /**
      * Name
      * @var string
@@ -38,7 +35,8 @@ class NOCC_MailAddress {
      * @param string $mailAddress Mail address (with or without Name)
      * @param string $mailName Mail name (optional)
      */
-    function __construct($mailAddress, $mailName = '') {
+    function __construct($mailAddress, $mailName = '')
+    {
         $this->_name = '';
         $this->_address = '';
 
@@ -54,12 +52,11 @@ class NOCC_MailAddress {
                 //TODO: Check if is valid address!
                 $this->_name = $name;
                 $this->_address = $address;
-            }
-            else { //if NOT "<" AND ">" are found...
+            } else { //if NOT "<" AND ">" are found...
                 //TODO: Check if is valid address!
                 $this->_address = trim($mailAddress);
             }
-            
+
             //TODO: Drop MISSING_MAILBOX@SYNTAX_ERROR address?
         }
         if (is_string($mailName) && !empty($mailName)) { //if name is set...
@@ -71,7 +68,8 @@ class NOCC_MailAddress {
      * Get the name
      * @return string Name
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->_name;
     }
 
@@ -79,7 +77,8 @@ class NOCC_MailAddress {
      * Has a name?
      * @return bool Has name?
      */
-    public function hasName() {
+    public function hasName()
+    {
         return !empty($this->_name);
     }
 
@@ -87,7 +86,8 @@ class NOCC_MailAddress {
      * Set the name
      * @param string $name Name
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         if (isset($name) && is_string($name)) {
             $this->_name = $name;
         }
@@ -97,7 +97,8 @@ class NOCC_MailAddress {
      * Get the address
      * @return string Address
      */
-    public function getAddress() {
+    public function getAddress()
+    {
         return $this->_address;
     }
 
@@ -105,7 +106,8 @@ class NOCC_MailAddress {
      * Has a address?
      * @return string Has address?
      */
-    public function hasAddress() {
+    public function hasAddress()
+    {
         return !empty($this->_address);
     }
 
@@ -113,7 +115,8 @@ class NOCC_MailAddress {
      * Set the address
      * @param string $address Address
      */
-    public function setAddress($address) {
+    public function setAddress($address)
+    {
         if (isset($address) && is_string($address)) {
             $this->_address = $address;
         }
@@ -122,21 +125,21 @@ class NOCC_MailAddress {
     /**
      * ...
      */
-    public function __toString() {
+    public function __toString()
+    {
         if (!$this->hasAddress()) {
             return '';
         }
-        
+
         if ($this->hasName()) {
             $name = $this->getName();
             if (strpos($name, ' ') !== false) {
                 return '"' . $name . '" <' . $this->getAddress() . '>';
-            }
-            else {
+            } else {
                 return $name . ' <' . $this->getAddress() . '>';
             }
         }
-        
+
         return $this->getAddress();
     }
 
@@ -146,32 +149,34 @@ class NOCC_MailAddress {
      * @return bool Valid?
      * @static
      */
-    public static function isValidAddress($address) {
-        //TODO: Check better!
-	// added + as valid in name part of emailaddress
-	// 19.07.2013 oh allow addresses like ...@some.d.omain.de
-	$regexp = "/^[A-Za-z0-9\._\-\+]+@([A-Za-z0-9][A-Za-z0-9\-]{0,62})(\.[A-Za-z0-9][A-Za-z0-9\-]{0,62})*$/";
-        if (preg_match($regexp, $address)) { //if valid mail address...
-            return true;
-        }
-        return false;
+    public static function isValidAddress($address)
+    {
+        if (strlen($address) > 254)  return false;
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) return false;
+
+        list($user, $domain) = explode('@', $address);
+
+        if (!checkdnsrr($domain, 'MX') && !checkdnsrr($domain, 'A')) return false;
+
+        return true;
     }
-    
+
     /**
      * Are mail address are equal?
      * @param string $a Mail address A (with or without Name)
      * @param string $b Mail address B (with or without Name)
      * @return int -1 (Invalid) or 0 (Unequal) or 1 (Equal);
      */
-    public static function compareAddress($a, $b) {
+    public static function compareAddress($a, $b)
+    {
         if (!isset($a) || !isset($b)) {
             return -1;
         }
-        $mailAddressA = new NOCC_MailAddress($a);
+        $mailAddressA = new NVLL_MailAddress($a);
         if (!$mailAddressA->hasAddress()) {
             return -1;
         }
-        $mailAddressB = new NOCC_MailAddress($b);
+        $mailAddressB = new NVLL_MailAddress($b);
         if (!$mailAddressB->hasAddress()) {
             return -1;
         }
@@ -189,8 +194,8 @@ class NOCC_MailAddress {
      * @return string Name (or address)
      * @static
      */
-    public static function chopAddress($mailAddress) {
+    public static function chopAddress($mailAddress)
+    {
         return preg_replace('|\s+<\S+@\S+>|', '', $mailAddress);
     }
 }
-?>
