@@ -4,22 +4,17 @@
  * Class for wrapping a attached file
  *
  * Copyright 2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: nocc_attachedfile.php 2552 2012-05-28 13:23:16Z gerundt $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
 /**
  * Wrapping a attached file
- *
- * @package    NOCC
  */
-class NOCC_AttachedFile
+class NVLL_AttachedFile
 {
     /**
      * Temp file path
