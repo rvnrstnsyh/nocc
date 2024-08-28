@@ -5,29 +5,23 @@
  *
  * Copyright 2002 Mike Rylander <mrylander@mail.com>
  * Copyright 2008-2011 Tim Gerundt <tim@gerundt.de>
+ * Copyright 2024 Rivane Rasetiansyah <re@nvll.me>
  *
- * This file is part of NOCC. NOCC is free software under the terms of the
+ * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
- * along with NOCC.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    NOCC
- * @license    http://www.gnu.org/licenses/ GNU General Public License
- * @version    SVN: $Id: user_filters.php 2674 2016-09-14 14:02:23Z oheil $
+ * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'exception.php';
+require_once 'NVLL_Exception.php';
 
 /**
  * Handling user filters
- *
- * @package    NOCC
- * @todo Rename to NOCC_UserFilters!
  * @todo Hide all preferenes behind getter/setter!
  * @todo Rewrite to avoid global variables!
  * @todo Add add() function?
  * @todo Add delete() function?
  */
-class NOCCUserFilters
+class NVLL_UserFilters
 {
     // TODO: Hide behind get/setKey()?
     var $key;
@@ -54,7 +48,7 @@ class NOCCUserFilters
         $this->dirty_flag = 1;
 
         if (empty($conf->prefs_dir)) {
-            $ev = new NoccException("User preferences are turned off but tried to create object.");
+            $ev = new NVLL_Exception("User preferences are turned off but tried to create object.");
             return;
         }
     }
@@ -76,19 +70,19 @@ class NOCCUserFilters
         $key = preg_replace("/(\\\|\/)/", "_", $key);
         $key = preg_replace('/(@[^@]+)(?=.*\\1)/', '', $key);
 
-        $filters = new NOCCUserFilters($key, $ev);
+        $filters = new NVLL_UserFilters($key, $ev);
         /* Open the preferences file */
         $filename = $conf->prefs_dir . '/' . $key . '.filter';
 
         if (!file_exists($filename)) {
             $filters->dirty_flag = 1;
             $filters->commit($ev);
-            if (NoccException::isException($ev))
+            if (NVLL_Exception::isException($ev))
                 return;
         }
         $file = fopen($filename, 'r');
         if (!$file) {
-            $ev = new NoccException("Could not open $filename for reading user preferences");
+            $ev = new NVLL_Exception("Could not open $filename for reading user preferences");
             return;
         }
 
@@ -128,16 +122,16 @@ class NOCCUserFilters
         // Write prefs to file
         $filename = $conf->prefs_dir . '/' . $this->key . '.filter';
         if (file_exists($filename) && !is_writable($filename)) {
-            $ev = new NoccException($html_prefs_file_error);
+            $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
         if (!is_writeable($conf->prefs_dir)) {
-            $ev = new NoccException($html_prefs_file_error);
+            $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
         $file = fopen($filename, 'w');
         if (!$file) {
-            $ev = new NoccException($html_prefs_file_error);
+            $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
 
