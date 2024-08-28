@@ -232,14 +232,15 @@ if (
 if (isset($_REQUEST['fillindomain']) && isset($conf->typed_domain_login)) {
     for ($count = 0; $count < count($conf->domains); $count++) {
         if ($_REQUEST['fillindomain'] == $conf->domains[$count]->domain)
-            $_REQUEST['domainnum'] = $count;
+            $_REQUEST['domain_index'] = $count;
     }
 }
 
-// Were we provided with a domainnum to use
-if (isset($_REQUEST['domainnum']) && !(isset($_REQUEST['server']))) {
-    $domainnum = $_REQUEST['domainnum'];
-    if (!isset($conf->domains[$domainnum])) {
+// Were we provided with a domain_index to use
+if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
+    $domain_index = $_REQUEST['domain_index'];
+
+    if (!isset($conf->domains[$domain_index])) {
         $ev = new NVLL_Exception($lang_could_not_connect);
         require './html/header.php';
         require './html/error.php';
@@ -247,18 +248,17 @@ if (isset($_REQUEST['domainnum']) && !(isset($_REQUEST['server']))) {
         exit;
     }
 
-    $domain = new NVLL_Domain($conf->domains[$domainnum]);
-
-    $_SESSION['nvll_domains'] = $domainnum;
-    $_SESSION['nvll_domain'] = $conf->domains[$domainnum]->domain;
-    $_SESSION['nvll_servr'] = $conf->domains[$domainnum]->in;
-    $_SESSION['nvll_smtp_server'] = $conf->domains[$domainnum]->smtp;
-    $_SESSION['nvll_smtp_port'] = $conf->domains[$domainnum]->smtp_port;
-    $_SESSION['smtp_auth'] = $conf->domains[$domainnum]->smtp_auth_method;
-    $_SESSION['imap_namespace'] = $conf->domains[$domainnum]->imap_namespace;
-    $_SESSION['ucb_pop_server'] = $conf->domains[$domainnum]->have_ucb_pop_server;
-    $_SESSION['quota_enable'] = $conf->domains[$domainnum]->quota_enable;
-    $_SESSION['quota_type'] = $conf->domains[$domainnum]->quota_type;
+    $domain = new NVLL_Domain($conf->domains[$domain_index]);
+    $_SESSION['nvll_domain_index'] = $domain_index;
+    $_SESSION['nvll_domain'] = $conf->domains[$domain_index]->domain;
+    $_SESSION['nvll_servr'] = $conf->domains[$domain_index]->in;
+    $_SESSION['nvll_smtp_server'] = $conf->domains[$domain_index]->smtp;
+    $_SESSION['nvll_smtp_port'] = $conf->domains[$domain_index]->smtp_port;
+    $_SESSION['smtp_auth'] = $conf->domains[$domain_index]->smtp_auth_method;
+    $_SESSION['imap_namespace'] = $conf->domains[$domain_index]->imap_namespace;
+    $_SESSION['ucb_pop_server'] = $conf->domains[$domain_index]->have_ucb_pop_server;
+    $_SESSION['quota_enable'] = $conf->domains[$domain_index]->quota_enable;
+    $_SESSION['quota_type'] = $conf->domains[$domain_index]->quota_type;
 
     // Check allowed logins
     if (!$domain->isAllowedLogin($_SESSION['nvll_login'])) {

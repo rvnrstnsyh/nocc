@@ -26,8 +26,8 @@ function get_default_from_address()
 			if (isset($_SESSION['nvll_login']) && strlen($_SESSION['nvll_login']) > 0 && isset($_SESSION['nvll_domain']) && strlen($_SESSION['nvll_domain']) > 0) {
 				$user_part = $_SESSION['nvll_login'];
 
-				if (isset($conf->domains[$_SESSION['nvll_domains']]->from_part) && strlen($conf->domains[$_SESSION['nvll_domains']]->from_part) > 0) {
-					$reg = $conf->domains[$_SESSION['nvll_domains']]->from_part;
+				if (isset($conf->domains[$_SESSION['nvll_domain_index']]->from_part) && strlen($conf->domains[$_SESSION['nvll_domain_index']]->from_part) > 0) {
+					$reg = $conf->domains[$_SESSION['nvll_domain_index']]->from_part;
 					$reg = preg_replace("/\\\/", '\\\\\\', $reg);
 					$user_part = preg_replace("/^" . $reg . "$/", "$1", $user_part);
 				}

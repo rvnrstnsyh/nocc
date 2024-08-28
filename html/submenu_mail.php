@@ -1,4 +1,3 @@
-<!-- start of $Id: submenu_mail.php 2610 2014-04-28 08:48:56Z oheil $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
@@ -51,4 +50,3 @@ $msgnum = $content['msgnum'];
     </li>
   </ul>
 </div>
-<!-- end of $Id: submenu_mail.php 2610 2014-04-28 08:48:56Z oheil $ -->

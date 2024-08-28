@@ -1,23 +1,29 @@
-<!-- start of $Id: send.php 2967 2021-12-10 14:24:34Z oheil $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
 $html_mail = $user_prefs->getSendHtmlMail();
 $has_images = false;
+
 if (isset($content['body'])) {
   $has_images = NVLL_Security::hasDisabledHtmlImages($content['body']);
 }
+
 $display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
 // out-commented: dont allow display_image in edit mode, all user input would be lost
 $req_action = "";
+
 if (isset($_REQUEST['action'])) {
   $req_action = $_REQUEST['action'];
 }
+
 $req_mail = "";
+
 if (isset($_REQUEST['mail'])) {
   $req_mail = $_REQUEST['mail'];
 }
+
 $req_display_images = "";
+
 if (isset($_REQUEST['display_images'])) {
   $req_display_images = $_REQUEST['display_images'];
 }
@@ -25,6 +31,7 @@ if (isset($_REQUEST['display_images'])) {
 // Default e-mail address on send form
 $mail_from = get_default_from_address();
 ?>
+
 <div class="send">
   <br>
   <fieldset>
@@ -35,11 +42,9 @@ $mail_from = get_default_from_address();
 
     <?php
     if (isset($broken_forwarding) && !($broken_forwarding)) {
-      if (isset($forward_msgnum)) {
-    ?>
+      if (isset($forward_msgnum)) { ?>
         <div><input type="hidden" name="forward_msgnum" value="<?php echo $forward_msgnum ?>" /></div>
-    <?php
-      }
+    <?php }
     }
 
     // include old messageid
@@ -47,8 +52,8 @@ $mail_from = get_default_from_address();
     if (!empty($mail_messageid)) {
       print('<div><input type="hidden" name="mail_messageid" value="' . $mail_messageid . '" /></div>');
     }
-    if (isset($_SESSION['nvll_domains']) && $_SESSION['nvll_domains'] >= 0) {
-      print('<div><input type="hidden" name="saved_domainnum" value="' . $_SESSION['nvll_domains'] . '" /></div>');
+    if (isset($_SESSION['nvll_domain_index']) && $_SESSION['nvll_domain_index'] >= 0) {
+      print('<div><input type="hidden" name="saved_domain_index" value="' . $_SESSION['nvll_domain_index'] . '" /></div>');
     }
     ?>
 
@@ -57,20 +62,19 @@ $mail_from = get_default_from_address();
       $isForward = isset($_GET['action']) && $_GET['action'] == 'forward';
       $hasAttachments = isset($_SESSION['nvll_attach_array']) && count($_SESSION['nvll_attach_array']) > 0;
 
-      if ($isForward || $hasAttachments):
-      ?>
+      if ($isForward || $hasAttachments): ?>
         <tr>
           <td class="sendLabel">&nbsp;</td>
           <td class="sendData"></td>
         </tr>
       <?php endif; ?>
       <tr>
-        <td class="sendLabel"><label <?php echo $conf->domains[$_SESSION['nvll_domains']]->allow_address_change ? 'for="mail_from"' : '' ?>><?php echo $html_from_label ?></label></td>
+        <td class="sendLabel"><label <?php echo $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change ? 'for="mail_from"' : '' ?>><?php echo $html_from_label ?></label></td>
         <td class="sendData">
           <?php
           $prefs_show_email = (
-            (isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domains']]->allow_address_change)
-            || (! isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->allow_address_change)
+            (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
           );
           if ($prefs_show_email) {
           ?>
@@ -263,8 +267,7 @@ $mail_from = get_default_from_address();
 </div>
 
 <script type="text/javascript">
-  <!--
-  var btnClicked;
+  let btnClicked;
 
   function validate(f) {
     if (checkSendDelay() == false) {
@@ -289,7 +292,7 @@ $mail_from = get_default_from_address();
       return (true);
     }
     if (window.RegExp) {
-      var reg = new RegExp("[0-9A-Za-z]+", "g");
+      let reg = new RegExp("[0-9A-Za-z]+", "g");
       if (!reg.test(f.elements['mail_to'].value)) {
         alert("<?php echo $to_empty ?>");
         f.elements['mail_to'].focus();
@@ -304,19 +307,15 @@ $mail_from = get_default_from_address();
   }
 
   function checkSendDelay() {
-    var thisdate = new Date();
-    var send_delay = <?php echo ($conf->send_delay) ?>;
-    <?php
-    if (isset($_SESSION['last_send'])) {
-    ?>
-      var last_send = <?php echo ($_SESSION['last_send']) ?>;
-    <?php
-    } else {
-    ?>
-      var last_send = 0;
-    <?php
-    }
-    ?>
+    let thisdate = new Date();
+    let send_delay = <?php echo ($conf->send_delay) ?>;
+    let last_send
+
+    <?php if (isset($_SESSION['last_send'])) { ?>
+      last_send = <?php echo ($_SESSION['last_send']) ?>;
+    <?php } else { ?>
+      last_send = 0;
+    <?php } ?>
 
     if (last_send + send_delay < (thisdate.getTime() / 1000)) {
       return (true);
@@ -324,11 +323,6 @@ $mail_from = get_default_from_address();
       alert('<?php echo (i18n_message($lang_err_send_delay, $conf->send_delay)) ?>');
       return (false);
     }
-
     return false;
   }
-
-  //
-  -->
 </script>
-<!-- end of $Id: send.php 2967 2021-12-10 14:24:34Z oheil $ -->

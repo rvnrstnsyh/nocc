@@ -818,8 +818,8 @@ class NVLL_UserPrefs
         global $html_invalid_wrap_msg;
 
         $allow_address_change = (
-            (isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domains']]->allow_address_change)
-            || (! isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->allow_address_change)
+            (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
         );
         if ($allow_address_change) {
             if (strlen($this->_emailAddress) > 0 && !NVLL_MailAddress::isValidAddress($this->_emailAddress)) {

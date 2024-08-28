@@ -42,16 +42,16 @@ if (file_exists($custom_header)) {
 		//TODO: Why check for $_SESSION['quota_type'])?
 		if (isRssAllowed()) {
 			if (isset($_SESSION['quota_type'])) {
-				//$_nvkey='NVLL_'.md5(uniqid(rand(),true));
+				//$_vmbox='IM_'.md5(uniqid(rand(),true));
 				$rss_url = "rss.php";
-				//$rss_url .= '?_nvkey='.$_nvkey.'&';
-				$rss_url .= '?_nvkey=RSS&';
+				//$rss_url .= '?_vmbox='.$_vmbox.'&';
+				$rss_url .= '?_vmbox=RSS&';
 				$rss_url .= 'nvll_lang=' . base64_encode($_SESSION['nvll_lang']);
 				$rss_url .= '&amp;nvll_smtp_server=' . base64_encode($_SESSION['nvll_smtp_server']);
 				$rss_url .= '&amp;nvll_smtp_port=' . base64_encode($_SESSION['nvll_smtp_port']);
 				$rss_url .= '&amp;nvll_theme=' . base64_encode($_SESSION['nvll_theme']);
 				$rss_url .= '&amp;nvll_domain=' . base64_encode($_SESSION['nvll_domain']);
-				$rss_url .= '&amp;nvll_domains=' . base64_encode($_SESSION['nvll_domains']);
+				$rss_url .= '&amp;nvll_domain_index=' . base64_encode($_SESSION['nvll_domain_index']);
 				$rss_url .= '&amp;imap_namespace=' . base64_encode($_SESSION['imap_namespace']);
 				$rss_url .= '&amp;nvll_servr=' . base64_encode($_SESSION['nvll_servr']);
 				$rss_url .= '&amp;nvll_folder=' . base64_encode($_SESSION['nvll_folder']);
@@ -122,4 +122,3 @@ if (file_exists($custom_header)) {
 		</div>
 		<div id="main">
 		<?php } ?>
-		<!-- end of $Id: header.php 2981 2021-12-22 08:53:00Z oheil $ -->

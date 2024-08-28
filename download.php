@@ -15,7 +15,6 @@ require_once './classes/NVLL_IMAP.php';
 
 try {
 	$pop = new NVLL_IMAP();
-
 	$mime = $_REQUEST['mime'];
 	$filename = $_REQUEST['filename'];
 	$mail = $_REQUEST['mail'];

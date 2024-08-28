@@ -1,4 +1,3 @@
-<!-- start of $Id: submenu_prefs.php 2581 2013-08-22 10:14:02Z gerundt $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 if ($pop->is_imap() && $conf->prefs_dir) {
@@ -28,4 +27,3 @@ if ($pop->is_imap() && $conf->prefs_dir) {
     </ul>
   </div>
 <?php } ?>
-<!-- end of $Id: submenu_prefs.php 2581 2013-08-22 10:14:02Z gerundt $ -->

@@ -18,7 +18,7 @@ try {
     $transfer = $_REQUEST['transfer'];
     $mime = $_REQUEST['mime'];
 
-    if (! $pop->is_horde()) {
+    if (!$pop->is_horde()) {
         $img = $pop->fetchbody($mail, $num);
     } else {
         $img = $pop->fetchbody($mail, $num, $num, false);

@@ -37,15 +37,15 @@ class NVLL_Session
 		$session_has_expired = 0;
 		NVLL_Session::remove_old_sessions();
 
-		if (!isset($_REQUEST['_nvkey']) || (strlen($_REQUEST['_nvkey']) > 0 && preg_match("/^NVLL_/", $_REQUEST['_nvkey']))) {
+		if (!isset($_REQUEST['_vmbox']) || (strlen($_REQUEST['_vmbox']) > 0 && preg_match("/^NVLL_/", $_REQUEST['_vmbox']))) {
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
 				if (preg_match("/^NVLL_/", $cookie_key)) {
-					$_nvkey = $cookie_key;
-					session_name($_nvkey);
+					$_vmbox = $cookie_key;
+					session_name($_vmbox);
 					session_set_cookie_params($cookie_lifetime, '/', '', false);
 					session_start();
 
-					$_SESSION['_nvkey'] = $_nvkey;
+					$_SESSION['_vmbox'] = $_vmbox;
 					//
 					// The currently provided RSS URL (right next to INBOX) allows to view list of emails without authentification.
 					// With the following if/then/else switch one can read/answer/... the email
@@ -76,20 +76,20 @@ class NVLL_Session
 		//	$found_session=true;
 		//}
 		//else {
-		if (isset($_REQUEST['_nvkey']) && strlen($_REQUEST['_nvkey']) > 0) {
-			$_nvkey = $_REQUEST['_nvkey'];
-			session_name($_nvkey);
+		if (isset($_REQUEST['_vmbox']) && strlen($_REQUEST['_vmbox']) > 0) {
+			$_vmbox = $_REQUEST['_vmbox'];
+			session_name($_vmbox);
 			session_set_cookie_params($cookie_lifetime, '/', '', false);
 			session_start();
 
 			if (isset($_SESSION['send_backup']) && ! isset($_GET['discard'])) {
 				$send_backup = $_SESSION['send_backup'];
 			}
-			$_nvvalue = session_id();
-			$_SESSION['_nvkey'] = $_nvkey;
-			$_SESSION['_nvvalue'] = $_nvvalue;
+			$_vmboxvalue = session_id();
+			$_SESSION['_vmbox'] = $_vmbox;
+			$_SESSION['_vmboxvalue'] = $_vmboxvalue;
 
-			if ($_SESSION['_nvkey'] == "RSS") {
+			if ($_SESSION['_vmbox'] == "RSS") {
 				$found_session = true;
 			} else if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
 				$_SESSION['restart_session'] = true;
@@ -99,11 +99,11 @@ class NVLL_Session
 				$found_session = true;
 			} else {
 				NVLL_Session::destroy();
-				if (preg_match("/^IM_/", $_nvkey)) {
+				if (preg_match("/^IM_/", $_vmbox)) {
 					$session_has_expired = 1;
 				}
 			}
-			if (isset($_SESSION['_nvkey']) && $_SESSION['_nvkey'] == "RSS") {
+			if (isset($_SESSION['_vmbox']) && $_SESSION['_vmbox'] == "RSS") {
 			} else {
 				if ($found_session && NVLL_Session::check_session_age()) {
 					NVLL_Session::destroy();
@@ -121,16 +121,16 @@ class NVLL_Session
 		} else {
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
 				if (preg_match("/^IM_/", $cookie_key)) {
-					$_nvkey = $cookie_key;
-					session_name($_nvkey);
+					$_vmbox = $cookie_key;
+					session_name($_vmbox);
 					session_set_cookie_params($cookie_lifetime, '/', '', false);
 					session_start();
 					if (isset($_SESSION['send_backup'])) {
 						$send_backup = $_SESSION['send_backup'];
 					}
-					$_nvvalue = session_id();
-					$_SESSION['_nvkey'] = $_nvkey;
-					$_SESSION['_nvvalue'] = $_nvvalue;
+					$_vmboxvalue = session_id();
+					$_SESSION['_vmbox'] = $_vmbox;
+					$_SESSION['_vmboxvalue'] = $_vmboxvalue;
 					$_SESSION['restart_session'] = true;
 
 					if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
@@ -243,15 +243,15 @@ class NVLL_Session
 	public static function remove_old_session_tmp_file()
 	{
 		global $conf;
-		if (!empty($conf->tmpdir) && isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
-			$available_session_files = glob($conf->tmpdir . '/' . $_SESSION['_nvkey'] . "_*");
+		if (!empty($conf->tmpdir) && isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
+			$available_session_files = glob($conf->tmpdir . '/' . $_SESSION['_vmbox'] . "_*");
 			if (is_array($available_session_files) && count($available_session_files) > 0) {
 				foreach ($available_session_files as $filename) {
-					$_nvkey = preg_replace("/\.session$/", "", $filename);
-					if (isset($_SESSION[$_nvkey]) && $_SESSION[$_nvkey] > 0) {
-						$_SESSION[$_nvkey] = $_SESSION[$_nvkey] - 1;
+					$_vmbox = preg_replace("/\.session$/", "", $filename);
+					if (isset($_SESSION[$_vmbox]) && $_SESSION[$_vmbox] > 0) {
+						$_SESSION[$_vmbox] = $_SESSION[$_vmbox] - 1;
 					} else {
-						unset($_SESSION[$_nvkey]);
+						unset($_SESSION[$_vmbox]);
 						unlink($filename);
 					}
 				}
@@ -306,7 +306,7 @@ class NVLL_Session
 		if (strlen($next_name) == 0) {
 			$next_name = 'NVLL_' . md5(uniqid(rand(), true));
 		}
-		$next_name = "_nvkey=" . $next_name;
+		$next_name = "_vmbox=" . $next_name;
 		return $next_name;
 	}
 
@@ -316,18 +316,18 @@ class NVLL_Session
 	 */
 	public static function rename_session()
 	{
-		$old_nvkey = session_name();
-		if (preg_match("/^NVLL_/", $old_nvkey)) {
-			$_nvkey = 'IM_' . md5(uniqid(rand(), true));
-			//session_name($_nvkey);
+		$old_vmbox = session_name();
+		if (preg_match("/^NVLL_/", $old_vmbox)) {
+			$_vmbox = 'IM_' . md5(uniqid(rand(), true));
+			//session_name($_vmbox);
 			session_regenerate_id(true);
-			$_nvvalue = session_id();
-			$_SESSION['_nvkey'] = $_nvkey;
-			$_SESSION['_nvvalue'] = $_nvvalue;
+			$_vmboxvalue = session_id();
+			$_SESSION['_vmbox'] = $_vmbox;
+			$_SESSION['_vmboxvalue'] = $_vmboxvalue;
 
-			setcookie($old_nvkey, '', time() - 3600, '/', '', false);
+			setcookie($old_vmbox, '', time() - 3600, '/', '', false);
 			//return true;
-			return $_nvkey;
+			return $_vmbox;
 		} else {
 			//return false;
 			return "";
@@ -348,13 +348,13 @@ class NVLL_Session
 				$cookie_lifetime = $conf->max_session_lifetime;
 			}
 		}
-		$_nvkey = 'NVLL_' . md5(uniqid(rand(), true));
-		session_name($_nvkey);
+		$_vmbox = 'NVLL_' . md5(uniqid(rand(), true));
+		session_name($_vmbox);
 		session_set_cookie_params($cookie_lifetime, '/', '', false);
 		session_start();
-		$_nvvalue = session_id();
-		$_SESSION['_nvkey'] = $_nvkey;
-		$_SESSION['_nvvalue'] = $_nvvalue;
+		$_vmboxvalue = session_id();
+		$_SESSION['_vmbox'] = $_vmbox;
+		$_SESSION['_vmboxvalue'] = $_vmboxvalue;
 		$_SESSION['creation_time'] = time();
 	}
 
@@ -377,7 +377,7 @@ class NVLL_Session
 			$save_string .= " " . $_SESSION['nvll_smtp_port'];
 			$save_string .= " " . $_SESSION['nvll_theme'];
 			$save_string .= " " . $_SESSION['nvll_domain'];
-			$save_string .= " " . $_SESSION['nvll_domains'];
+			$save_string .= " " . $_SESSION['nvll_domain_index'];
 			$save_string .= " " . $_SESSION['imap_namespace'];
 			$save_string .= " " . $_SESSION['nvll_servr'];
 			$save_string .= " " . $_SESSION['nvll_folder'];
@@ -394,7 +394,7 @@ class NVLL_Session
 			$save_string = base64_encode($save_string);
 
 			// save string to file
-			$filename = $conf->prefs_dir . '/' . $_SESSION['_nvkey'] . '.session';
+			$filename = $conf->prefs_dir . '/' . $_SESSION['_vmbox'] . '.session';
 
 			if (file_exists($filename) && !is_writable($filename)) {
 				// $ev = new NVLL_Exception($html_session_file_error);
@@ -420,14 +420,14 @@ class NVLL_Session
 	 * Load a saved session file
 	 * @static
 	 */
-	public static function load_session_file($_nvkey)
+	public static function load_session_file($_vmbox)
 	{
 		global $conf;
 		if (empty($conf->prefs_dir)) {
 			return false;
 		}
 
-		$filename = $conf->prefs_dir . '/' . $_nvkey . '.session';
+		$filename = $conf->prefs_dir . '/' . $_vmbox . '.session';
 		if (!file_exists($filename)) {
 			return false;
 		}
@@ -454,8 +454,8 @@ class NVLL_Session
 			return false;
 		}
 
-		$_nvkey = session_name();
-		$line = NVLL_Session::load_session_file($_nvkey);
+		$_vmbox = session_name();
+		$line = NVLL_Session::load_session_file($_vmbox);
 		if (! $line) {
 			return false;
 		}
@@ -469,7 +469,7 @@ class NVLL_Session
 			$_SESSION['nvll_smtp_port'],
 			$_SESSION['nvll_theme'],
 			$_SESSION['nvll_domain'],
-			$_SESSION['nvll_domains'],
+			$_SESSION['nvll_domain_index'],
 			$_SESSION['imap_namespace'],
 			$_SESSION['nvll_servr'],
 			$_SESSION['nvll_folder'],
@@ -499,8 +499,8 @@ class NVLL_Session
 	{
 		global $conf;
 		if (isset($conf->prefs_dir)) {
-			$_nvkey = session_name();
-			$filename = $conf->prefs_dir . '/' . $_nvkey . '.session';
+			$_vmbox = session_name();
+			$filename = $conf->prefs_dir . '/' . $_vmbox . '.session';
 			if (file_exists($filename)) {
 				unlink($filename);
 			}
@@ -514,17 +514,17 @@ class NVLL_Session
 	 */
 	public static function destroy($forceSessionStart = false)
 	{
-		$_nvkey = 'NVLLSESSID';
-		if (isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
-			$_nvkey = $_SESSION['_nvkey'];
+		$_vmbox = 'NVLLSESSID';
+		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
+			$_vmbox = $_SESSION['_vmbox'];
 		}
-		//session_name($_nvkey);
+		//session_name($_vmbox);
 		NVLL_Session::remove_session_file();
 		if ($forceSessionStart) {
 			session_set_cookie_params(0, '/', '', false);
 			session_start();
 		}
-		setcookie($_nvkey, '', time() - 3600, '/', '', false);
+		setcookie($_vmbox, '', time() - 3600, '/', '', false);
 
 		$_SESSION = array();
 		session_destroy();
@@ -544,12 +544,12 @@ class NVLL_Session
 				$cookie_lifetime = time() + $conf->max_session_lifetime;
 			}
 		}
-		$_nvkey = 'NVLLSESSID';
-		if (isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
-			$_nvkey = $_SESSION['_nvkey'];
+		$_vmbox = 'NVLLSESSID';
+		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
+			$_vmbox = $_SESSION['_vmbox'];
 		}
-		$_nvvalue = session_id();
-		setcookie($_nvkey, $_nvvalue, $cookie_lifetime, '/', '', false);
+		$_vmboxvalue = session_id();
+		setcookie($_vmbox, $_vmboxvalue, $cookie_lifetime, '/', '', false);
 	}
 
 	/**
@@ -558,11 +558,11 @@ class NVLL_Session
 	 */
 	public static function deleteCookie()
 	{
-		$_nvkey = 'NVLLSESSID';
-		if (isset($_SESSION['_nvkey']) && strlen($_SESSION['_nvkey']) > 0) {
-			$_nvkey = $_SESSION['_nvkey'];
+		$_vmbox = 'NVLLSESSID';
+		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
+			$_vmbox = $_SESSION['_vmbox'];
 		}
-		setcookie($_nvkey, '', time() - 3600, '/', '', false);
+		setcookie($_vmbox, '', time() - 3600, '/', '', false);
 	}
 
 	/**
@@ -583,7 +583,7 @@ class NVLL_Session
 	 */
 	public static function getUrlGetSession()
 	{
-		return "_nvkey=" . session_name();
+		return "_vmbox=" . session_name();
 	}
 
 	/**

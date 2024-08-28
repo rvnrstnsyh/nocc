@@ -1,8 +1,5 @@
-<!-- start of $Id: menu_mail.php 2713 2017-09-06 12:34:03Z oheil $ -->
-<?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
-?>
+<?php if (!isset($conf->loaded)) die('Hacking attempt'); ?>
+
 <div class="mainmenu">
   <ul>
     <?php if ($user_prefs->getUseInboxFolder()) { ?>
@@ -36,4 +33,3 @@ if (!isset($conf->loaded))
     <?php } ?>
   </ul>
 </div>
-<!-- end of $Id: menu_mail.php 2713 2017-09-06 12:34:03Z oheil $ -->

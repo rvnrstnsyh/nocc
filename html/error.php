@@ -1,5 +1,5 @@
-<!-- start of $Id: error.php 2728 2017-11-20 10:22:45Z oheil $ -->
 <?php if (!isset($conf->loaded)) die('Hacking attempt'); ?>
+
 <div class="error">
   <table class="errorTable">
     <tr class="errorTitle">
@@ -26,4 +26,3 @@
     </tr>
   </table>
 </div>
-<!-- end of $Id: error.php 2728 2017-11-20 10:22:45Z oheil $ -->

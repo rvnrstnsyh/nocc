@@ -1,8 +1,5 @@
-<!-- start of $Id: menu_inbox_bottom_opts.php 1685 2009-01-10 00:10:33Z gerundt $ -->
-<?php
-if (!isset($conf->loaded))
-  die('Hacking attempt');
-?>
+<?php if (!isset($conf->loaded)) die('Hacking attempt'); ?>
+
 <table>
   <tr>
     <td class="menuOpts left">
@@ -42,4 +39,3 @@ if (!isset($conf->loaded))
   </tr>
 </table>
 </form>
-<!-- end of $Id: menu_inbox_bottom_opts.php 1685 2009-01-10 00:10:33Z gerundt $ -->

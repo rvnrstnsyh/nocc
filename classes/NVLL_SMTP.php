@@ -81,22 +81,22 @@ class NVLL_SMTP
 
 		// $smtp = fsockopen($this->smtp_server, $this->port, $errno, $errstr); 
 		$context = stream_context_create();
+		$domain_index = $_SESSION['nvll_domain_index'];
 
-		$domainnum = $_SESSION['nvll_domains'];
-		if (isset($conf->domains[$domainnum]->smtp_allow_self_signed) && $conf->domains[$domainnum]->smtp_allow_self_signed == true) {
-			stream_context_set_option($context, "ssl", "allow_self_signed", $conf->domains[$domainnum]->smtp_allow_self_signed);
+		if (isset($conf->domains[$domain_index]->smtp_allow_self_signed) && $conf->domains[$domain_index]->smtp_allow_self_signed == true) {
+			stream_context_set_option($context, "ssl", "allow_self_signed", $conf->domains[$domain_index]->smtp_allow_self_signed);
 		}
-		if (isset($conf->domains[$domainnum]->smtp_verify_peer) && $conf->domains[$domainnum]->smtp_verify_peer == false) {
-			stream_context_set_option($context, "ssl", "verify_peer", $conf->domains[$domainnum]->smtp_verify_peer);
+		if (isset($conf->domains[$domain_index]->smtp_verify_peer) && $conf->domains[$domain_index]->smtp_verify_peer == false) {
+			stream_context_set_option($context, "ssl", "verify_peer", $conf->domains[$domain_index]->smtp_verify_peer);
 		}
-		if (isset($conf->domains[$domainnum]->smtp_verify_peer_name) && $conf->domains[$domainnum]->smtp_verify_peer_name == false) {
-			stream_context_set_option($context, "ssl", "verify_peer_name", $conf->domains[$domainnum]->smtp_verify_peer_name);
+		if (isset($conf->domains[$domain_index]->smtp_verify_peer_name) && $conf->domains[$domain_index]->smtp_verify_peer_name == false) {
+			stream_context_set_option($context, "ssl", "verify_peer_name", $conf->domains[$domain_index]->smtp_verify_peer_name);
 		}
-		if (isset($conf->domains[$domainnum]->smtp_peer_name) && $conf->domains[$domainnum]->smtp_peer_name != "") {
-			stream_context_set_option($context, "ssl", "peer_name", $conf->domains[$domainnum]->smtp_peer_name);
+		if (isset($conf->domains[$domain_index]->smtp_peer_name) && $conf->domains[$domain_index]->smtp_peer_name != "") {
+			stream_context_set_option($context, "ssl", "peer_name", $conf->domains[$domain_index]->smtp_peer_name);
 		}
-		if (isset($conf->domains[$domainnum]->smtp_security_level) && $conf->domains[$domainnum]->smtp_security_level >= 0) {
-			stream_context_set_option($context, "ssl", "security_level", $conf->domains[$domainnum]->smtp_security_level);
+		if (isset($conf->domains[$domain_index]->smtp_security_level) && $conf->domains[$domain_index]->smtp_security_level >= 0) {
+			stream_context_set_option($context, "ssl", "security_level", $conf->domains[$domain_index]->smtp_security_level);
 		}
 
 		$remote_socket = $this->smtp_server . ":" . $this->port;
@@ -148,27 +148,27 @@ class NVLL_SMTP
 		require_once './utils/crypt.php';
 
 		if (
-			isset($_SESSION['nvll_domains'])
-			&& isset($conf->domains[$_SESSION['nvll_domains']]->smtp_user)
-			&& strlen($conf->domains[$_SESSION['nvll_domains']]->smtp_user) > 0
+			isset($_SESSION['nvll_domain_index'])
+			&& isset($conf->domains[$_SESSION['nvll_domain_index']]->smtp_user)
+			&& strlen($conf->domains[$_SESSION['nvll_domain_index']]->smtp_user) > 0
 		) {
-			$user = $conf->domains[$_SESSION['nvll_domains']]->smtp_user;
-			$password = $conf->domains[$_SESSION['nvll_domains']]->smtp_password;
+			$user = $conf->domains[$_SESSION['nvll_domain_index']]->smtp_user;
+			$password = $conf->domains[$_SESSION['nvll_domain_index']]->smtp_password;
 		} else {
 			$user = $_SESSION['nvll_login'];
 			$password = decpass($_SESSION['nvll_passwd'], $conf->master_key);
 		}
 
 		if (
-			isset($conf->domains[$_SESSION['nvll_domains']]->smtp_user_without_domain)
-			&& $conf->domains[$_SESSION['nvll_domains']]->smtp_user_without_domain == true
+			isset($conf->domains[$_SESSION['nvll_domain_index']]->smtp_user_without_domain)
+			&& $conf->domains[$_SESSION['nvll_domain_index']]->smtp_user_without_domain == true
 		) {
 			$domain_char = '@';
 			if (
-				isset($conf->domains[$_SESSION['nvll_domains']]->login_with_domain_character)
-				&& strlen($conf->domains[$_SESSION['nvll_domains']]->login_with_domain_character) > 0
+				isset($conf->domains[$_SESSION['nvll_domain_index']]->login_with_domain_character)
+				&& strlen($conf->domains[$_SESSION['nvll_domain_index']]->login_with_domain_character) > 0
 			) {
-				$domain_char = $conf->domains[$_SESSION['nvll_domains']]->login_with_domain_character;
+				$domain_char = $conf->domains[$_SESSION['nvll_domain_index']]->login_with_domain_character;
 			}
 			$user = preg_replace("/" . $domain_char . ".*?$/", "", $user);
 		}

@@ -1,4 +1,3 @@
-<!-- start of $Id: menu_inbox.php 2713 2017-09-06 12:34:03Z oheil $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
@@ -73,4 +72,3 @@ switch ($action) {
     <?php } ?>
   </ul>
 </div>
-<!-- end of $Id: menu_inbox.php 2713 2017-09-06 12:34:03Z oheil $ -->

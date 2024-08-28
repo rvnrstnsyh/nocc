@@ -1,12 +1,11 @@
-<!-- start of $Id: prefs.php 3016 2022-08-25 11:00:42Z oheil $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
 $big_list = $pop->getmailboxesnames();
-
 // Build list for sent mails folder selection
 $sent_folders_list = array();
 $currentSentFolder = $user_prefs->getSentFolderName();
+
 if (count($big_list) > 1) {
   for ($i = 0; $i < count($big_list); $i++) {
     if (!empty($currentSentFolder) && $_SESSION['imap_namespace'] . $currentSentFolder == $big_list[$i]) {
@@ -20,6 +19,7 @@ if (count($big_list) > 1) {
 // Build list for deleted mails folder selection
 $trash_folders_list = array();
 $currentTrashFolder = $user_prefs->getTrashFolderName();
+
 if (count($big_list) > 1) {
   for ($i = 0; $i < count($big_list); $i++) {
     if (!empty($currentTrashFolder) && $_SESSION['imap_namespace'] . $currentTrashFolder == $big_list[$i]) {
@@ -33,6 +33,7 @@ if (count($big_list) > 1) {
 // Build list for inbox mails folder selection
 $inbox_folders_list = array();
 $currentInboxFolder = $user_prefs->getInboxFolderName();
+
 if (count($big_list) > 1) {
   for ($i = 0; $i < count($big_list); $i++) {
     if (!empty($currentInboxFolder) && $_SESSION['imap_namespace'] . $currentInboxFolder == $big_list[$i]) {
@@ -62,8 +63,8 @@ if (count($big_list) > 1) {
           </tr>
           <?php
           $allow_address_change = (
-            (isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domains']]->allow_address_change)
-            || (! isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->allow_address_change)
+            (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change)
+            || (! isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
           );
           if ($allow_address_change) {
             //$from_email_show=($user_prefs->getEmailAddress() != '') ? $user_prefs->getEmailAddress() : get_default_from_address();
@@ -264,15 +265,15 @@ if (count($big_list) > 1) {
         <table>
           <tr>
             <td class="prefsLabel"><label>SMTP:</label></td>
-            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domains']]->smtp . ':' . $conf->domains[$_SESSION['nvll_domains']]->smtp_port; ?></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domain_index']]->smtp . ':' . $conf->domains[$_SESSION['nvll_domain_index']]->smtp_port; ?></td>
           </tr>
           <tr>
             <td class="prefsLabel"><label><?php echo $pop->is_imap() ? 'IMAP:' : 'POP3'; ?></label></td>
-            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domains']]->in; ?></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domain_index']]->in; ?></td>
           </tr>
           <tr>
             <td class="prefsLabel"><label>Authentication:</label></td>
-            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domains']]->smtp_auth_method ? $conf->domains[$_SESSION['nvll_domains']]->smtp_auth_method : 'PLAIN'; ?></td>
+            <td class="prefsData"><?php echo $conf->domains[$_SESSION['nvll_domain_index']]->smtp_auth_method ? $conf->domains[$_SESSION['nvll_domain_index']]->smtp_auth_method : 'PLAIN'; ?></td>
           </tr>
         </table>
       </fieldset>
@@ -384,4 +385,3 @@ if (count($big_list) > 1) {
     </div>
   </form>
 </div>
-<!-- end of $Id: prefs.php 3016 2022-08-25 11:00:42Z oheil $ -->

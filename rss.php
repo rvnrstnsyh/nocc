@@ -12,7 +12,7 @@ require_once './classes/NVLL_Session.php';
 require_once './classes/NVLL_UserPrefs.php';
 
 $from_rss = true;
-$_REQUEST['_nvkey'] = "RSS";
+$_REQUEST['_vmbox'] = "RSS";
 
 NVLL_Session::start();
 
@@ -24,7 +24,7 @@ $_SESSION['nvll_smtp_server'] = base64_decode($_REQUEST['nvll_smtp_server']);
 $_SESSION['nvll_smtp_port'] = base64_decode($_REQUEST['nvll_smtp_port']);
 $_SESSION['nvll_theme'] = base64_decode($_REQUEST['nvll_theme']);
 $_SESSION['nvll_domain'] = base64_decode($_REQUEST['nvll_domain']);
-$_SESSION['nvll_domains'] = base64_decode($_REQUEST['nvll_domains']);
+$_SESSION['nvll_domain_index'] = base64_decode($_REQUEST['nvll_domain_index']);
 $_SESSION['imap_namespace'] = base64_decode($_REQUEST['imap_namespace']);
 $_SESSION['nvll_servr'] = base64_decode($_REQUEST['nvll_servr']);
 $_SESSION['nvll_folder'] = base64_decode($_REQUEST['nvll_folder']);

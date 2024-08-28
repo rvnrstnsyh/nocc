@@ -134,10 +134,10 @@ class NVLL_IMAP
 				//  If authcid is something like "ad\user" the "ad\" must be stripped from authzid
 				//  For Details about PLAIN SASL see https://www.rfc-editor.org/rfc/rfc4616.html
 				if (
-					isset($conf->domains[$_SESSION['nvll_domains']]->from_part) &&
-					strlen($conf->domains[$_SESSION['nvll_domains']]->from_part) > 0
+					isset($conf->domains[$_SESSION['nvll_domain_index']]->from_part) &&
+					strlen($conf->domains[$_SESSION['nvll_domain_index']]->from_part) > 0
 				) {
-					$reg = $conf->domains[$_SESSION['nvll_domains']]->from_part;
+					$reg = $conf->domains[$_SESSION['nvll_domain_index']]->from_part;
 					$reg = preg_replace("/\\\/", '\\\\\\', $reg);
 					$tmp_username = preg_replace("/^" . $reg . "$/", "$1", $tmp_username);
 				}
@@ -986,7 +986,7 @@ class NVLL_IMAP
 			return;
 		}
 
-		$tmpFile = $_SESSION['_nvkey'] . "_" . md5(uniqid(rand(), true)) . '.tmp';
+		$tmpFile = $_SESSION['_vmbox'] . "_" . md5(uniqid(rand(), true)) . '.tmp';
 		$_SESSION['fd_message'][] = $tmpFile;
 		$tmpFile = $conf->tmpdir . '/' . $tmpFile;
 		$_SESSION[$tmpFile] = 1;
@@ -1212,8 +1212,8 @@ class NVLL_IMAP
 			$remote = explode(":", $mailbox);
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
 				if (preg_match("/^NVLL_/", $cookie_key)) {
-					$_nvkey = $cookie_key;
-					if ($line = NVLL_Session::load_session_file($_nvkey)) {
+					$_vmbox = $cookie_key;
+					if ($line = NVLL_Session::load_session_file($_vmbox)) {
 						list(
 							$session_id,
 							$TMP_SESSION['nvll_user'],
@@ -1224,7 +1224,7 @@ class NVLL_IMAP
 							$TMP_SESSION['nvll_smtp_port'],
 							$TMP_SESSION['nvll_theme'],
 							$TMP_SESSION['nvll_domain'],
-							$TMP_SESSION['nvll_domains'],
+							$TMP_SESSION['nvll_domain_index'],
 							$TMP_SESSION['imap_namespace'],
 							$TMP_SESSION['nvll_servr'],
 							$TMP_SESSION['nvll_folder'],
@@ -1334,10 +1334,10 @@ class NVLL_IMAP
 				//  If authcid is something like "ad\user" the "ad\" must be stripped from authzid
 				//  For Details about PLAIN SASL see https://www.rfc-editor.org/rfc/rfc4616.html
 				if (
-					isset($conf->domains[$TMP_SESSION['nvll_domains']]->from_part) &&
-					strlen($conf->domains[$TMP_SESSION['nvll_domains']]->from_part) > 0
+					isset($conf->domains[$TMP_SESSION['nvll_domain_index']]->from_part) &&
+					strlen($conf->domains[$TMP_SESSION['nvll_domain_index']]->from_part) > 0
 				) {
-					$reg = $conf->domains[$TMP_SESSION['nvll_domains']]->from_part;
+					$reg = $conf->domains[$TMP_SESSION['nvll_domain_index']]->from_part;
 					$reg = preg_replace("/\\\/", '\\\\\\', $reg);
 					$tmp_username = preg_replace("/^" . $reg . "$/", "$1", $tmp_username);
 				}
@@ -2131,8 +2131,8 @@ class NVLL_IMAP
 
 		foreach ($_COOKIE as $cookie_key => $cookie_value) {
 			if (preg_match("/^NVLL_/", $cookie_key)) {
-				$_nvkey = $cookie_key;
-				if ($line = NVLL_Session::load_session_file($_nvkey)) {
+				$_vmbox = $cookie_key;
+				if ($line = NVLL_Session::load_session_file($_vmbox)) {
 					list(
 						$session_id,
 						$TMP_SESSION['nvll_user'],
@@ -2143,7 +2143,7 @@ class NVLL_IMAP
 						$TMP_SESSION['nvll_smtp_port'],
 						$TMP_SESSION['nvll_theme'],
 						$TMP_SESSION['nvll_domain'],
-						$TMP_SESSION['nvll_domains'],
+						$TMP_SESSION['nvll_domain_index'],
 						$TMP_SESSION['imap_namespace'],
 						$TMP_SESSION['nvll_servr'],
 						$TMP_SESSION['nvll_folder'],
@@ -2275,8 +2275,8 @@ class NVLL_IMAP
 		if (isset($conf->horde_imap_client) && $conf->horde_imap_client) {
 			$r = true;
 		}
-		if (isset($conf->domains[$_SESSION['nvll_domains']]->horde_imap_client)) {
-			if ($conf->domains[$_SESSION['nvll_domains']]->horde_imap_client) {
+		if (isset($conf->domains[$_SESSION['nvll_domain_index']]->horde_imap_client)) {
+			if ($conf->domains[$_SESSION['nvll_domain_index']]->horde_imap_client) {
 				$r = true;
 			} else {
 				$r = false;

@@ -11,7 +11,7 @@
 require_once './common.php';
 require_once './classes/NVLL_SMTP.php';
 
-$ev = "";
+$ev = null;
 
 try {
     $pop = new NVLL_IMAP();

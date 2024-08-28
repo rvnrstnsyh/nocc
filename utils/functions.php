@@ -11,13 +11,12 @@
 require_once './vendor/autoload.php';
 
 require_once './classes/NVLL_IMAP.php';
-require_once './classes/NVLL_HTMLPurifier_URIScheme_cid.php';
-
 require_once './classes/NVLL_Theme.php';
 require_once './classes/NVLL_MailReader.php';
 require_once './classes/NVLL_QuotaUsage.php';
 require_once './classes/NVLL_MailAddress.php';
 require_once './classes/NVLL_AttachedFile.php';
+require_once './classes/NVLL_HTMLPurifier_URIScheme_CID.php';
 
 /**
  * recursivle traverse a directory and return an array of all files and directories
@@ -1372,12 +1371,12 @@ function isRssAllowed()
     }
     $is_domain_allowed = false;
     if (
-        isset($_SESSION['nvll_domains']) &&
-        isset($conf->domains[$_SESSION['nvll_domains']]) &&
-        isset($conf->domains[$_SESSION['nvll_domains']]->allow_rss) &&
+        isset($_SESSION['nvll_domain_index']) &&
+        isset($conf->domains[$_SESSION['nvll_domain_index']]) &&
+        isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_rss) &&
         true
     ) {
-        $is_domain_allowed = $conf->domains[$_SESSION['nvll_domains']]->allow_rss;
+        $is_domain_allowed = $conf->domains[$_SESSION['nvll_domain_index']]->allow_rss;
     } else {
         $is_domain_allowed = true;
     }

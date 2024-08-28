@@ -1,4 +1,3 @@
-<!-- start of $Id: html_mail.php 2870 2020-04-11 16:39:37Z oheil $ -->
 <div class="mailNav">
   <table class="head">
     <?php
@@ -140,5 +139,4 @@ if ($content['spam']) {
   //TODO: Rename this CSS class "mail" to "mailBody"?
   echo '<div class="mail">' . $content['body'] . '</div>';
   ?>
-</div> <!-- .mailData -->
-<!-- end of $Id: html_mail.php 2870 2020-04-11 16:39:37Z oheil $ -->
+</div>

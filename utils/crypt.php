@@ -8,7 +8,6 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-
 /**
  * Returns NTLM Type 3 message
  * @param string $type2message the Type 2 message from the server as a binary string

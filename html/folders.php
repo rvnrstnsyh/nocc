@@ -1,14 +1,12 @@
-<!-- start of $Id: folders.php 2967 2021-12-10 14:24:34Z oheil $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
 $renameoldbox = $pop->html_folder_select('renameoldbox', $_SESSION['nvll_folder']);
 $removeoldbox = $pop->html_folder_select('removeoldbox', $_SESSION['nvll_folder']);
 $downloadbox = $pop->html_folder_select('downloadbox', $_SESSION['nvll_folder']);
-
 $big_list = $pop->getmailboxesnames();
-
 $select_list = array();
+
 if (count($big_list) > 1) {
   for ($i = 0; $i < count($big_list); $i++) {
     $selected = "";
@@ -137,4 +135,3 @@ if (count($big_list) > 1) {
     </div>
   </form>
 </div>
-<!-- end of $Id: folders.php 2967 2021-12-10 14:24:34Z oheil $ -->

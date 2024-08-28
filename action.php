@@ -16,7 +16,6 @@ clear_attachments();
 
 // Reset exception vector
 $ev = null;
-
 $remember = NVLL_Request::getStringValue('remember');
 
 // Refresh quota usage
@@ -132,7 +131,7 @@ switch ($action) {
         //--------------------------------------------------------------------------------
     case 'compose':
 
-        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
             if (isset($_SESSION['send_backup']['mail_to'])) {
                 $mail_to = $_SESSION['send_backup']['mail_to'];
             }
@@ -181,7 +180,7 @@ switch ($action) {
         //--------------------------------------------------------------------------------
     case 'reply':
     case 'reply_all':
-        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
             unset($_SESSION['send_backup']);
         }
         clear_attachments();
@@ -237,7 +236,7 @@ switch ($action) {
         // Forward a mail...
         //--------------------------------------------------------------------------------
     case 'forward':
-        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) unset($_SESSION['send_backup']);
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) unset($_SESSION['send_backup']);
 
         clear_attachments();
 
@@ -631,12 +630,12 @@ switch ($action) {
                 break;
             }
             NVLL_Session::createCookie($remember);
-            if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
+            if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
                 //header("Location: ".$conf->base_url."action.php?".NVLL_Session::getUrlGetSession().'&action=compose');
-                header("Location: " . $conf->base_url . "action.php?_nvkey=" . $new_session_name . '&action=compose');
+                header("Location: " . $conf->base_url . "action.php?_vmbox=" . $new_session_name . '&action=compose');
             } else {
                 //header("Location: ".$conf->base_url."action.php?".NVLL_Session::getUrlGetSession());
-                header("Location: " . $conf->base_url . "action.php?_nvkey=" . $new_session_name);
+                header("Location: " . $conf->base_url . "action.php?_vmbox=" . $new_session_name);
             }
             exit();
         }

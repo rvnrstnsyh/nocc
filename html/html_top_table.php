@@ -1,4 +1,3 @@
-<!-- start of $Id: html_top_table.php 2967 2021-12-10 14:24:34Z oheil $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
@@ -156,4 +155,3 @@ if ($pop->is_imap()) {
         }
         ?>
       </tr>
-      <!-- end of $Id: html_top_table.php 2967 2021-12-10 14:24:34Z oheil $ -->

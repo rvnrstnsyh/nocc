@@ -572,7 +572,7 @@ $conf->broken_forwarding = false;
 // Default encoding charset to use to display email which does not include one.
 $conf->default_charset = 'ISO-8859-1';
 // Delay between 2 mail send (in second)
-$conf->send_delay = 30;
+$conf->send_delay = 60;
 
 // ##
 // ## User options

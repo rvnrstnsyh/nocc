@@ -12,8 +12,8 @@ require_once './common.php';
 
 $mail_from = get_default_from_address();
 if (
-    (isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domains']]->allow_address_change)
-    || (! isset($conf->domains[$_SESSION['nvll_domains']]->allow_address_change) && $conf->allow_address_change)
+    (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change)
+    || (! isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
 ) {
     $mail_from = NVLL_Request::getStringValue('mail_from');
 }
@@ -23,27 +23,28 @@ $mail_cc = NVLL_Request::getStringValue('mail_cc');
 $mail_bcc = NVLL_Request::getStringValue('mail_bcc');
 $mail_subject = NVLL_Request::getStringValue('mail_subject');
 $mail_body = NVLL_Request::getStringValue('mail_body');
+
 if (strlen(NVLL_Request::getStringValue('nvll_attach_array')) > 0) {
     $mail_att = unserialize(base64_decode(NVLL_Request::getStringValue('nvll_attach_array')));
     if (! is_array($mail_att)) {
         unset($mail_att);
     }
 }
+
 $mail_receipt = isset($_REQUEST['receipt']);
 $mail_priority = NVLL_Request::getStringValue('priority');
-$domainnum = NVLL_Request::getStringValue('saved_domainnum');
-
+$domain_index = NVLL_Request::getStringValue('saved_domain_index');
 $send_backup = array();
-$send_backup['nvll_domains'] = $domainnum;
+$send_backup['nvll_domain_index'] = $domain_index;
 $send_backup['mail_from'] = $mail_from;
 $send_backup['mail_to'] = $mail_to;
 $send_backup['mail_cc'] = $mail_cc;
 $send_backup['mail_bcc'] = $mail_bcc;
 $send_backup['mail_subject'] = $mail_subject;
 $send_backup['mail_body'] = $mail_body;
-if (isset($mail_att)) {
-    $send_backup['mail_att'] = $mail_att;
-}
+
+if (isset($mail_att)) $send_backup['mail_att'] = $mail_att;
+
 $send_backup['mail_receipt'] = $mail_receipt;
 $send_backup['mail_priority'] = $mail_priority;
 $_SESSION['send_backup'] = $send_backup;
@@ -117,7 +118,7 @@ switch ($_REQUEST['sendaction']) {
         $mail_body = "";
         $mail_receipt = "";
         $mail_priority = "";
-        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
             unset($_SESSION['send_backup']);
         }
         clear_attachments();
@@ -275,7 +276,7 @@ switch ($_REQUEST['sendaction']) {
                     }
                 }
             }
-            if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domains'] == $_SESSION['send_backup']['nvll_domains']) {
+            if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
                 unset($_SESSION['send_backup']);
             }
             clear_attachments();

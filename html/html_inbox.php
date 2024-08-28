@@ -1,10 +1,9 @@
-<!-- start of $Id: html_inbox.php 2567 2013-08-06 10:44:40Z oheil $ -->
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
 $even_odd_class = ($tmp['index'] % 2) ? 'even' : 'odd';
-
 $unread_class = '';
+
 if ($_SESSION['ucb_pop_server'] || $pop->is_imap()) {
   if ($tmp['unread'] == true) { //if unread...
     $unread_class = ' unread';
@@ -18,11 +17,13 @@ $row_class = $even_odd_class . $unread_class . $spam_class;
 if ($tmp['flagged']) $row_class .= ' flagged';
 
 $spam_class = '';
+
 if ($tmp['spam'] == true) { //if SPAM...
   $spam_class = ' spam' . ucfirst($even_odd_class); //spamOdd or spamEven
 }
 
 $target_blank = '';
+
 if (isset($user_prefs->seperate_msg_win) && $user_prefs->seperate_msg_win) $target_blank = ' target="_blank"';
 
 echo '<tr class="' . $row_class . '">';
@@ -97,5 +98,3 @@ foreach ($conf->column_order as $column) { //For all columns...
   echo '</td>';
 }
 echo '</tr>';
-?>
-<!-- end of $Id: html_inbox.php 2567 2013-08-06 10:44:40Z oheil $ -->

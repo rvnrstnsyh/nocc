@@ -1,81 +1,48 @@
 /**
  * Update "Port" textbox at login page.
- * 
+ *
  * This file is part of NVLL. NVLL is free software under the terms of the
  * GNU General Public License. You should have received a copy of the license
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 function updateLoginPort() {
-  var form = document.getElementById("nvll_webmail_login");
-  if (form.servtype.options[form.servtype.selectedIndex].value == "imap") {
-    form.port.value = 143;
-  } else if (
-    form.servtype.options[form.servtype.selectedIndex].value == "notls"
-  ) {
-    form.port.value = 143;
-  } else if (
-    form.servtype.options[form.servtype.selectedIndex].value == "ssl"
-  ) {
-    form.port.value = 993;
-  } else if (
-    form.servtype.options[form.servtype.selectedIndex].value ==
-      "ssl/novalidate-cert"
-  ) {
-    form.port.value = 993;
-  } else if (
-    form.servtype.options[form.servtype.selectedIndex].value == "pop3"
-  ) {
-    form.port.value = 110;
-  } else if (
-    form.servtype.options[form.servtype.selectedIndex].value == "pop3/notls"
-  ) {
-    form.port.value = 110;
-  } else if (
-    form.servtype.options[form.servtype.selectedIndex].value == "pop3/ssl"
-  ) {
-    form.port.value = 995;
-  } else if (
-    form.servtype.options[form.servtype.selectedIndex].value ==
-      "pop3/ssl/novalidate-cert"
-  ) {
-    form.port.value = 995;
-  }
+  const form = document.getElementById("nvll_webmail_login");
+  const servType = form.servtype.options[form.servtype.selectedIndex].value;
+  const portMap = {
+    "imap": 143,
+    "notls": 143,
+    "ssl": 993,
+    "ssl/novalidate-cert": 993,
+    "pop3": 110,
+    "pop3/notls": 110,
+    "pop3/ssl": 995,
+    "pop3/ssl/novalidate-cert": 995,
+  };
+
+  form.port.value = portMap[servType] || "";
 }
 
 /**
  * Update login page.
  */
-function updateLoginPage(id) {
-  if (!id) id = "";
-  var form = document.getElementById("nvll_webmail_login");
-  if (form.user.value == "" && form.passwd.value == "") {
-    if (form.theme && form.lang) {
-      var lang_page = "index.php?" + id + "&theme=" +
-        form.theme[form.theme.selectedIndex].value + "&lang=" +
-        form.lang[form.lang.selectedIndex].value;
-      self.location = lang_page;
-    }
-    if (!form.theme && form.lang) {
-      var lang_page = "index.php?" + id + "&lang=" +
-        form.lang[form.lang.selectedIndex].value;
-      self.location = lang_page;
-    }
-    if (form.theme && !form.lang) {
-      var lang_page = "index.php?" + id + "&theme=" +
-        form.theme[form.theme.selectedIndex].value;
-      self.location = lang_page;
-    }
-    if (!form.theme && !form.lang) {
-      var lang_page = "index.php?" + id;
-      self.location = lang_page;
-    }
+function updateLoginPage(id = "") {
+  const form = document.getElementById("nvll_webmail_login");
+
+  if (form.user.value === "" && form.passwd.value === "") {
+    const theme = form.theme?.[form.theme.selectedIndex]?.value;
+    const lang = form.lang?.[form.lang.selectedIndex]?.value;
+    const lang_page = `index.php?${id}${theme ? `&theme=${theme}` : ""}${
+      lang ? `&lang=${lang}` : ""
+    }`;
+
+    self.location = lang_page;
   }
 }
 
 /**
  * This array is used to remember mark status of rows.
  */
-var marked_row = new Array();
+const marked_row = {};
 
 /**
  * Enables highlight and marking of rows in inbox table.
@@ -83,166 +50,128 @@ var marked_row = new Array();
  * Based on the PMA_markRowsInit() function from phpMyAdmin <http://www.phpmyadmin.net/>.
  */
 function markInboxRowsInit() {
-  if (document.getElementById("inboxTable") != null) {
-    // for every table row ...
-    var rows = document.getElementById("inboxTable").getElementsByTagName("tr");
-    for (var i = 0; i < rows.length; i++) {
-      // ... with the class 'odd' or 'even' ...
-      if (
-        "odd" != rows[i].className.substr(0, 3) &&
-        "even" != rows[i].className.substr(0, 4)
-      ) {
-        continue;
-      }
-      // ... add event listeners ...
-      // ... to highlight the row on mouseover ...
-      if (navigator.appName == "Microsoft Internet Explorer") {
-        // but only for IE, other browsers are handled by :hover in css
-        rows[i].onmouseover = function () {
-          this.className += " hover";
-        };
-        rows[i].onmouseout = function () {
-          this.className = this.className.replace(" hover", "");
-        };
-      }
-      // ... and to mark the row on click ...
-      rows[i].onmousedown = function () {
-        var unique_id;
-        var checkbox;
+  const inboxTable = document.getElementById("inboxTable");
+  if (!inboxTable) return;
 
-        checkbox = this.getElementsByTagName("input")[0];
-        if (checkbox && checkbox.type == "checkbox") {
-          unique_id = checkbox.name + checkbox.value;
-        } else if (this.id.length > 0) {
-          unique_id = this.id;
-        } else {
-          return;
-        }
+  const rows = inboxTable.getElementsByTagName("tr");
 
-        if (
-          typeof (marked_row[unique_id]) == "undefined" ||
-          !marked_row[unique_id]
-        ) {
-          marked_row[unique_id] = true;
-        } else {
-          marked_row[unique_id] = false;
-        }
+  Array.from(rows).forEach((row) => {
+    const className = row.className;
 
-        if (marked_row[unique_id]) {
-          this.className += " marked";
-        } else {
-          this.className = this.className.replace(" marked", "");
-        }
+    if (!className.startsWith("odd") && !className.startsWith("even")) return;
 
-        if (checkbox && checkbox.disabled == false) {
+    if (navigator.appName === "Microsoft Internet Explorer") {
+      row.onmouseover = () => row.classList.add("hover");
+      row.onmouseout = () => row.classList.remove("hover");
+    }
+
+    row.onmousedown = () => {
+      const checkbox = row.querySelector("input[type='checkbox']");
+      const unique_id = checkbox ? checkbox.name + checkbox.value : row.id;
+
+      if (unique_id) {
+        marked_row[unique_id] = !marked_row[unique_id];
+        row.classList.toggle("marked", marked_row[unique_id]);
+
+        if (checkbox && !checkbox.disabled) {
           checkbox.checked = marked_row[unique_id];
         }
-      };
-
-      // .. and checkbox clicks
-      var checkbox = rows[i].getElementsByTagName("input")[0];
-      if (checkbox) {
-        checkbox.onclick = function () {
-          // opera does not recognize return false;
-          this.checked = !this.checked;
-        };
       }
+    };
+
+    const checkbox = row.querySelector("input[type='checkbox']");
+
+    if (checkbox) {
+      checkbox.onclick = () => {
+        checkbox.checked = !checkbox.checked;
+        return false;
+      };
     }
-  }
+  });
 }
+
 window.onload = markInboxRowsInit;
 
 /**
  * Invert checked messages in inbox table.
- *
  * Based on the markAllRows() and unMarkAllRows() functions from phpMyAdmin <http://www.phpmyadmin.net/>.
  */
 function InvertCheckedMsgs() {
-  if (document.getElementById("inboxTable") != null) {
-    var rows = document.getElementById("inboxTable").getElementsByTagName("tr");
-    var unique_id;
-    var checkbox;
+  const inboxTable = document.getElementById("inboxTable");
 
-    for (var i = 0; i < rows.length; i++) {
-      checkbox = rows[i].getElementsByTagName("input")[0];
-      if (checkbox && checkbox.type == "checkbox") {
-        unique_id = checkbox.name + checkbox.value;
-        if (checkbox.checked == false) {
-          checkbox.checked = true;
-          if (
-            typeof (marked_row[unique_id]) == "undefined" ||
-            !marked_row[unique_id]
-          ) {
-            rows[i].className += " marked";
-            marked_row[unique_id] = true;
-          }
-        } else {
-          checkbox.checked = false;
-          rows[i].className = rows[i].className.replace(" marked", "");
-          marked_row[unique_id] = false;
-        }
-      }
+  if (!inboxTable) return true;
+
+  const rows = inboxTable.getElementsByTagName("tr");
+
+  Array.from(rows).forEach((row) => {
+    const checkbox = row.querySelector("input[type='checkbox']");
+    const unique_id = checkbox ? checkbox.name + checkbox.value : "";
+
+    if (checkbox && unique_id) {
+      checkbox.checked = !checkbox.checked;
+      marked_row[unique_id] = checkbox.checked;
+      row.classList.toggle("marked", checkbox.checked);
     }
-  }
+  });
+
   return true;
 }
 
 /**
- * handle marker for changes in inbox
+ * Handle marker for changes in inbox
  */
-var nvll_cur_num_msg = 0;
-var nvll_session = "";
-var nvll_inbox = "";
-var nvll_timer = 600; //default 10minutes
-var nvll_message =
-  "Your inbox content has changed, please refresh the page to see the update.";
-var nvll_alert = true;
+let nvll_cur_num_msg = 0;
+let nvll_session = "";
+let nvll_timer = 600;
+let nvll_message = "Your inbox content has changed.";
+let nvll_alert = true;
+
 function ShowInboxChangedMarker() {
-  els = document.getElementsByClassName("inbox_changed");
-  var i;
-  for (i = 0; i < els.length; i++) {
-    els[i].style.display = "inline";
-  }
+  const els = document.getElementsByClassName("inbox_changed");
+  Array.from(els).forEach((el) => el.style.display = "inline");
+
   if (nvll_alert) {
     alert(nvll_message);
     nvll_alert = false;
+    window.location.reload();
   }
   return true;
 }
-var xhttp = new XMLHttpRequest();
+
+const xhttp = new XMLHttpRequest();
+
 xhttp.onreadystatechange = function () {
-  if (this.readyState == 4 && this.status == 200) {
-    cur_num_msg = parseInt(this.responseText);
-    if (cur_num_msg != -1 && cur_num_msg != nvll_cur_num_msg) {
+  if (this.readyState === 4 && this.status === 200) {
+    const cur_num_msg = parseInt(this.responseText, 10);
+    if (cur_num_msg !== -1 && cur_num_msg !== nvll_cur_num_msg) {
       ShowInboxChangedMarker();
     }
   }
   return true;
 };
+
 function GetInboxChangedHandler() {
   xhttp.open(
     "GET",
-    "action.php?" + nvll_session + "&action=inbox_changed&num_msg=" +
-      nvll_cur_num_msg,
+    `action.php?${nvll_session}&action=inbox_changed&num_msg=${nvll_cur_num_msg}`,
   );
   xhttp.send();
   return true;
 }
+
 function InitInboxChangedHandler(
   cur_num_msg,
   session,
-  timer,
-  message,
-  show_alert,
+  timer = 600,
+  message = nvll_message,
+  show_alert = true,
 ) {
   nvll_session = session;
   nvll_timer = timer;
   nvll_message = message;
   nvll_alert = show_alert;
   nvll_cur_num_msg = cur_num_msg;
-  //GetInboxChangedHandler();
-  if (timer > 0) {
-    setInterval(GetInboxChangedHandler, timer * 1000); //default: every 600 seconds = 10 minutes
-  }
+
+  if (timer > 0) setInterval(GetInboxChangedHandler, timer * 1000);
   return true;
 }

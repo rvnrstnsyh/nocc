@@ -8,13 +8,12 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-//If a previous authentification cookie was set, we use it to bypass login
-//window.
+//If a previous authentification cookie was set, we use it to bypass login window.
 
 require_once './common.php';
 require_once './utils/captcha.php';
 
-if (isset($_REQUEST['_nvkey']) && $_REQUEST['_nvkey'] == "RSS") {
+if (isset($_REQUEST['_vmbox']) && $_REQUEST['_vmbox'] == "RSS") {
   header("Location: " . $conf->base_url);
   exit();
 }
@@ -26,8 +25,8 @@ if (isset($_SESSION['restart_session']) && $_SESSION['restart_session'] == true)
 
 require_once './utils/check.php';
 require './html/header.php';
-
 ?>
+
 <form action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" method="POST" id="nvll_webmail_login" accept-charset="UTF-8">
   <div id="loginBox">
     <h2><?php echo i18n_message($html_welcome, $conf->nvll_name); ?></h2>
@@ -35,18 +34,6 @@ require './html/header.php';
     <input type="hidden" name="action" value="login" />
     <table>
       <tr>
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
-        <!-- abcdefghijklmnopqrstuvwxyz 01234567890 -->
         <th><label for="user"><?php echo $html_user_label; ?></label></th>
         <td>
           <input class="button" type="text" name="user" id="user" size="25" placeholder="e.g. chernobyl, chernobyl@nvll.me" value="<?php if (isset($REMOTE_USER)) echo $REMOTE_USER; ?>" />
@@ -58,19 +45,19 @@ require './html/header.php';
               $i = 0;
               while (!empty($conf->domains[$i]->in)) {
                 if (strpos($_SERVER['HTTP_HOST'], $conf->domains[$i]->domain))
-                  echo '<input type="hidden" name="domainnum" id="domainnum" value="' . $i . '" />' . "\n";
+                  echo '<input type="hidden" name="domain_index" id="domain_index" value="' . $i . '" />' . "\n";
                 $i++;
               }
             } else {
-              echo '<label for="domainnum">@</label> <select class="button" name="domainnum" id="domainnum">';
+              echo '<label for="domain_index">@</label> <select class="button" name="domain_index" id="domain_index">';
               $i = 0;
               while (!empty($conf->domains[$i]->in)) {
                 if (isset($conf->domains[$i]->show_as) && strlen($conf->domains[$i]->show_as) > 0) {
-                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domains'] == $i) {
+                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domain_index'] == $i) {
                     echo "<option value=\"$i\">" . $conf->domains[$i]->show_as . '</option>';
                   }
                 } else {
-                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domains'] == $i) {
+                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domain_index'] == $i) {
                     echo "<option value=\"$i\">" . $conf->domains[$i]->domain . '</option>';
                   }
                 }
@@ -79,7 +66,7 @@ require './html/header.php';
               echo '</select>' . "\n";
             }
           } else {
-            echo '<input type="hidden" name="domainnum" value="0" id="domainnum" />' . "\n";
+            echo '<input type="hidden" name="domain_index" value="0" id="domain_index" />' . "\n";
           }
           ?>
         </td>
