@@ -550,7 +550,7 @@ img.sort {
   background-color: #d6d6d6;
 }
 
-#inboxTable .unread {
+#inboxTable .unseen {
   font-weight: bold;
 }
 
