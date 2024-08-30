@@ -82,22 +82,33 @@ switch ($action) {
 
             if ($user_prefs->getCollect() == 2 || $user_prefs->getCollect() == 3) {
                 require_once './classes/nvll_contacts.php';
-                $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
 
+                $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
                 $contacts_object = new NVLL_Contacts();
                 $all_to = trim($content['from']) . "; " . trim($content['to']) . "; " . trim($content['cc']) . "; " . trim($content['reply_to']);
                 $contacts = $contacts_object->add_contact($path, $all_to);
-                if (count($contacts) <= $conf->contact_number_max) {
-                    $contacts_object->saveList($path, $contacts, $conf, $ev);
-                }
+
+                if (count($contacts) <= $conf->contact_number_max) $contacts_object->saveList($path, $contacts, $conf, $ev);
                 //ignore exception as emails should be send anyways
             }
 
             // Display or hide distant HTML images
-            if (!NVLL_Request::getBoolValue('display_images')) {
-                $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
-            }
+            if (!NVLL_Request::getBoolValue('display_images')) $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
+
             display_embedded_html_images($content, $attachmentParts);
+
+            // Display as plain text
+            if ($conf->use_plaintext_by_default && $content['body'] && !NVLL_Request::getBoolValue('as_html') && !isset($_REQUEST['user_charset'])) {
+                add_quoting($content['body'], $content);
+
+                $content['body'] = htmlspecialchars($content['body'], ENT_COMPAT | ENT_SUBSTITUTE, $charset);
+                $content['body'] = NVLL_Body::prepareTextLinks($content['body']);
+
+                if ($user_prefs->getColoredQuotes()) $content['body'] = NVLL_Body::addColoredQuotes($content['body']);
+
+                $content['body'] = trim($content['body']);
+                $content['body'] = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $content['body'] . '</span>';
+            }
         } catch (Exception $ex) {
             //TODO: Show error without NVLL_Exception!
             $ev = new NVLL_Exception($ex->getMessage());

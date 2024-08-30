@@ -192,7 +192,7 @@ $i = 0;
 $conf->domains[$i] = new stdClass();
 $conf->domains[$i]->show_as = 'localhost';
 $conf->domains[$i]->domain = 'localhost';
-$conf->domains[$i]->in = 'localhost:143';
+$conf->domains[$i]->in = 'localhost:143/notls';
 $conf->domains[$i]->smtp = 'localhost';
 $conf->domains[$i]->smtp_port = 25;
 $conf->domains[$i]->login_with_domain = false;
@@ -536,7 +536,7 @@ $conf->ad = "___________________________________\r\nNVLL, https://nvll.me";
 $conf->broken_forwarding = false;
 
 // Default encoding charset to use to display email which does not include one.
-$conf->default_charset = 'ISO-8859-1';
+$conf->default_charset = 'UTF-8';
 // Delay between 2 mail send (in second)
 $conf->send_delay = 60;
 
@@ -555,6 +555,9 @@ $conf->use_verbose = true;
 
 // let users see message headers by default
 $conf->use_verbose_by_default = true;
+
+// let users see message as plaintext by default
+$conf->use_plaintext_by_default = true;
 
 // Number of contacts per user, 0 to disable contacts list
 $conf->contact_number_max = 10;

@@ -3,9 +3,11 @@
     <?php
     if (!isset($conf->loaded)) die('Hacking attempt');
 
+    $url_session = NVLL_Session::getUrlGetSession();
     $verbose = (isset($_REQUEST['verbose']) && $_REQUEST['verbose'] == 1) ? '1' : '0';
-    $has_images = NVLL_Security::hasDisabledHtmlImages($content['body']);
+    $as_html = (isset($_REQUEST['as_html']) && $_REQUEST['as_html'] == 1) ? '1' : '0';
     $display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
+    $has_images = NVLL_Security::hasDisabledHtmlImages($content['body']);
 
     if ($conf->use_verbose && $verbose == '0') { //If displaying "normal" header...
       echo '<tr><th class="mailHeaderLabel">' . $html_from_label . '</th><td class="mailHeaderData">' . htmlspecialchars($content['from'], ENT_COMPAT | ENT_SUBSTITUTE) . '</td></tr>';
@@ -55,7 +57,7 @@
       if ($priority != '')  echo '<tr><th class="mailHeaderLabel">' . $html_priority_label . '</th><td class="mailHeaderData">' . $priority . '</td></tr>';
 
       echo '<tr><th class="mailHeaderLabel">' . $html_encoding_label . '</th><td class="mailHeaderData">';
-      echo '<form id="encoding" action="action.php?' . NVLL_Session::getUrlGetSession() . '" method="post"><div>';
+      echo '<form id="encoding" action="action.php?' . $url_session . '&charset=1' . '" method="POST"><div>';
       echo '<input type="hidden" name="action" value="' . $_REQUEST['action'] . '"/>';
       echo '<input type="hidden" name="mail" value="' . $_REQUEST['mail'] . '"/>';
       echo '<input type="hidden" name="verbose" value="' . $_REQUEST['verbose'] . '"/>';
@@ -84,9 +86,8 @@
           echo ' selected="selected"';
         echo '>' . $charset_array[$i]->label . '</option>';
       }
-      if ($optgroupOpen) { //if <optgroup> open...
-        echo '</optgroup>';
-      }
+      //if <optgroup> open...
+      if ($optgroupOpen) echo '</optgroup>';
       echo '</select>&nbsp;&nbsp;<input name="submit" class="button" type="submit" value="' . $html_submit . '" />';
       echo '</div></form>';
       echo '</td></tr>';
@@ -94,32 +95,58 @@
       echo '<tr><td colspan="2">';
       echo '<pre class="mailVerboseHeader">' . htmlspecialchars(trim($content['header']), ENT_COMPAT | ENT_SUBSTITUTE) . '</pre>';
       echo '</td></tr>';
-      if ($content['att'] != '') {
-        echo $content['att'];
-      }
+      if ($content['att'] != '') echo $content['att'];
     }
     ?>
   </table>
 
   <table class="menu">
     <?php
+    // Common URL parameters
+    $commonUrlParams = NVLL_Session::getUrlGetSession() . "&action=aff_mail&display_images=$display_images";
+    $is_html = isset($_REQUEST['as_html']) && $_REQUEST['as_html'] == '1';
+    $asHtmlParam = $is_html ? "&as_html=1" : "";
+    $verboseParam = "&verbose=$verbose";
+
+    echo '<tr>';
+
     // Show/hide header link
-    if ($conf->use_verbose)
-      if ($verbose == '1')
-        echo '<tr><td class="mailSwitchHeaders dontPrint"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['msgnum'] . '&amp;verbose=0&amp;display_images=' . $display_images . '">' . $html_remove_header . '</a></td>';
-      else
-        echo '<tr><td class="mailSwitchHeaders dontPrint"><a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['msgnum'] . '&amp;verbose=1&amp;display_images=' . $display_images . '">' . $html_view_header . '</a></td>';
-    else
-      echo '<tr><td>&nbsp;</td>';
+    if ($conf->use_verbose) {
+      if ($verbose == '1') {
+        $headerLink = "<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}$asHtmlParam\">$html_remove_header</a>";
+        echo "<td class=\"mailSwitchHeaders dontPrint\" style=\"display:flex;\">$headerLink";
+      } else {
+        $headerLink = "<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}&verbose=1$asHtmlParam\">$html_view_header</a>";
+        echo "<td class=\"mailSwitchHeaders dontPrint\">$headerLink";
+      }
+
+      // View as HTML/Plain text link
+      if ($content['body_mime'] == 'text/html') {
+        if ($is_html || isset($_REQUEST['charset'])) {
+          echo "&nbsp;|&nbsp;<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}$verboseParam\">$html_view_as_plain</a>";
+        } else {
+          echo "&nbsp;|&nbsp;<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}&as_html=1$verboseParam\">$html_view_as_html</a>";
+        }
+      }
+
+      echo "</td>";
+    } else {
+      echo '<td>&nbsp;</td>';
+    }
 
     // Next/prev message links
-    echo '<td class="right dontPrint">';
-    if (($content['prev'] != '') && ($content['prev'] != 0))
-      echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['prev'] . '&amp;verbose=' . $verbose . '" title="' . $title_prev_msg . '" rel="prev">&laquo; ' . $alt_prev . '</a>';
-    echo "&nbsp;";
-    if (($content['next'] != '') && ($content['next'] != 0))
-      echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=aff_mail&amp;mail=' . $content['next'] . '&amp;verbose=' . $verbose . '" title="' . $title_next_msg . '" rel="next">' . $alt_next . ' &raquo;</a>';
-    echo "</td></tr>";
+    $prevLink = ($content['prev'] !== '' && $content['prev'] !== 0)
+      ? "<a href=\"action.php?$commonUrlParams&mail={$content['prev']}$asHtmlParam$verboseParam\" title=\"$title_prev_msg\" rel=\"prev\">&laquo; $alt_prev</a>"
+      : '';
+
+    $nextLink = ($content['next'] !== '' && $content['next'] !== 0)
+      ? "<a href=\"action.php?$commonUrlParams&mail={$content['next']}$asHtmlParam$verboseParam\" title=\"$title_next_msg\" rel=\"next\">$alt_next &raquo;</a>"
+      : '';
+
+    $separator = ($prevLink && $nextLink) ? '&nbsp;' : '';
+
+    echo "<td class=\"right dontPrint\">$prevLink$separator$nextLink</td>";
+    echo '</tr>';
     ?>
   </table>
 </div>
@@ -128,7 +155,7 @@
   echo ('<div class="nopic">');
   echo ($html_images_warning);
   echo ('<br/>');
-  echo ('<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=aff_mail&mail=' . $content['msgnum'] . '&verbose=' . $verbose . '&display_images=1">' . $html_images_display . '</a>');
+  echo ('<a href="action.php?' . $url_session . '&action=aff_mail&mail=' . $content['msgnum'] . '&verbose=' . $verbose . '&as_html=1&display_images=1">' . $html_images_display . '</a>');
   echo ('</div>');
 }
 if ($content['spam']) echo ('<div class="spamWarning">' . $html_spam_warning . '</div>'); ?>
