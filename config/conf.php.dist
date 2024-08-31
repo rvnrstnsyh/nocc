@@ -483,7 +483,7 @@ $conf->default_sort = '4';
 $conf->default_sortdir = '1';
 
 // Default theme
-$conf->default_theme = 'newlook';
+$conf->default_theme = 'NVLL';
 
 // If you don't want to display images (GIF, JPEG and PNG) sent as attachements
 // set it to 'false'

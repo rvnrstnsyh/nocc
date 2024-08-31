@@ -497,9 +497,9 @@ img.sort {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
+  text-align: left;
   font-size: larger;
-  background: var(--white-color) url(./img/postagestamp02.png) top right no-repeat;
+  background: var(--white-color) url(./img/postcard-with-stamp.png) top right no-repeat;
   border: 1px solid var(--gray-100);
 }
 
@@ -509,7 +509,7 @@ img.sort {
 }
 
 #loginBox table {
-  margin: auto;
+  margin: 0 0 0 4px;
   padding: 0.5em;
 }
 
@@ -536,7 +536,7 @@ img.sort {
 }
 
 #loginBox p {
-  margin: -7px 0 0 35px;
+  margin: -7px 0 8px 186.5px;
   padding: 0.5em;
 }
 
