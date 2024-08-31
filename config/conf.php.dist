@@ -287,13 +287,13 @@ $conf->database_name = 'nvll';
 $conf->database_version = 1;
 $conf->database_persistent = true;
 
-// -- Create the database
+// # -- Create the database
 // CREATE DATABASE IF NOT EXISTS nvll;
 
-// -- Use the created database
+// # -- Use the created database
 // USE nvll;
 
-// -- Create the captcha table
+// # -- Create the captcha table
 // CREATE TABLE IF NOT EXISTS captchas (
 //     id INT UNSIGNED NOT NULL,
 //     time INT UNSIGNED NOT NULL,

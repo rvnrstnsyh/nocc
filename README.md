@@ -6,7 +6,7 @@ This is a modified version of an existing program, and GitHub has done an excell
 
 ## Installation
 
-    1)  Download retrmail-x.y.tar.gz (where x and y are version numbers)
+    1)  Download retrmail-x.y.tar.gz (where x and y are branch or version numbers)
         (or retrmail-x.y.zip for Windows' users).
         https://github.com/rvnrstnsyh/retrmail
 
