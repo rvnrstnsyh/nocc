@@ -37,16 +37,16 @@ if (!isset($_REQUEST['sort'])) {
     }
 }
 
-// Act on 'action'
-$action = NVLL_Request::getStringValue('action');
+// Act on 'service'
+$service = NVLL_Request::getStringValue('service');
 
-if ($action == 'logout') {
+if ($service == 'logout') {
     require_once './utils/proxy.php';
     header('Location: ' . $conf->base_url . 'logout.php?' . NVLL_Session::getUrlGetSession());
     exit;
 }
 
-if ($action == 'inbox_changed') {
+if ($service == 'inbox_changed') {
     $_SESSION['ajxfolder'] = "INBOX";
     if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) {
         $_SESSION['ajxfolder'] = $user_prefs->getInboxFolderName();
@@ -56,7 +56,7 @@ if ($action == 'inbox_changed') {
 try {
     $pop = new NVLL_IMAP();
 } catch (Exception $ex) {
-    if ($action == 'inbox_changed') {
+    if ($service == 'inbox_changed') {
         echo -1;
         unset($_SESSION['ajxfolder']);
         return;
@@ -71,7 +71,7 @@ try {
 
 NVLL_Session::setSendHtmlMail($user_prefs->getSendHtmlMail());
 
-switch ($action) {
+switch ($service) {
         //--------------------------------------------------------------------------------
         // Display a mail...
         //--------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ switch ($action) {
             display_embedded_html_images($content, $attachmentParts);
 
             // Display as plain text
-            if ($conf->use_plaintext_by_default && $content['body'] && !NVLL_Request::getBoolValue('as_html') && !isset($_REQUEST['user_charset'])) {
+            if ($conf->use_plaintext_by_default && isset($content['body']) && strlen(trim(preg_replace('/[\x00-\x1F\x7F]/', '', $content['body']))) > 0 && !NVLL_Request::getBoolValue('as_html') && !isset($_REQUEST['user_charset'])) {
                 add_quoting($content['body'], $content);
 
                 $content['body'] = htmlspecialchars($content['body'], ENT_COMPAT | ENT_SUBSTITUTE, $charset);
@@ -209,7 +209,7 @@ switch ($action) {
 
         $mail_messageid = urlencode($content['message_id']);
 
-        if ($action == 'reply') { // if reply...
+        if ($service == 'reply') { // if reply...
             $mail_to = !empty($content['reply_to']) ? $content['reply_to'] : $content['from'];
         } else { //if reply all...
             $cc = "";
@@ -556,7 +556,7 @@ switch ($action) {
         // Login...
         //--------------------------------------------------------------------------------
     default:
-        if ($action == 'login') {
+        if ($service == 'login') {
             if ($conf->use_captcha && !verify_captcha($_REQUEST['challenge'], $_REQUEST['captcha'])) {
                 $ev = new NVLL_Exception('Invalid Captcha');
                 require './html/header.php';
@@ -636,11 +636,11 @@ switch ($action) {
             }
             NVLL_Session::createCookie($remember);
             if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
-                //header("Location: ".$conf->base_url."action.php?".NVLL_Session::getUrlGetSession().'&action=compose');
-                header("Location: " . $conf->base_url . "action.php?_vmbox=" . $new_session_name . '&action=compose');
+                //header("Location: ".$conf->base_url."api.php?".NVLL_Session::getUrlGetSession().'&service=compose');
+                header("Location: " . $conf->base_url . "api.php?_vmbox=" . $new_session_name . '&service=compose');
             } else {
-                //header("Location: ".$conf->base_url."action.php?".NVLL_Session::getUrlGetSession());
-                header("Location: " . $conf->base_url . "action.php?_vmbox=" . $new_session_name);
+                //header("Location: ".$conf->base_url."api.php?".NVLL_Session::getUrlGetSession());
+                header("Location: " . $conf->base_url . "api.php?_vmbox=" . $new_session_name);
             }
             exit();
         }
@@ -650,7 +650,7 @@ switch ($action) {
         $skip = 0;
         $num_msg = $pop->num_msg();
 
-        if ($action == 'inbox_changed') {
+        if ($service == 'inbox_changed') {
             $req_num_msg = 0;
             if (isset($_REQUEST['num_msg'])) {
                 $req_num_msg = intval($_REQUEST['num_msg']);
@@ -1055,7 +1055,7 @@ function set_list_of_folders($pop, $subscribed)
         }
         if ($unseen > 0) {
             if (!in_array($folder_name, $new_folders)) {
-                $list_of_folders .= ' <a href="action.php?' . NVLL_Session::getUrlGetSession() . '&amp;folder=' . $folder_name . '">' . $folder_name . " ($unseen)" . '</a>';
+                $list_of_folders .= ' <a href="api.php?' . NVLL_Session::getUrlGetSession() . '&amp;folder=' . $folder_name . '">' . $folder_name . " ($unseen)" . '</a>';
                 $_SESSION['list_of_folders'] = $list_of_folders;
                 array_push($new_folders, $folder_name);
             }

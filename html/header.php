@@ -78,7 +78,7 @@ if (file_exists($custom_header)) {
 
 				echo "<ul>\n";
 				echo "<li>[<a href=\"index.php?" . NVLL_Session::get_next_session_name() . "\" target=\"_blank\">" . $html_new_session . "</a>]</li>";
-				echo "  <li>[<a href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&action=setprefs\">" . convertLang2Html($html_preferences) . "</a>]</li>\n";
+				echo "  <li>[<a href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&service=setprefs\">" . convertLang2Html($html_preferences) . "</a>]</li>\n";
 
 				if ($conf->enable_logout) {
 					$title = "";

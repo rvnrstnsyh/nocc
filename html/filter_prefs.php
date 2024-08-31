@@ -8,9 +8,9 @@
   </fieldset>
 
   <?php if ($html_filter_select) { ?>
-    <form class="managefilterLists" method="POST" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
+    <form class="managefilterLists" method="POST" action="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
       <div>
-        <input type="hidden" name="action" value="filters" />
+        <input type="hidden" name="service" value="filters" />
         <input type="hidden" name="do" value="delete" />
         <table>
           <tr>
@@ -29,9 +29,9 @@
     </form>
   <?php } ?>
 
-  <form method="POST" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
+  <form method="POST" action="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
     <div>
-      <input type="hidden" name="action" value="filters" />
+      <input type="hidden" name="service" value="filters" />
       <input type="hidden" name="do" value="create" />
       <table>
         <tr>
@@ -122,7 +122,7 @@
       <div class="prefsSubmitButtonsLeft">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
+        <a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
         </a>
       </div>

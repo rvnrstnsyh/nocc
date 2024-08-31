@@ -153,7 +153,7 @@ xhttp.onreadystatechange = function () {
 function GetInboxChangedHandler() {
   xhttp.open(
     "GET",
-    `action.php?${nvll_session}&action=inbox_changed&num_msg=${nvll_cur_num_msg}`,
+    `api.php?${nvll_session}&service=inbox_changed&num_msg=${nvll_cur_num_msg}`,
   );
   xhttp.send();
   return true;

@@ -3,8 +3,6 @@
 # addcgipath.sh      Adds path for PHP CGI exec when running
 #                    with suEXEC for example
 #
-# Author:            Olivier Cahagne
-#
 
 if test $# -eq 0
 then
@@ -21,7 +19,7 @@ else
   mkdir bak
 fi
 
-for i in action.php delete.php download.php index.php logout.php \
+for i in api.php delete.php download.php index.php logout.php \
   send.php
   do
   mv $i bak/$i

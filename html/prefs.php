@@ -48,9 +48,9 @@ if (count($big_list) > 1) {
 <div class="prefs">
   <?php if (isset($_REQUEST['submit_prefs'])) echo '<p class="success-message-bg">' . convertLang2Html($html_prefs_updated) . '</p>'; ?>
   <br>
-  <form method="POST" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
+  <form method="POST" action="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
     <div>
-      <input type="hidden" name="action" value="setprefs" />
+      <input type="hidden" name="service" value="setprefs" />
       <input type="hidden" name="submit_prefs" value="set" />
       <fieldset>
         <legend><?php echo strtoupper(convertLang2Html($html_personal_information)) ?></legend>
@@ -361,7 +361,7 @@ if (count($big_list) > 1) {
       <p class="prefsSubmitButtonsRight">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
+        <a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
         </a>
       </p>

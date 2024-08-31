@@ -29,8 +29,8 @@ class NVLL_Body
                 $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
             }
         }
-        $body = preg_replace("|href=\"mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)\"|i", "href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&amp;action=write&amp;mail_to=$1\"", $body);
-        $body = preg_replace("|href=mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)|i", "href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&amp;action=write&amp;mail_to=$1\"", $body);
+        $body = preg_replace("|href=\"mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)\"|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
+        $body = preg_replace("|href=mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
 
         for ($i = 0; $i < $count; $i++) $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
 
@@ -61,7 +61,7 @@ class NVLL_Body
             }
         }
 
-        $body = preg_replace("/([0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,})/", "<a href=\"action.php?" . NVLL_Session::getUrlGetSession() . "&amp;action=write&amp;mail_to=\\1\">\\1</a>", $body);
+        $body = preg_replace("/([0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,})/", "<a href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=\\1\">\\1</a>", $body);
         for ($i = 0; $i < $count; $i++) $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
         $body = str_replace($nvllEntities, $htmlEntities, $body);
 

@@ -26,7 +26,7 @@ try {
 
 $num_messages = $pop->num_msg();
 $url_session = NVLL_Session::getUrlGetSession();
-$url = "action.php?{$url_session}";
+$url = "api.php?{$url_session}";
 $user_prefs = NVLL_Session::getUserPrefs();
 $referrer = $_SERVER['HTTP_REFERER'] ?? '';
 // Work out folder and target_folder
@@ -80,8 +80,8 @@ if (isset($_REQUEST['only_one'])) {
     }
 
     $url = $mark_mode === 'unseen' || $mail === 0
-        ? "action.php?{$url_session}"
-        : "action.php?{$url_session}&action=aff_mail&mail={$mail}&verbose={$verbose}&display_images={$display_images}";
+        ? "api.php?{$url_session}"
+        : "api.php?{$url_session}&service=aff_mail&mail={$mail}&verbose={$verbose}&display_images={$display_images}";
 } else {
     $msg_to_forward = '';
     for ($i = $num_messages; $i >= 1; $i--) {
@@ -117,12 +117,12 @@ if (isset($_REQUEST['only_one'])) {
                 }
             }
 
-            $mark_actions = [
+            $mark_services = [
                 'set_flag' => $_REQUEST['mark_mode'] ?? '',
                 'bottom_set_flag' => $_REQUEST['bottom_mark_mode'] ?? ''
             ];
 
-            foreach ($mark_actions as $flag_type => $mode) {
+            foreach ($mark_services as $flag_type => $mode) {
                 if (isset($_REQUEST[$flag_type])) {
                     switch ($mode) {
                         case 'seen':
@@ -145,7 +145,7 @@ if (isset($_REQUEST['only_one'])) {
 
     if ($msg_to_forward != '') {
         $msg_to_forward = substr($msg_to_forward, 1);
-        $url = "action.php?{$url_session}&action=forward&mail={$msg_to_forward}";
+        $url = "api.php?{$url_session}&service=forward&mail={$msg_to_forward}";
     }
 }
 

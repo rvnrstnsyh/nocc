@@ -4,29 +4,20 @@ if (!isset($conf->loaded)) die('Hacking attempt');
 $html_mail = $user_prefs->getSendHtmlMail();
 $has_images = false;
 
-if (isset($content['body'])) {
-  $has_images = NVLL_Security::hasDisabledHtmlImages($content['body']);
-}
+if (isset($content['body'])) $has_images = NVLL_Security::hasDisabledHtmlImages($content['body']);
 
-$display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
 // out-commented: dont allow display_image in edit mode, all user input would be lost
-$req_action = "";
+$display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
 
-if (isset($_REQUEST['action'])) {
-  $req_action = $_REQUEST['action'];
-}
+$service_request = "";
+if (isset($_REQUEST['service'])) $service_request = $_REQUEST['service'];
 
 $req_mail = "";
-
-if (isset($_REQUEST['mail'])) {
-  $req_mail = $_REQUEST['mail'];
-}
+if (isset($_REQUEST['mail'])) $req_mail = $_REQUEST['mail'];
 
 $req_display_images = "";
 
-if (isset($_REQUEST['display_images'])) {
-  $req_display_images = $_REQUEST['display_images'];
-}
+if (isset($_REQUEST['display_images'])) $req_display_images = $_REQUEST['display_images'];
 
 // Default e-mail address on send form
 $mail_from = get_default_from_address();
@@ -38,8 +29,7 @@ $mail_from = get_default_from_address();
     <legend><?php echo strtoupper(convertLang2Html($html_new_msg)); ?></legend>
   </fieldset>
   <!-- If 'file_uploads=Off', we must set formtype to "normal" otherwise it won't work -->
-  <form id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" method="post" onsubmit="return(validate(this));" action="send.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=<?php echo $req_action; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>">
-
+  <form method="POST" action="send.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&service=<?php echo $service_request; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>" id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" onsubmit="return(validate(this));">
     <?php
     if (isset($broken_forwarding) && !($broken_forwarding)) {
       if (isset($forward_msgnum)) { ?>
@@ -59,7 +49,7 @@ $mail_from = get_default_from_address();
 
     <table>
       <?php
-      $isForward = isset($_GET['action']) && $_GET['action'] == 'forward';
+      $isForward = isset($_GET['service']) && $_GET['service'] == 'forward';
       $hasAttachments = isset($_SESSION['nvll_attach_array']) && count($_SESSION['nvll_attach_array']) > 0;
 
       if ($isForward || $hasAttachments): ?>
@@ -119,7 +109,7 @@ $mail_from = get_default_from_address();
       </tr>
       <!-- If 'file_uploads=Off', we mustn't present the ability to do attachments -->
       <?php if (ini_get("file_uploads")) { ?>
-        <?php if (isset($_GET['action']) && $_GET['action'] != 'forward') { ?>
+        <?php if (isset($_GET['service']) && $_GET['service'] != 'forward') { ?>
           <tr>
             <td class="sendLabel"><label for="mail_att"><?php echo $html_att_label ?></label></td>
             <td class="sendData">
@@ -209,7 +199,7 @@ $mail_from = get_default_from_address();
         echo ($html_images_warning);
         echo ('<br/>');
         // out-commented: dont allow display_image in edit mode, all user input would be lost
-        //echo('<a href="action.php?'.NVLL_Session::getUrlGetSession().'&action='.$action.'&mail='.$content['msgnum'].'&verbose='.$verbose.'&display_images=1">'.$html_images_display.'</a>');
+        //echo('<a href="api.php?'.NVLL_Session::getUrlGetSession().'&service='.$service.'&mail='.$content['msgnum'].'&verbose='.$verbose.'&display_images=1">'.$html_images_display.'</a>');
         echo ('</td></tr></div>');
       }
       echo '<tr>'

@@ -1,14 +1,14 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 
-$action = NVLL_Request::getStringValue('action');
+$service = NVLL_Request::getStringValue('service');
 $selected = 0;
-switch ($action) {
+switch ($service) {
   case '':
   case 'login':
   case 'cookie':
     $selected = 1;
-    $line = '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
+    $line = '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&service=compose">' . $html_new_msg . '</a>';
     break;
   case 'compose':
     $selected = 2;
@@ -28,14 +28,14 @@ switch ($action) {
     break;
   case 'managefolders':
     $selected = 3;
-    $line = '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&action=compose">' . $html_new_msg . '</a>';
+    $line = '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&service=compose">' . $html_new_msg . '</a>';
     break;
 }
 ?>
 <div class="mainmenu">
   <ul>
     <?php if ($selected != 1 && $user_prefs->getUseInboxFolder()) { ?>
-      <li><a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_back); ?></a></li>
+      <li><a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_back); ?></a></li>
     <?php } ?>
     <?php if ($selected == 1) echo '<li class="selected">';
     else echo '<li>'; ?>
@@ -48,7 +48,7 @@ switch ($action) {
       $jumpInbox = "&folder=" . $user_prefs->getInboxFolderName();
     }
     ?>
-    <a href="action.php?<?php echo NVLL_Session::getUrlGetSession() . $jumpInbox; ?>"><?php echo convertLang2Html($html_inbox); ?><span class="inbox_changed" style="display:none;color:darkred;">!</span></a>
+    <a href="api.php?<?php echo NVLL_Session::getUrlGetSession() . $jumpInbox; ?>"><?php echo convertLang2Html($html_inbox); ?><span class="inbox_changed" style="display:none;color:darkred;">!</span></a>
     </li>
     <?php if ($selected == 2) echo '<li class="selected">';
     else echo '<li>'; ?>
@@ -57,7 +57,7 @@ switch ($action) {
     <?php if ($_SESSION['is_imap']) { ?>
       <?php if ($selected == 3) echo '<li class="selected">';
       else echo '<li>'; ?>
-      <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=managefolders" title="<?php echo convertLang2Html($html_manage_folders_link); ?>"><?php echo convertLang2Html($html_folders); ?></a>
+      <a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&service=managefolders" title="<?php echo convertLang2Html($html_manage_folders_link); ?>"><?php echo convertLang2Html($html_folders); ?></a>
       </li>
     <?php } ?>
     <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>

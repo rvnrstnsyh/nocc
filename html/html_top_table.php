@@ -15,7 +15,7 @@ $reapply_filters = '';
 
 if ($pop->is_imap()) {
   if ($pop->get_folder_count() > 1) {
-    $folder_line = "<form method=\"post\" action=\"action.php?" . NVLL_Session::getUrlGetSession() . "\"><div><label for=\"folder\">$html_other_folders:</label>  \n";
+    $folder_line = "<form method=\"POST\" action=\"api.php?" . NVLL_Session::getUrlGetSession() . "\"><div><label for=\"folder\">$html_other_folders:</label>  \n";
     //$folder_line .= $pop->html_folder_select('folder', $_SESSION['nvll_folder']);
     $folder_line .= $pop->html_folder_select('folder', $_SESSION['goto_folder']);
     $folder_line .= "<input type=\"submit\" class=\"button\" name=\"submit\" value=\"$html_gotofolder\" />";
@@ -23,7 +23,7 @@ if ($pop->is_imap()) {
   }
 
   if ($_SESSION['nvll_folder'] == 'INBOX') {
-    $reapply_filters = '<form method="post" action="action.php?' . NVLL_Session::getUrlGetSession() . '">
+    $reapply_filters = '<form method="POST" action="api.php?' . NVLL_Session::getUrlGetSession() . '">
       <input type="hidden" name="reapply_filters" value="1">
       <input class="button" type="submit" value="' . $html_reapply_filters . '">
     </form>';
@@ -86,7 +86,7 @@ if ($pop->is_imap()) {
 <?php } ?>
 <div class="messageList">
   <!-- Message list bloc -->
-  <form method="post" action="delete.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" id="delete_form">
+  <form method="POST" action="delete.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" id="delete_form">
     <?php include 'menu_inbox_top_opts.php'; ?>
     <table id="inboxTable">
       <tr>
@@ -133,10 +133,10 @@ if ($pop->is_imap()) {
           if ($_SESSION['nvll_sort'] == $column) echo ' sorted';
           echo '">';
           if ($column_title != '') { //If we have a column title...
-            echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">' . $column_title . '</a>';
+            echo '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">' . $column_title . '</a>';
             if ($_SESSION['nvll_sort'] == $column) {
               echo '&nbsp;';
-              echo '<a href="action.php?' . NVLL_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">';
+              echo '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&sort=' . $column . '&amp;sortdir=' . $new_sortdir . '">';
               echo '  <img src="themes/' . $_SESSION['nvll_theme'] . '/img/' . $arrow . '.png" class="sort" alt="' . $html_sort . '" title="' . $html_sort_by . ' ' . $column_title . '" />';
               echo '</a>';
             }

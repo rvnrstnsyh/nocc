@@ -1,10 +1,10 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
 if ($pop->is_imap() && $conf->prefs_dir) {
-  $action = NVLL_Request::getStringValue('action');
+  $service = NVLL_Request::getStringValue('service');
   $selected = 0;
 
-  switch ($action) {
+  switch ($service) {
     case '':
     case 'setprefs':
       $selected = 1;
@@ -18,11 +18,11 @@ if ($pop->is_imap() && $conf->prefs_dir) {
     <ul>
       <?php if ($selected == 1) echo '<li class="selected">';
       else echo '<li>'; ?>
-      <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=setprefs"><?php echo convertLang2Html($html_preferences) ?></a>
+      <a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&service=setprefs"><?php echo convertLang2Html($html_preferences) ?></a>
       </li>
       <?php if ($selected == 2) echo '<li class="selected">';
       else echo '<li>'; ?>
-      <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&action=filters"><?php echo convertLang2Html($html_manage_filters_link) ?></a>
+      <a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&service=filters"><?php echo convertLang2Html($html_manage_filters_link) ?></a>
       </li>
     </ul>
   </div>

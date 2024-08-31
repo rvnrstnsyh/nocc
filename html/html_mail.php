@@ -57,8 +57,8 @@
       if ($priority != '')  echo '<tr><th class="mailHeaderLabel">' . $html_priority_label . '</th><td class="mailHeaderData">' . $priority . '</td></tr>';
 
       echo '<tr><th class="mailHeaderLabel">' . $html_encoding_label . '</th><td class="mailHeaderData">';
-      echo '<form id="encoding" action="action.php?' . $url_session . '&charset=1' . '" method="POST"><div>';
-      echo '<input type="hidden" name="action" value="' . $_REQUEST['action'] . '"/>';
+      echo '<form method="POST" action="api.php?' . $url_session . '&charset=1' . '" id="encoding"><div>';
+      echo '<input type="hidden" name="service" value="' . $_REQUEST['service'] . '"/>';
       echo '<input type="hidden" name="mail" value="' . $_REQUEST['mail'] . '"/>';
       echo '<input type="hidden" name="verbose" value="' . $_REQUEST['verbose'] . '"/>';
       echo '<select class="button" name="user_charset">';
@@ -103,7 +103,7 @@
   <table class="menu">
     <?php
     // Common URL parameters
-    $commonUrlParams = NVLL_Session::getUrlGetSession() . "&action=aff_mail&display_images=$display_images";
+    $commonUrlParams = NVLL_Session::getUrlGetSession() . "&service=aff_mail&display_images=$display_images";
     $is_html = isset($_REQUEST['as_html']) && $_REQUEST['as_html'] == '1';
     $asHtmlParam = $is_html ? "&as_html=1" : "";
     $verboseParam = "&verbose=$verbose";
@@ -113,19 +113,19 @@
     // Show/hide header link
     if ($conf->use_verbose) {
       if ($verbose == '1') {
-        $headerLink = "<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}$asHtmlParam\">$html_remove_header</a>";
+        $headerLink = "<a href=\"api.php?$commonUrlParams&mail={$content['msgnum']}$asHtmlParam\">$html_remove_header</a>";
         echo "<td class=\"mailSwitchHeaders dontPrint\" style=\"display:flex;\">$headerLink";
       } else {
-        $headerLink = "<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}&verbose=1$asHtmlParam\">$html_view_header</a>";
+        $headerLink = "<a href=\"api.php?$commonUrlParams&mail={$content['msgnum']}&verbose=1$asHtmlParam\">$html_view_header</a>";
         echo "<td class=\"mailSwitchHeaders dontPrint\">$headerLink";
       }
 
       // View as HTML/Plain text link
       if ($content['body_mime'] == 'text/html') {
         if ($is_html || isset($_REQUEST['charset'])) {
-          echo "&nbsp;|&nbsp;<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}$verboseParam\">$html_view_as_plain</a>";
+          echo "&nbsp;|&nbsp;<a href=\"api.php?$commonUrlParams&mail={$content['msgnum']}$verboseParam\">$html_view_as_plain</a>";
         } else {
-          echo "&nbsp;|&nbsp;<a href=\"action.php?$commonUrlParams&mail={$content['msgnum']}&as_html=1$verboseParam\">$html_view_as_html</a>";
+          echo "&nbsp;|&nbsp;<a href=\"api.php?$commonUrlParams&mail={$content['msgnum']}&as_html=1$verboseParam\">$html_view_as_html</a>";
         }
       }
 
@@ -136,11 +136,11 @@
 
     // Next/prev message links
     $prevLink = ($content['prev'] !== '' && $content['prev'] !== 0)
-      ? "<a href=\"action.php?$commonUrlParams&mail={$content['prev']}$asHtmlParam$verboseParam\" title=\"$title_prev_msg\" rel=\"prev\">&laquo; $alt_prev</a>"
+      ? "<a href=\"api.php?$commonUrlParams&mail={$content['prev']}$asHtmlParam$verboseParam\" title=\"$title_prev_msg\" rel=\"prev\">&laquo; $alt_prev</a>"
       : '';
 
     $nextLink = ($content['next'] !== '' && $content['next'] !== 0)
-      ? "<a href=\"action.php?$commonUrlParams&mail={$content['next']}$asHtmlParam$verboseParam\" title=\"$title_next_msg\" rel=\"next\">$alt_next &raquo;</a>"
+      ? "<a href=\"api.php?$commonUrlParams&mail={$content['next']}$asHtmlParam$verboseParam\" title=\"$title_next_msg\" rel=\"next\">$alt_next &raquo;</a>"
       : '';
 
     $separator = ($prevLink && $nextLink) ? '&nbsp;' : '';
@@ -155,7 +155,7 @@
   echo ('<div class="nopic">');
   echo ($html_images_warning);
   echo ('<br/>');
-  echo ('<a href="action.php?' . $url_session . '&action=aff_mail&mail=' . $content['msgnum'] . '&verbose=' . $verbose . '&as_html=1&display_images=1">' . $html_images_display . '</a>');
+  echo ('<a href="api.php?' . $url_session . '&service=aff_mail&mail=' . $content['msgnum'] . '&verbose=' . $verbose . '&as_html=1&display_images=1">' . $html_images_display . '</a>');
   echo ('</div>');
 }
 if ($content['spam']) echo ('<div class="spamWarning">' . $html_spam_warning . '</div>'); ?>

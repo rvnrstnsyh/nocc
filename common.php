@@ -56,7 +56,7 @@ $conf->nvll_version = '1.9.15-dev';
 $conf->nvll_url = 'https://nvll.me';
 
 $pwd_to_encrypt = false;
-if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'login') {
+if (isset($_REQUEST['service']) && $_REQUEST['service'] == 'login') {
     $pwd_to_encrypt = true;
 }
 

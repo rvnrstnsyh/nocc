@@ -44,7 +44,7 @@ $query_str = NVLL_Session::getUrlQuery();
   <script type="text/javascript">
     function prompt_delete (email, id) {
       if (confirm("<?php echo unhtmlentities($html_delete) ?> `" + email + "' <?php echo unhtmlentities($html_contact_del) ?> ?")) {
-        var url = '<?php echo "contacts_manager.php?" . $query_str . "&" . NVLL_Session::getUrlGetSession() ?>&action=delete&id=' + id;
+        var url = '<?php echo "contacts_manager.php?" . $query_str . "&" . NVLL_Session::getUrlGetSession() ?>&service=delete&id=' + id;
         document.location.href = url;
       }
     }
@@ -69,8 +69,8 @@ $query_str = NVLL_Session::getUrlQuery();
     exit;
 }
 
-$action = isset($_GET['action']) ? $_GET['action'] : '';
-switch ($action) {
+$service = isset($_GET['service']) ? $_GET['service'] : '';
+switch ($service) {
     case "add_prompt":
         if (isset($_GET['id'])) {
             //$tab = array_pad(explode("\t", $contacts[$_GET['id']]), -4, "");
@@ -78,7 +78,7 @@ switch ($action) {
         } ?>
 
     <div class="contactAdd">
-        <form id="form2" method="post" action="<?php echo "contacts_manager.php?" . NVLL_Session::getUrlGetSession() . "&" . $query_str ?>&amp;action=add">
+        <form id="form2" method="POST" action="<?php echo "contacts_manager.php?" . NVLL_Session::getUrlGetSession() . "&" . $query_str ?>&amp;service=add">
             <table>
                 <tr>
                 <td colspan="2" class="contactsTitle">
@@ -344,10 +344,10 @@ switch ($action) {
             NVLL_Contacts::create_rulers($contacts, $ruler_top, $ruler_listonly, $all_rulers, $count2list, $show_lists_only);
         }
         if (count($contacts) < $conf->contact_number_max) {
-            echo '<form id="addlistForm" method="post" action="contacts_manager.php?' . NVLL_Session::getUrlGetSession() . '&action=addlist">';
+            echo '<form id="addlistForm" method="POST" action="contacts_manager.php?' . NVLL_Session::getUrlGetSession() . '&service=addlist">';
             echo '<p class="contactsAddLink">';
             echo '<input class="button" type="textbox" name="listname" id="listname" value="" /><input class="button" type="submit" name="addlist" id="addlist" value="' . convertLang2Html($html_contact_list_add) . '" onclick="return check_list(\'listname\');" />';
-            echo '<a style="padding-left:100px;" href="contacts_manager.php?action=add_prompt&amp;' . $query_str . '&' . NVLL_Session::getUrlGetSession() . '">' . convertLang2Html($html_contact_add) . '</a>';
+            echo '<a style="padding-left:100px;" href="contacts_manager.php?service=add_prompt&amp;' . $query_str . '&' . NVLL_Session::getUrlGetSession() . '">' . convertLang2Html($html_contact_add) . '</a>';
         }
         else {
             echo '<p class="contactsAddLink">';
@@ -417,7 +417,7 @@ switch ($action) {
                     <td><?php echo ($tab[2]) ? htmlspecialchars($tab[2], ENT_COMPAT | ENT_SUBSTITUTE) : "&nbsp;"; ?></td>
                     <td><?php echo htmlspecialchars($tab[3], ENT_COMPAT | ENT_SUBSTITUTE); ?></td>
                     <td>
-                    <input type="button" name="Submit5" value="<?php echo $html_modify ?>" class="button" onclick="self.location.href='<?php echo "contacts_manager.php?" . NVLL_Session::getUrlGetSession() . "&" . $query_str ?>&amp;action=add_prompt&amp;id=<?php echo $i ?>&amp;modif=1'"/>
+                    <input type="button" name="Submit5" value="<?php echo $html_modify ?>" class="button" onclick="self.location.href='<?php echo "contacts_manager.php?" . NVLL_Session::getUrlGetSession() . "&" . $query_str ?>&amp;service=add_prompt&amp;id=<?php echo $i ?>&amp;modif=1'"/>
                     </td>
                     <td>
                     <input type="button" name="Submit" value="<?php echo $html_delete ?>" class="button" onclick="prompt_delete ('<?php echo ($tab[5] == 0) ? $tab[3] : $tab[1]; ?>', <?php echo $i ?>)"/>
@@ -430,7 +430,7 @@ switch ($action) {
   <p class="contactsAddLink">
     <?php if (count($contacts) < $conf->contact_number_max) {
             // echo '<input class="button" type="textbox" name="listname2" id="listname2" value="" /><input class="button" type="submit" name="addlist2" id="addlist2" value="' . convertLang2Html($html_contact_list_add) . '" onclick="return check_list(\'listname2\');" />';
-            // echo '<a style="padding-left:100px;" href="contacts_manager.php?action=add_prompt&amp;' . $query_str . '&' . NVLL_Session::getUrlGetSession() . '">' . convertLang2Html($html_contact_add) . '</a></p>';
+            // echo '<a style="padding-left:100px;" href="contacts_manager.php?service=add_prompt&amp;' . $query_str . '&' . NVLL_Session::getUrlGetSession() . '">' . convertLang2Html($html_contact_add) . '</a></p>';
         } else {
             echo i18n_message($html_contact_err1, $conf->contact_number_max) . convertLang2Html($html_contact_err2) . '</p>';
         }

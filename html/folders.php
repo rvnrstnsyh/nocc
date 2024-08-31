@@ -24,9 +24,9 @@ if (count($big_list) > 1) {
   <fieldset>
     <legend><?php echo strtoupper(convertLang2Html($html_folders)); ?></legend>
   </fieldset>
-  <form method="post" action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" accept-charset="UTF-8">
+  <form method="POST" action="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" accept-charset="UTF-8">
     <div>
-      <input type="hidden" name="action" value="managefolders" />
+      <input type="hidden" name="service" value="managefolders" />
       <input type="hidden" name="submit_folders" value="1" />
       <table>
         <tr>
@@ -89,7 +89,7 @@ if (count($big_list) > 1) {
       <p class="prefsSubmitButtonsLeft">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save_selected) ?>" />
         &nbsp;&nbsp;
-        <a href="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
+        <a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="button" class="button" name="sendaction" value="<?php echo convertLang2Html($html_cancel) ?>" />
         </a>
       </p>

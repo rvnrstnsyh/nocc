@@ -19,7 +19,7 @@ if (isset($_REQUEST['_vmbox']) && $_REQUEST['_vmbox'] == "RSS") {
 }
 
 if (isset($_SESSION['restart_session']) && $_SESSION['restart_session'] == true) {
-  header("Location: " . $conf->base_url . "action.php?" . NVLL_Session::getUrlGetSession());
+  header("Location: " . $conf->base_url . "api.php?" . NVLL_Session::getUrlGetSession());
   exit();
 }
 
@@ -27,11 +27,11 @@ require_once './utils/check.php';
 require './html/header.php';
 ?>
 
-<form action="action.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" method="POST" id="nvll_webmail_login" accept-charset="UTF-8">
+<form method="POST" action="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" id="nvll_webmail_login" accept-charset="UTF-8">
   <div id="loginBox">
     <h2><?php echo i18n_message($html_welcome, $conf->nvll_name); ?></h2>
+    <input type="hidden" name="service" value="login" />
     <input type="hidden" name="folder" value="INBOX" />
-    <input type="hidden" name="action" value="login" />
     <table>
       <tr>
         <th><label for="user"><?php echo $html_user_label; ?></label></th>

@@ -34,8 +34,8 @@ class NVLL_BodyTest extends PHPUnit\Framework\TestCase
                         * <a href="http://nvll.sf.net/" target="_blank">NVLL</a>
                         * <A href="http://nvll.sf.net/?lang=de" target="_blank">NVLL German</A>
                         * <a href="http://nvll.sourceforge.net/docs/changelog.php" target="_blank">NVLL ChangeLog</a>
-                        * <a href="action.php?_vmbox=NVLLSESSID&amp;action=write&amp;mail_to=nvll-discuss@lists.sourceforge.net">Mailing list</a>
-                        * <A href="action.php?_vmbox=NVLLSESSID&amp;action=write&amp;mail_to=nvll-discuss@lists.sourceforge.net">Mailing list</A>';
+                        * <a href="api.php?_vmbox=NVLLSESSID&amp;service=compose&amp;mail_to=nvll-discuss@lists.sourceforge.net">Mailing list</a>
+                        * <A href="api.php?_vmbox=NVLLSESSID&amp;service=compose&amp;mail_to=nvll-discuss@lists.sourceforge.net">Mailing list</A>';
 
                 $this->assertEquals($expected, NVLL_Body::prepareHtmlLinks($actual, 'http://localhost/retrmail/'));
         }
@@ -72,8 +72,8 @@ class NVLL_BodyTest extends PHPUnit\Framework\TestCase
                         * &lt;<a href="http://nvll.sf.net/" target="_blank">http://nvll.sf.net/</a>&gt;
                         * &lt;&lt;<a href="http://nvll.sf.net/" target="_blank">http://nvll.sf.net/</a>&gt;&gt;
                         * [<a href="http://nvll.sf.net/" target="_blank">http://nvll.sf.net/</a>]
-                        * <a href="action.php?_vmbox=NVLLSESSID&amp;action=write&amp;mail_to=nvll-discuss@lists.sourceforge.net">nvll-discuss@lists.sourceforge.net</a>
-                        * &lt;<a href="action.php?_vmbox=NVLLSESSID&amp;action=write&amp;mail_to=nvll-discuss@lists.sourceforge.net">nvll-discuss@lists.sourceforge.net</a>&gt;';
+                        * <a href="api.php?_vmbox=NVLLSESSID&amp;service=compose&amp;mail_to=nvll-discuss@lists.sourceforge.net">nvll-discuss@lists.sourceforge.net</a>
+                        * &lt;<a href="api.php?_vmbox=NVLLSESSID&amp;service=compose&amp;mail_to=nvll-discuss@lists.sourceforge.net">nvll-discuss@lists.sourceforge.net</a>&gt;';
 
                 $this->assertEquals($expected, NVLL_Body::prepareTextLinks($actual, 'http://localhost/retrmail/'));
         }

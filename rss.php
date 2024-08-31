@@ -104,7 +104,7 @@ while ($tmp = array_shift($tab_mail)) { //for all mails...
     $rssfeeditem->setDescription($rssDescription);
     $rssfeeditem->setTimestamp($content['timestamp']);
     $rssfeeditem->setContent($rssContent);
-    $rssfeeditem->setLink($conf->base_url . 'action.php?' . NVLL_Session::getUrlGetSession() . '&amp;action=aff_mail&amp;mail=' . $tmp['number'] . '&amp;verbose=0&amp;rss=true');
+    $rssfeeditem->setLink($conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession() . '&amp;service=aff_mail&amp;mail=' . $tmp['number'] . '&amp;verbose=0&amp;rss=true');
     $rssfeeditem->setCreator(htmlspecialchars($tmp['from'], ENT_COMPAT | ENT_SUBSTITUTE));
     $rssfeed->addItem($rssfeeditem);
   } catch (Exception $ex) {

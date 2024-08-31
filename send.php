@@ -58,7 +58,7 @@ if (!isset($_SESSION['nvll_loggedin'])) {
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     clear_attachments();
     require_once './utils/proxy.php';
-    header('Location: ' . $conf->base_url . 'action.php?' . NVLL_Session::getUrlGetSession());
+    header('Location: ' . $conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession());
     return;
 }
 require_once './classes/NVLL_MIME.php';
@@ -76,17 +76,15 @@ if (NVLL_Session::getSendHtmlMail()) {
 switch ($_REQUEST['sendaction']) {
     case unhtmlentities($html_attach):
         // Counting the attachments number in the array
-        if (!isset($_SESSION['nvll_attach_array']))
-            $_SESSION['nvll_attach_array'] = array();
-        $attach_array = $_SESSION['nvll_attach_array'];
+        if (!isset($_SESSION['nvll_attach_array'])) $_SESSION['nvll_attach_array'] = array();
 
+        $attach_array = $_SESSION['nvll_attach_array'];
         //TODO: Check if "$conf->tmpdir" exists?
         $tmpFile = $conf->tmpdir . '/' . basename($mail_att['tmp_name'] . md5(uniqid(rand(), true)) . '.att');
 
         // Adding the new file to the array
         if (@move_uploaded_file($mail_att['tmp_name'], $tmpFile)) {
             $attachedFile = new NVLL_AttachedFile($tmpFile, basename($mail_att['name']), $mail_att['size'], $mail_att['type']);
-
             $attach_array[] = $attachedFile;
         } else {
             $ev = new NVLL_Exception($html_file_upload_attack);
@@ -118,13 +116,14 @@ switch ($_REQUEST['sendaction']) {
         $mail_body = "";
         $mail_receipt = "";
         $mail_priority = "";
+
         if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
             unset($_SESSION['send_backup']);
         }
-        clear_attachments();
 
+        clear_attachments();
         require_once './utils/proxy.php';
-        header('Location: ' . $conf->base_url . 'action.php?' . NVLL_Session::getUrlGetSession());
+        header('Location: ' . $conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession());
 
         //require './html/header.php';
         //require './html/menu_inbox.php';
@@ -145,18 +144,19 @@ switch ($_REQUEST['sendaction']) {
         $mail->priority = $_REQUEST['priority'];
         $mail->receipt = isset($_REQUEST['receipt']);
         $mail->headers = '';
+
         if (!empty($_REQUEST['mail_messageid'])) {
             $mail->headers .= 'References: ' . urldecode($_REQUEST['mail_messageid']) . $mail->crlf;
             $mail->headers .= 'In-Reply-To: ' . urldecode($_REQUEST['mail_messageid']) . $mail->crlf;
         }
+
         $mail->headers .= 'User-Agent: ' . $conf->nvll_name . ' <' . $conf->nvll_url . '>';
         $mail->to = cut_address(trim($mail_to), 'UTF-8');
         $mail->cc = cut_address(trim($mail_cc), 'UTF-8');
         $mail->bcc = cut_address(trim($mail_bcc), 'UTF-8');
         $user_prefs = NVLL_Session::getUserPrefs();
-        if ($user_prefs->getBccSelf()) {
-            array_unshift($mail->bcc, $mail->from);
-        }
+
+        if ($user_prefs->getBccSelf()) array_unshift($mail->bcc, $mail->from);
 
         if ($user_prefs->getCollect() == 1 || $user_prefs->getCollect() == 3) {
             require_once './classes/NVLL_Contacts.php';
@@ -165,9 +165,8 @@ switch ($_REQUEST['sendaction']) {
             $contacts_object = new NVLL_Contacts();
             $all_to = $mail_to . ";" . $mail_cc . ";" . $mail_bcc;
             $contacts = $contacts_object->add_contact($path, $all_to);
-            if (count($contacts) <= $conf->contact_number_max) {
-                $contacts_object->saveList($path, $contacts, $conf, $ev);
-            }
+
+            if (count($contacts) <= $conf->contact_number_max) $contacts_object->saveList($path, $contacts, $conf, $ev);
             //ignore exception as emails should be send anyways
         }
 
@@ -180,10 +179,11 @@ switch ($_REQUEST['sendaction']) {
         // Wrap outgoing message if needed
         $wrap_msg = $user_prefs->getWrapMessages();
         if ($mail_body != '') {
-            if ($wrap_msg)
+            if ($wrap_msg) {
                 $mail->body = wrap_outgoing_msg($mail_body, $wrap_msg, $mail->crlf);
-            else
+            } else {
                 $mail->body = $mail_body;
+            }
         }
 
         if (isset($conf->ad)) {
@@ -235,9 +235,7 @@ switch ($_REQUEST['sendaction']) {
             $mail_list = explode('$', $_REQUEST['forward_msgnum']);
             for ($msg_num = 0; $msg_num < count($mail_list); $msg_num++) {
                 $forward_msgnum = $mail_list[$msg_num];
-
                 $origmsg = $pop->fetchmessage($forward_msgnum);
-
                 // Attach it
                 //TODO: Move filename to a own variable!
                 if (count($mail_list) == 1) {
@@ -282,7 +280,7 @@ switch ($_REQUEST['sendaction']) {
             clear_attachments();
             // Redirect user to inbox
             require_once './utils/proxy.php';
-            header("Location: " . $conf->base_url . "action.php?successfulsend=true&" . NVLL_Session::getUrlGetSession());
+            header("Location: " . $conf->base_url . "api.php?successfulsend=true&" . NVLL_Session::getUrlGetSession());
         }
         break;
 
@@ -290,6 +288,7 @@ switch ($_REQUEST['sendaction']) {
         // Rebuilding the attachments array with only the files the user wants to keep
         $tmp_array = array();
         $attach_array = $_SESSION['nvll_attach_array'];
+
         for ($i = 0; $i < count($attach_array); $i++) {
             $attachedFile = $attach_array[$i];
             if (!isset($_REQUEST['file-' . $i])) {
