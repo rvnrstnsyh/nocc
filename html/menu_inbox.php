@@ -62,7 +62,7 @@ switch ($service) {
     <?php } ?>
     <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
       <li>
-        <a href="javascript:void(0);" onclick="window.open('contacts_manager.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo i18n_message($html_contacts, ''); ?></a>
+        <a href="javascript:void(0);" onclick="window.open('contacts_manager.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes, resizable=yes, width=700, height=350')"><?php echo i18n_message($html_contacts, ''); ?></a>
       </li>
     <?php } ?>
     <?php if (isset($_GET['successfulsend']) && $_GET['successfulsend']) { ?>

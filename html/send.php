@@ -79,7 +79,7 @@ $mail_from = get_default_from_address();
         <td class="sendData">
           <input class="button" type="text" name="mail_to" id="mail_to" size="60" value="<?php echo (isset($mail_to) ? stripslashes(htmlspecialchars($mail_to, ENT_COMPAT | ENT_SUBSTITUTE)) : ''); ?>" />
           <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
-            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_to&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
+            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_to&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes, resizable=yes, width=700, height=350')"><?php echo $html_select_contacts ?></a>
           <?php } ?>
         </td>
       </tr>
@@ -88,7 +88,7 @@ $mail_from = get_default_from_address();
         <td class="sendData">
           <input class="button" type="text" name="mail_cc" id="mail_cc" size="60" value="<?php echo (isset($mail_cc) ? htmlspecialchars($mail_cc, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?>" />
           <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
-            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_cc&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
+            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_cc&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes, resizable=yes, width=700, height=350')"><?php echo $html_select_contacts ?></a>
           <?php } ?>
         </td>
       </tr>
@@ -97,7 +97,7 @@ $mail_from = get_default_from_address();
         <td class="sendData">
           <input class="button" type="text" name="mail_bcc" id="mail_bcc" size="60" value="<?php echo (isset($mail_bcc) ? htmlspecialchars($mail_bcc, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?>" />
           <?php if ($conf->prefs_dir && isset($conf->contact_number_max) && $conf->contact_number_max != 0) { ?>
-            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_bcc&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes,resizable=yes,width=900,height=400')"><?php echo $html_select_contacts ?></a>
+            <a href="javascript:void(0);" onclick="window.open('contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&field=mail_bcc&amp;<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes, resizable=yes, width=700, height=350')"><?php echo $html_select_contacts ?></a>
           <?php } ?>
         </td>
       </tr>
