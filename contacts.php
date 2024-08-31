@@ -24,12 +24,12 @@ try {
   require './html/footer.php';
   exit;
 }
+
 $pop->close();
-
 $theme = new NVLL_Theme($_SESSION['nvll_theme']);
-
 $_SESSION['nvll_loggedin'] = 1;
 ?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo $lang ?>" lang="<?php echo $lang ?>">
 
@@ -39,15 +39,15 @@ $_SESSION['nvll_loggedin'] = 1;
   <link href="<?php echo $theme->getFavicon(); ?>" rel="shortcut icon" type="image/x-icon" />
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
   <script type="text/javascript">
-    <!--
     function toggleemail(bt, email) {
       var field = window.opener.document.getElementById("sendform").<?php echo $_GET['field']; ?>.value;
 
       if (bt.value == '<?php echo unhtmlentities($html_add) ?>') {
-        if (field == '')
+        if (field == '') {
           window.opener.document.getElementById("sendform").<?php echo $_GET['field']; ?>.value = email;
-        else
+        } else {
           window.opener.document.getElementById("sendform").<?php echo $_GET['field']; ?>.value = field + "; " + email;
+        }
       } else {
         //var f = '';
         //tbl = field.split("; ");
@@ -72,8 +72,6 @@ $_SESSION['nvll_loggedin'] = 1;
       else
         bt.value = '<?php echo unhtmlentities($html_add) ?>';
     }
-    //
-    -->
   </script>
 </head>
 
@@ -81,8 +79,7 @@ $_SESSION['nvll_loggedin'] = 1;
   <?php
   // By default display user contacts
   if (empty($_REQUEST['is_ldap'])) {
-    if (!isset($conf->contact_number_max) || $conf->contact_number_max == 0) {
-  ?>
+    if (!isset($conf->contact_number_max) || $conf->contact_number_max == 0) { ?>
       <div class="error">
         <table class="errorTable">
           <tr class="errorTitle">
@@ -95,8 +92,7 @@ $_SESSION['nvll_loggedin'] = 1;
           </tr>
         </table>
       </div>
-    <?php
-      exit;
+    <?php exit;
     }
   }
   if ($conf->contact_ldap === true) {
@@ -137,8 +133,7 @@ $_SESSION['nvll_loggedin'] = 1;
 
     <?php
     // enable/disable search input
-    if ((!empty($_REQUEST['is_ldap'])) && (!empty($conf->contact_ldap_options['search']))) {
-    ?>
+    if ((!empty($_REQUEST['is_ldap'])) && (!empty($conf->contact_ldap_options['search']))) { ?>
       <div id="contact_search">
         <form action="contacts.php?<?php echo NVLL_Session::getUrlGetSession(); ?>">
           <input type="hidden" name="is_ldap" value="1" />
@@ -146,8 +141,6 @@ $_SESSION['nvll_loggedin'] = 1;
           <?php
           // print search by ... select box
           if (!empty($conf->contact_ldap_options['search_options']) && is_array($conf->contact_ldap_options['search_options'])) {
-
-
             // open select box
             $output_search_options = '<select name="search_field">';
 
@@ -173,12 +166,8 @@ $_SESSION['nvll_loggedin'] = 1;
           <button type="submit" value="<?php echo $html_search ?>"><span><?php echo $html_search ?></span></button>
         </form>
       </div>
-
-
-  <?php
-    }
-  }
-  ?>
+  <?php }
+  } ?>
   <div class="contactsList">
     <p class="contactsTitle">
       <?php echo i18n_message($html_contact_list, $_SESSION['nvll_user']); ?>
@@ -206,100 +195,95 @@ $_SESSION['nvll_loggedin'] = 1;
       ?>
 
       <?php
+      function generateRulerLinks($show_lists_only, $field, $sessionUrl, $html_contact_all, $html_contact_listonly)
+      {
+        $ruler_listonly = $show_lists_only
+          ? '-<a href="contacts.php?' . $sessionUrl . '&field=' . $field . '">&nbsp;&nbsp;' . convertLang2Html($html_contact_all) . '&nbsp;&nbsp;</a>'
+          : '-<a href="contacts.php?' . $sessionUrl . '&field=' . $field . '&listonly=1">&nbsp;&nbsp;' . convertLang2Html($html_contact_listonly) . '&nbsp;&nbsp;</a>';
+
+        return $ruler_listonly;
+      }
+
+      function generateEmailShow($tab, &$list_string)
+      {
+        if ($tab[5] == 1) {
+          $all_emails = array();
+          semisplit_address_list($tab[3], $all_emails, ';');
+          $list_count = min(3, count($all_emails));
+          $email_show = implode('; ', array_slice($all_emails, 0, $list_count));
+          if (count($all_emails) >= 3) {
+            $email_show .= '; ...';
+          }
+          $list_string = preg_replace('/"/', '\"', $tab[3]);
+        } else {
+          $email_show = $tab[3];
+          $list_string = '';
+        }
+        return $email_show;
+      }
+
       if (empty($_REQUEST['is_ldap'])) {
-        $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
+        $userKey = preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey());
+        $path = $conf->prefs_dir . '/' . $userKey . '.contacts';
         $contacts = NVLL_Contacts::loadList($path);
-        $show_lists_only = false;
-        if (isset($_GET['listonly']) && $_GET['listonly'] == 1) {
-          $show_lists_only = true;
-        }
-        if (count($contacts) <= 10) {
+        $contactCount = count($contacts);
+        $show_lists_only = !empty($_GET['listonly']) && $_GET['listonly'] == 1;
+
+        if ($contactCount <= 10) {
           echo $header;
-        }
-        if (count($contacts) > 10) {
+        } else {
           $count2list = array();
           $all_rulers = array();
           $ruler_top = '<a href="#top">&nbsp;&nbsp;' . convertLang2Html($html_contact_ruler_top) . '&nbsp;&nbsp;</a>-';
-          if ($show_lists_only) {
-            $ruler_listonly = '-<a href="contacts.php?' . NVLL_Session::getUrlGetSession() . '&field=' . $_GET['field'] . '">&nbsp;&nbsp;' . convertLang2Html($html_contact_all) . '&nbsp;&nbsp;</a>';
-          } else {
-            $ruler_listonly = '-<a href="contacts.php?' . NVLL_Session::getUrlGetSession() . '&field=' . $_GET['field'] . '&listonly=1">&nbsp;&nbsp;' . convertLang2Html($html_contact_listonly) . '&nbsp;&nbsp;</a>';
-          }
+          $sessionUrl = NVLL_Session::getUrlGetSession();
+          $ruler_listonly = generateRulerLinks($show_lists_only, $_GET['field'], $sessionUrl, $html_contact_all, $html_contact_listonly);
           NVLL_Contacts::create_rulers($contacts, $ruler_top, $ruler_listonly, $all_rulers, $count2list, $show_lists_only);
         }
 
         $ruler_count = 0;
-        for ($i = 0; $i < count($contacts); ++$i) {
-          //$tab = explode("\t", $contacts[$i]);
-          $tab = $contacts[$i];
-          if (count($contacts) > 10) {
-            if (isset($count2list[strval($i)])) {
-              echo $all_rulers[$ruler_count];
-              $ruler_count++;
-              echo $header;
-            }
+        foreach ($contacts as $i => $tab) {
+          $email_show = '';
+          $list_string = '';
+          if ($contactCount > 10 && isset($count2list[strval($i)])) {
+            echo $all_rulers[$ruler_count++];
+            echo $header;
           }
-          if ($tab[5] == 1 || ! $show_lists_only) {
-            $email_show = '';
-            if ($tab[5] == 1) {
-              //its a list of emails
-              $all_emails = array();
-              semisplit_address_list($tab[3], $all_emails, $sep = ';');
-              $list_count = min(3, count($all_emails));
-              for ($j = 0; $j < $list_count; $j++) {
-                $j == 0 ? $email_show = $all_emails[$j] : $email_show = $email_show . '; ' . $all_emails[$j];
-              }
-              if (count($all_emails) >= 3) {
-                $email_show = $email_show . '; ...';
-              }
-              $list_string = preg_replace('/"/', '\"', $tab[3]);
-            } else {
-              $email_show = $tab[3];
-            }
-            if ($lang_dir === 'ltr') {
 
-      ?>
-              <tr class="<?php echo ($i % 2) ? "contactsListEven" : "contactsListOdd" ?>">
-                <td class="contactNameFirst"><?php echo ($tab[0]) ? htmlspecialchars($tab[0], ENT_COMPAT | ENT_SUBSTITUTE) : "&nbsp;"; ?></td>
-                <td class="contactNameLast"><?php echo ($tab[1]) ? htmlspecialchars($tab[1], ENT_COMPAT | ENT_SUBSTITUTE) : "&nbsp;"; ?></td>
-                <td class="contactNickname"><?php echo ($tab[2]) ? htmlspecialchars($tab[2], ENT_COMPAT | ENT_SUBSTITUTE) : "&nbsp;"; ?></td>
-                <td class="contactEmail"><?php echo htmlspecialchars($email_show, ENT_COMPAT | ENT_SUBSTITUTE); ?></td>
-                <td><input type="button" name="Submit" id="<?php echo 'btn' . $i ?>" value="<?php echo unhtmlentities($html_add) ?>" class="button" onclick='toggleemail(document.getElementById("<?php echo 'btn' . $i ?>"),"<?php if ($tab[5] == 1) {
-                                                                                                                                                                                                                            $out = $list_string;
-                                                                                                                                                                                                                          } else {
-                                                                                                                                                                                                                            if (strlen(trim($tab[0])) > 0 || strlen(trim($tab[1])) > 0) {
-                                                                                                                                                                                                                              $out = "\\\"" . trim(trim($tab[0]) . " " . trim($tab[1])) . "\\\" <" . trim($tab[3]) . ">";
-                                                                                                                                                                                                                            } else if (strlen(trim($tab[2])) > 0) {
-                                                                                                                                                                                                                              $out = "\\\"" . trim($tab[2]) . "\\\" <" . trim($tab[3]) . ">";
-                                                                                                                                                                                                                            } else {
-                                                                                                                                                                                                                              $out = trim($tab[3]);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                          };
-                                                                                                                                                                                                                          echo $out; ?>");toggle(document.getElementById("<?php echo 'btn' . $i ?>"));' /></td>
-              </tr>
+          if ($tab[5] == 1 || !$show_lists_only) {
+            $email_show = generateEmailShow($tab, $list_string);
+            $rowClass = ($i % 2) ? "contactsListEven" : "contactsListOdd";
+            $nameFirst = htmlspecialchars($tab[0] ?? "&nbsp;", ENT_COMPAT | ENT_SUBSTITUTE);
+            $nameLast = htmlspecialchars($tab[1] ?? "&nbsp;", ENT_COMPAT | ENT_SUBSTITUTE);
+            $nickname = htmlspecialchars($tab[2] ?? "&nbsp;", ENT_COMPAT | ENT_SUBSTITUTE);
+            $emailShow = htmlspecialchars($email_show, ENT_COMPAT | ENT_SUBSTITUTE);
+            $buttonValue = unhtmlentities($html_add);
+            $buttonId = 'btn' . $i;
 
-            <?php } else { ?>
+            $output = $tab[5] == 1
+              ? "\\\"" . trim($tab[0] . " " . $tab[1]) . "\\\" <" . trim($tab[3]) . ">"
+              : (strlen(trim($tab[0])) > 0 || strlen(trim($tab[1])) > 0
+                ? "\\\"" . trim($tab[0] . " " . $tab[1]) . "\\\" <" . trim($tab[3]) . ">"
+                : (strlen(trim($tab[2])) > 0
+                  ? "\\\"" . trim($tab[2]) . "\\\" <" . trim($tab[3]) . ">"
+                  : trim($tab[3])
+                )
+              );
 
-              <tr class="<?php echo ($i % 2) ? "contactsListEven" : "contactsListOdd" ?>">
-                <td><input type="button" name="Submit" id="<?php echo 'btn' . $i ?>" value="<?php echo unhtmlentities($html_add) ?>" class="button" onclick='toggleemail(document.getElementById("<?php echo 'btn' . $i ?>"),"<?php if ($tab[5] == 1) {
-                                                                                                                                                                                                                            $out = $list_string;
-                                                                                                                                                                                                                          } else {
-                                                                                                                                                                                                                            if (strlen(trim($tab[0])) > 0 || strlen(trim($tab[1])) > 0) {
-                                                                                                                                                                                                                              $out = "\\\"" . trim(trim($tab[0]) . " " . trim($tab[1])) . "\\\" <" . trim($tab[3]) . ">";
-                                                                                                                                                                                                                            } else if (strlen(trim($tab[2])) > 0) {
-                                                                                                                                                                                                                              $out = "\\\"" . trim($tab[2]) . "\\\" <" . trim($tab[3]) . ">";
-                                                                                                                                                                                                                            } else {
-                                                                                                                                                                                                                              $out = trim($tab[3]);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                          };
-                                                                                                                                                                                                                          echo $out; ?>");toggle(document.getElementById("<?php echo 'btn' . $i ?>"));' /></td>
-                <td class="contactEmail"><?php echo htmlspecialchars($email_show, ENT_COMPAT | ENT_SUBSTITUTE); ?></td>
-                <td class="contactNickname"><?php echo ($tab[2]) ? htmlspecialchars($tab[2], ENT_COMPAT | ENT_SUBSTITUTE) : "&nbsp;"; ?></td>
-                <td class="contactNameLast"><?php echo ($tab[1]) ? htmlspecialchars($tab[1], ENT_COMPAT | ENT_SUBSTITUTE) : "&nbsp;"; ?></td>
-                <td class="contactNameFirst"><?php echo ($tab[0]) ? htmlspecialchars($tab[0], ENT_COMPAT | ENT_SUBSTITUTE) : "&nbsp;"; ?></td>
-              </tr>
-              <?php
-            }
+            echo $lang_dir === 'ltr'
+              ? "<tr class=\"$rowClass\">
+                        <td class=\"contactNameFirst\">$nameFirst</td>
+                        <td class=\"contactNameLast\">$nameLast</td>
+                        <td class=\"contactNickname\">$nickname</td>
+                        <td class=\"contactEmail\">$emailShow</td>
+                        <td><input type=\"button\" name=\"Submit\" id=\"$buttonId\" value=\"$buttonValue\" class=\"button\" onclick='toggleemail(document.getElementById(\"$buttonId\"),\"$output\");toggle(document.getElementById(\"$buttonId\"));' /></td>
+                    </tr>"
+              : "<tr class=\"$rowClass\">
+                        <td><input type=\"button\" name=\"Submit\" id=\"$buttonId\" value=\"$buttonValue\" class=\"button\" onclick='toggleemail(document.getElementById(\"$buttonId\"),\"$output\");toggle(document.getElementById(\"$buttonId\"));' /></td>
+                        <td class=\"contactEmail\">$emailShow</td>
+                        <td class=\"contactNickname\">$nickname</td>
+                        <td class=\"contactNameLast\">$nameLast</td>
+                        <td class=\"contactNameFirst\">$nameFirst</td>
+                    </tr>";
           }
         }
       } else {
@@ -321,14 +305,10 @@ $_SESSION['nvll_loggedin'] = 1;
           }
 
           // Add different port to host, if available
-          if (!empty($conf->contact_ldap_options['port'])) {
-            $contact_host .= ':' . $conf->contact_ldap_options['port'];
-          }
+          if (!empty($conf->contact_ldap_options['port'])) $contact_host .= ':' . $conf->contact_ldap_options['port'];
 
           // convert attributes to array, if not already one
-          if (!is_array($conf->contact_ldap_options['attributes'])) {
-            $conf->contact_ldap_options['attributes'] = explode(',', $conf->contact_ldap_options['attributes']);
-          }
+          if (!is_array($conf->contact_ldap_options['attributes'])) $conf->contact_ldap_options['attributes'] = explode(',', $conf->contact_ldap_options['attributes']);
 
           if (!empty($conf->contact_ldap_options['suffix'])) {
             $contact_suffix = '@' . $conf->contact_ldap_options['suffix'];
@@ -388,7 +368,15 @@ $_SESSION['nvll_loggedin'] = 1;
 
           // Sort LDAP search by:
           if (!empty($conf->contact_ldap_options['search_sortby'])) {
-            ldap_sort($contact_connection, $contact_search, $conf->contact_ldap_options['search_sortby']);
+            $contact_search = ldap_search($contact_connection, $dn, $filter, $attributes);
+            $entries = ldap_get_entries($contact_connection, $contact_search);
+
+            if ($entries['count'] > 0) {
+              usort($entries, function ($a, $b) use ($conf) {
+                $field = $conf->contact_ldap_options['search_sortby'];
+                return strcmp($a[$field][0], $b[$field][0]);
+              });
+            }
           }
 
           // LDAP get the data
@@ -420,9 +408,7 @@ $_SESSION['nvll_loggedin'] = 1;
                 $contact_email = $list_val[$contact_list_uid][0] . $contact_suffix;
               }
 
-              if ($lang_dir === 'ltr') {
-              ?>
-
+              if ($lang_dir === 'ltr') { ?>
                 <tr class="<?php echo ($i % 2) ? "contactsListEven" : "contactsListOdd" ?>">
                   <td class="contactNameFirst"><?php echo unhtmlentities($contact_name[0]); ?></td>
                   <td class="contactNameLast"><?php echo unhtmlentities($contact_name[1]); ?></td>
@@ -437,24 +423,19 @@ $_SESSION['nvll_loggedin'] = 1;
                   <td class="contactNickname"><?php echo unhtmlentities($list_val[$contact_list_uid][0]); ?></td>
                   <td class="contactNameLast"><?php echo unhtmlentities($contact_name[1]); ?></td>
                   <td class="contactNameFirst"><?php echo unhtmlentities($contact_name[0]); ?></td>
-                </tr>
+                </tr> <?php } // ltr/rtl end
+                    $i++;
+                  }
+                }
 
-      <?php
-              } // ltr/rtl end
-
-              $i++;
-            }
-          }
-
-          if ($contact_list['count'] == 0) {
-            print('<tr><td colspan="4">' . $html_contact_none  . '</td></tr>');
-          }
-        } else {
-          // bye bye!!!
-          print('<a href="contacts.php?' . NVLL_Session::getUrlGetSession() . '">' . $html_back . '</a>');
-        }
-      }
-      ?>
+                if ($contact_list['count'] == 0) {
+                  print('<tr><td colspan="4">' . $html_contact_none  . '</td></tr>');
+                }
+              } else {
+                // bye bye!!!
+                print('<a href="contacts.php?' . NVLL_Session::getUrlGetSession() . '">' . $html_back . '</a>');
+              }
+            } ?>
     </table>
     <?php
     echo '<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />';
