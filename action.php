@@ -574,13 +574,14 @@ switch ($action) {
                     if (!in_array($folder, $existing_folders)) {
                         if ($pop->createmailbox($folder)) {
                             $pop->subscribe($folder, true);
+                        } else if ($_SESSION['nvll_folder'] == $folder) {
+                            // Subscribe to INBOX.
+                            $pop->subscribe($_SESSION['nvll_folder'], false);
                         } else {
                             error_log("NVLL: Error creating folder '$folder': " . $pop->last_error());
                         }
                     }
                 }
-            } else {
-                $pop->subscribe($_SESSION['nvll_folder'], false);
             }
         }
 
