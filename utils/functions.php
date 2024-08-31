@@ -454,13 +454,13 @@ function format_date(&$date, &$lang)
     // if locale can't be set, use default for no locale
     if (!setlocale(LC_TIME, $lang_locale)) $default_date_format = $no_locale_date_format;
 
-    // format dates
-    //return strftime($default_date_format, $date);
+    // set time to GMT+0
     $default_date_format = str_replace("%A", "%l", $default_date_format);
     $default_date_format = str_replace("%B", "%F", $default_date_format);
     $default_date_format = str_replace("%", "", $default_date_format);
 
-    return date($default_date_format, $date);
+    // use gmdate instead of date to ensure GMT+0
+    return gmdate($default_date_format, $date);
 }
 
 /**
@@ -482,14 +482,15 @@ function format_time(&$time, &$lang)
     // if locale can't be set, use default for no locale
     setlocale(LC_TIME, $lang_locale);
 
-    // format dates
-    //return strftime($default_time_format, $time);
+    // set time to GMT+0
     $default_time_format = str_replace("%M", "%i", $default_time_format);
     $default_time_format = str_replace("%I", "%h", $default_time_format);
     $default_time_format = str_replace("%p", "%A", $default_time_format);
     $default_time_format = str_replace("%S", "%s", $default_time_format);
     $default_time_format = str_replace("%", "", $default_time_format);
-    return date($default_time_format, $time);
+
+    // use gmdate instead of date to ensure GMT+0
+    return gmdate($default_time_format, $time);
 }
 
 /**
