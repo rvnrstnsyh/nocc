@@ -95,6 +95,7 @@ require './html/header.php';
         echo '</td>';
         echo '</tr>';
       }
+
       if ($conf->hide_lang_select_from_login_page == false) { ?>
         <tr>
           <th><label for="lang"><?php echo $html_lang_label ?></label></th>
@@ -102,7 +103,7 @@ require './html/header.php';
             <select class="button" name="lang" id="lang" onchange="updateLoginPage('<?php echo NVLL_Session::getUrlGetSession(); ?>')">
               <?php
               echo '<option value="default"';
-              if (! isset($_REQUEST['lang']) || $_REQUEST['lang'] == "default") {
+              if (!isset($_REQUEST['lang']) || $_REQUEST['lang'] == "default") {
                 echo ' selected="selected"';
               }
               echo '>' . convertLang2Html($html_default) . '</option>';
@@ -128,18 +129,17 @@ require './html/header.php';
             <select class="button" name="theme" id="theme" onchange="updateLoginPage('<?php echo NVLL_Session::getUrlGetSession(); ?>')">
               <?php
               echo '<option value="default"';
-              if (! isset($_REQUEST['lang']) || $_REQUEST['lang'] == "default") {
-                echo ' selected="selected"';
-              }
+              if (!isset($_REQUEST['lang']) || $_REQUEST['lang'] == "default") echo ' selected="selected"';
+
               echo '>' . convertLang2Html($html_default) . '</option>';
               $themes = new NVLL_Themes('./themes/', $_SESSION['nvll_theme']);
+
               foreach ($themes->getThemeNames() as $themeName) { //for all theme names...
                 echo '<option value="' . $themeName . '"';
-                if (isset($_REQUEST['theme']) && $_REQUEST['theme'] != "default" && $themeName == $_SESSION['nvll_theme']) {
-                  echo ' selected="selected"';
-                }
+                if (isset($_REQUEST['theme']) && $_REQUEST['theme'] != "default" && $themeName == $_SESSION['nvll_theme']) echo ' selected="selected"';
                 echo '>' . $themeName . '</option>';
               }
+
               unset($themeName);
               unset($themes);
               ?>

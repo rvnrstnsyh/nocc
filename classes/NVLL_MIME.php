@@ -140,6 +140,7 @@ class NVLL_MIME
         $message = $part['message'];
         $encoding = $part['encoding'];
         $charset = $part['charset'];
+
         switch ($encoding) {
             case 'base64':
                 $message = chunk_split(base64_encode($message));
@@ -148,12 +149,14 @@ class NVLL_MIME
                 $message = quoted_printable_encode($message);
                 break;
         }
+
         $val = 'Content-Type: ' . $part['ctype'] . ';';
         $val .= ($part['charset'] ? $this->crlf . "\tcharset=\"" . $part['charset'] . '"' : '');
         $val .= ($part['name'] ? $this->crlf . "\tname=\"" . $part['name'] . '"' : '');
         $val .= $this->crlf . 'Content-Transfer-Encoding: ' . $encoding;
         $val .= ($part['name'] ? $this->crlf . 'Content-Disposition: attachment;' . $this->crlf . "\tfilename=\"" . $part['name'] . '"' : '');
         $val .= $this->crlf . $this->crlf . $message . $this->crlf;
+
         return ($val);
     }
 
@@ -168,8 +171,7 @@ class NVLL_MIME
         $boundary = 'NextPart' . md5(uniqid(rand(), true));
         $multipart = 'Content-Type: multipart/mixed;' . $this->crlf . "\tboundary=\"$boundary\"" . $this->crlf . $this->crlf . 'This is a MIME encoded message.' . $this->crlf . $this->crlf . '--' . $boundary;
 
-        for ($i = sizeof($this->parts) - 1; $i >= 0; $i--)
-            $multipart .= $this->crlf . $this->_buildMessage($this->parts[$i]) . '--' . $boundary;
+        for ($i = sizeof($this->parts) - 1; $i >= 0; $i--) $multipart .= $this->crlf . $this->_buildMessage($this->parts[$i]) . '--' . $boundary;
         return ($multipart .= '--' . $this->crlf);
     }
 
@@ -181,10 +183,11 @@ class NVLL_MIME
      */
     private function _buildNoneMultipart()
     {
-        if (sizeof($this->parts) == 1)
+        if (sizeof($this->parts) == 1) {
             $part = $this->_buildMessage($this->parts[0]);
-        else
+        } else {
             $part = '';
+        }
         return ($part . $this->crlf);
     }
 
@@ -204,24 +207,35 @@ class NVLL_MIME
                 $mime .= 'Subject: ' . $this->subject . $this->crlf;
             }
         }
-        if (!empty($this->from))
+
+        if (!empty($this->from)) {
             $mime .= 'From: ' . $this->from . $this->crlf;
-        if (count($this->cc) > 0 && $this->cc[0] != '')
+        }
+
+        if (count($this->cc) > 0 && $this->cc[0] != '') {
             $mime .= 'Cc: ' . join(', ', $this->cc) . $this->crlf;
-        if (count($this->bcc) > 0 && $this->bcc[0] != '')
+        }
+
+        if (count($this->bcc) > 0 && $this->bcc[0] != '') {
             $mime .= 'Bcc: ' . join(', ', $this->bcc) . $this->crlf;
+        }
+
         $mime .= 'Date: ' . date('r') . $this->crlf;
-        if (!empty($this->from))
+        if (!empty($this->from)) {
             $mime .= 'Reply-To: ' . $this->from . $this->crlf . 'Errors-To: ' . $this->from . $this->crlf;
-        if ($this->receipt != false)
+        }
+
+        if ($this->receipt != false) {
             $mime .= 'Disposition-Notification-To: ' . $this->from . $this->crlf;
+        }
+
         $mime .= 'X-Priority: ' . $this->priority . $this->crlf;
-        if (!empty($this->headers))
+        if (!empty($this->headers)) {
             $mime .= $this->headers . $this->crlf;
+        }
 
         // Strip lonely "\r\n.\r\n" in order to avoid STMP errors
         $mime = str_replace("\r\n.\r\n", "\r\n..\r\n", $mime);
-
         $mail_format = '';
         if (NVLL_Session::getSendHtmlMail()) {
             $mail_format = 'text/html';
@@ -247,8 +261,8 @@ class NVLL_MIME
         if (!$this->useSmtpServer()) { //if use sendmail...
             $rcpt_to = join(', ', $this->to);
             $ev = @mail($rcpt_to, $this->subject, '', $mime, '-f' . $this->strip_comment($this->from));
-
             $user_prefs = NVLL_Session::getUserPrefs();
+
             if ($user_prefs->getUseSentFolder() && $user_prefs->getSentFolderName() != '') {
                 // Copy email to Sent folder
                 //TODO: Optimize try block!
@@ -280,11 +294,12 @@ class NVLL_MIME
                 $smtp->subject = $this->subject;
                 $smtp->data = $mime;
                 $smtp_return = $smtp->send();
-                if (NVLL_Exception::isException($smtp_return)) {
-                    return ($smtp_return);
-                }
+
+                if (NVLL_Exception::isException($smtp_return)) return ($smtp_return);
+
                 $copy_return = 1;
                 $user_prefs = NVLL_Session::getUserPrefs();
+
                 if ($user_prefs->getUseSentFolder() && $user_prefs->getSentFolderName() != "") {
                     // Copy email to Sent folder
                     //TODO: Optimize try block!
@@ -313,9 +328,7 @@ class NVLL_MIME
      */
     public function useSmtpServer()
     {
-        if (($this->smtp_server != '' && $this->smtp_port != '')) {
-            return true;
-        }
+        if (($this->smtp_server != '' && $this->smtp_port != '')) return true;
         return false;
     }
 
@@ -329,9 +342,7 @@ class NVLL_MIME
      */
     private function strip_comment_array($array)
     {
-        for ($i = 0; $i < count($array); $i++) {
-            $array[$i] = $this->strip_comment($array[$i]);
-        }
+        for ($i = 0; $i < count($array); $i++) $array[$i] = $this->strip_comment($array[$i]);
         return $array;
     }
 

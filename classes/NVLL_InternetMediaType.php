@@ -59,9 +59,8 @@ class NVLL_InternetMediaType
      */
     public function isText()
     {
-        if ($this->_type == 0) { //if text...
-            return true;
-        }
+        //if text...
+        if ($this->_type == 0) return true;
         return false;
     }
 
@@ -71,10 +70,10 @@ class NVLL_InternetMediaType
      */
     public function isPlainText()
     {
-        if ($this->isText()) { //if text...
-            if ($this->_subtype == 'plain') { //if plain text...
-                return true;
-            }
+        //if text...
+        if ($this->isText()) {
+            //if plain text...
+            if ($this->_subtype == 'plain') return true;
         }
         return false;
     }
@@ -85,10 +84,10 @@ class NVLL_InternetMediaType
      */
     public function isHtmlText()
     {
-        if ($this->isText()) { //if text...
-            if ($this->_subtype == 'html') { //if HTML text...
-                return true;
-            }
+        //if text...
+        if ($this->isText()) {
+            //if HTML text...
+            if ($this->_subtype == 'html') return true;
         }
         return false;
     }
@@ -99,10 +98,10 @@ class NVLL_InternetMediaType
      */
     public function isPlainOrHtmlText()
     {
-        if ($this->isText()) { //if text...
-            if ($this->_subtype == 'plain' || $this->_subtype == 'html') { //if plain or HTML text...
-                return true;
-            }
+        //if text...
+        if ($this->isText()) {
+            //if plain or HTML text...
+            if ($this->_subtype == 'plain' || $this->_subtype == 'html') return true;
         }
         return false;
     }
@@ -113,9 +112,8 @@ class NVLL_InternetMediaType
      */
     public function isMultipart()
     {
-        if ($this->_type == 1) { //if multipart...
-            return true;
-        }
+        //if multipart...
+        if ($this->_type == 1) return true;
         return false;
     }
 
@@ -125,10 +123,10 @@ class NVLL_InternetMediaType
      */
     public function isAlternativeMultipart()
     {
-        if ($this->isMultipart()) { //if multipart...
-            if ($this->isAlternative()) { //if alternative multipart...
-                return true;
-            }
+        //if multipart...
+        if ($this->isMultipart()) {
+            //if alternative multipart...
+            if ($this->isAlternative()) return true;
         }
         return false;
     }
@@ -139,10 +137,10 @@ class NVLL_InternetMediaType
      */
     public function isRelatedMultipart()
     {
-        if ($this->isMultipart()) { //if multipart...
-            if ($this->isRelated()) { //if related multipart...
-                return true;
-            }
+        //if multipart...
+        if ($this->isMultipart()) {
+            //if related multipart...
+            if ($this->isRelated()) return true;
         }
         return false;
     }
@@ -153,9 +151,8 @@ class NVLL_InternetMediaType
      */
     public function isMessage()
     {
-        if ($this->_type == 2) { //if message...
-            return true;
-        }
+        //if message...
+        if ($this->_type == 2) return true;
         return false;
     }
 
@@ -165,10 +162,10 @@ class NVLL_InternetMediaType
      */
     public function isRfc822Message()
     {
-        if ($this->isMessage()) { //if message...
-            if ($this->_subtype == 'rfc822') { //if RFC822 message...
-                return true;
-            }
+        //if message...
+        if ($this->isMessage()) {
+            //if RFC822 message...
+            if ($this->_subtype == 'rfc822') return true;
         }
         return false;
     }
@@ -179,9 +176,8 @@ class NVLL_InternetMediaType
      */
     public function isApplication()
     {
-        if ($this->_type == 3) { //if application...
-            return true;
-        }
+        //if application...
+        if ($this->_type == 3) return true;
         return false;
     }
 
@@ -191,9 +187,8 @@ class NVLL_InternetMediaType
      */
     public function isAudio()
     {
-        if ($this->_type == 4) { //if audio...
-            return true;
-        }
+        //if audio...
+        if ($this->_type == 4) return true;
         return false;
     }
 
@@ -203,9 +198,8 @@ class NVLL_InternetMediaType
      */
     public function isImage()
     {
-        if ($this->_type == 5) { //if image...
-            return true;
-        }
+        //if image...
+        if ($this->_type == 5) return true;
         return false;
     }
 
@@ -215,9 +209,8 @@ class NVLL_InternetMediaType
      */
     public function isVideo()
     {
-        if ($this->_type == 6) { //if video...
-            return true;
-        }
+        //if video...
+        if ($this->_type == 6) return true;
         return false;
     }
 
@@ -227,9 +220,8 @@ class NVLL_InternetMediaType
      */
     public function isOther()
     {
-        if ($this->_type == 7) { //if other...
-            return true;
-        }
+        //if other...
+        if ($this->_type == 7) return true;
         return false;
     }
 
@@ -239,9 +231,8 @@ class NVLL_InternetMediaType
      */
     public function isAlternative()
     {
-        if ($this->_subtype == 'alternative') { //if alternative...
-            return true;
-        }
+        //if alternative...
+        if ($this->_subtype == 'alternative') return true;
         return false;
     }
 
@@ -251,9 +242,8 @@ class NVLL_InternetMediaType
      */
     public function isRelated()
     {
-        if ($this->_subtype == 'related') { //if related...
-            return true;
-        }
+        //if related...
+        if ($this->_subtype == 'related') return true;
         return false;
     }
 

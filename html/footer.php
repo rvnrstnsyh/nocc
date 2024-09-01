@@ -1,6 +1,5 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
-
 //if the $theme variable NOT set...
 if (!isset($theme)) $theme = new NVLL_Theme($_SESSION['nvll_theme']);
 

@@ -16,6 +16,7 @@
   --black-500: #555555;
   --gray-100: #888888;
   --success-color: #adff2f;
+  --error-color: #b91c1c;
 }
 
 html {
@@ -475,8 +476,8 @@ img.sort {
 }
 
 .errorTable {
-  border: 1px solid #dd2222;
-  background-color: #dd2222;
+  border: 1px solid var(--error-color);
+  background-color: var(--error-color);
   width: 400px;
 }
 
@@ -484,7 +485,7 @@ img.sort {
   font-weight: bold;
   color: var(--white-color);
   text-align: center;
-  background: url(./img/error.png) top left no-repeat;
+  /* background: url(./img/error.png) top left no-repeat; */
 }
 
 .errorText {

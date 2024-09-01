@@ -560,10 +560,6 @@ class NVLL_UserPrefs
         $this->_inboxFolderName = $this->_convertToString($value);
     }
 
-
-
-
-
     /**
      * Get auto collect from user preferences
      * @param int $value
@@ -631,6 +627,7 @@ class NVLL_UserPrefs
             error_log("NVLL: $filename does not exist");
             return $prefs;
         }
+
         $file = fopen($filename, 'r');
         if (!$file) {
             $ev = new NVLL_Exception("Could not open $filename for reading user preferences");
@@ -641,6 +638,7 @@ class NVLL_UserPrefs
         while (!feof($file)) {
             $line = trim(fgets($file, 1024));
             $equalsAt = strpos($line, '=');
+
             if ($equalsAt <= 0) continue;
 
             $key = substr($line, 0, $equalsAt);
@@ -725,8 +723,8 @@ class NVLL_UserPrefs
                     break;
             }
         }
-        fclose($file);
 
+        fclose($file);
         $prefs->dirty_flag = 0;
         return $prefs;
     }
@@ -746,7 +744,6 @@ class NVLL_UserPrefs
         // Check it passes validation
         $this->validate($ev);
         if (NVLL_Exception::isException($ev)) return;
-
         // Do we need to write?
         if (!$this->dirty_flag) return;
 
@@ -757,10 +754,12 @@ class NVLL_UserPrefs
             $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
+
         if (!is_writable($conf->prefs_dir)) {
             $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
+
         $file = fopen($filename, 'w');
         if (!$file) {
             $ev = new NVLL_Exception($html_prefs_file_error);
@@ -783,16 +782,12 @@ class NVLL_UserPrefs
         fwrite($file, "sig_sep=" . $this->_useSignatureSeparator . "\n");
         fwrite($file, "html_mail_send=" . $this->_sendHtmlMail . "\n");
         fwrite($file, "graphical_smilies=" . $this->_useGraphicalSmilies . "\n");
-
         fwrite($file, "sent_folder=" . $this->_useSentFolder . "\n");
         fwrite($file, "sent_folder_name=" . str_replace($_SESSION['imap_namespace'], "", $this->_sentFolderName) . "\n");
-
         fwrite($file, "trash_folder=" . $this->_useTrashFolder . "\n");
         fwrite($file, "trash_folder_name=" . str_replace($_SESSION['imap_namespace'], "", $this->_trashFolderName) . "\n");
-
         fwrite($file, "inbox_folder=" . $this->_useInboxFolder . "\n");
         fwrite($file, "inbox_folder_name=" . str_replace($_SESSION['imap_namespace'], "", $this->_inboxFolderName) . "\n");
-
         fwrite($file, "collect=" . $this->_collect . "\n");
         fwrite($file, "lang=" . $this->lang . "\n");
         fwrite($file, "theme=" . $this->theme . "\n");
@@ -851,9 +846,7 @@ class NVLL_UserPrefs
      */
     private function _convertToFalse($value)
     {
-        if ($value === true || $value === 1 || $value === '1' || $value === 'on') {
-            return true;
-        }
+        if ($value === true || $value === 1 || $value === '1' || $value === 'on') return true;
         return false;
     }
 
@@ -865,9 +858,7 @@ class NVLL_UserPrefs
      */
     private function _convertToTrue($value)
     {
-        if ($value === false || $value === 0 || $value === '0' || $value === 'off') {
-            return false;
-        }
+        if ($value === false || $value === 0 || $value === '0' || $value === 'off') return false;
         return true;
     }
 
@@ -879,9 +870,7 @@ class NVLL_UserPrefs
      */
     private function _convertToString($value)
     {
-        if (is_string($value)) {
-            return $value;
-        }
+        if (is_string($value)) return $value;
         return '';
     }
 
@@ -900,6 +889,7 @@ class NVLL_UserPrefs
         $string = str_replace('_FROM_', $content['from'], $string);
         $string = str_replace('_TO_', $content['to'], $string);
         $string = str_replace('_SUBJECT_', $content['subject'], $string);
+
         return ($string . "\n");
     }
 }

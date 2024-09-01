@@ -12,18 +12,14 @@ if ($_SESSION['ucb_pop_server'] || $pop->is_imap()) {
 
 // Merge flagged classes if the item is flagged.
 $row_class = $even_odd_class . $unseen_class . $spam_class;
-
 //if Flagged...
 if ($tmp['flagged']) $row_class .= ' flagged';
 
 $spam_class = '';
-
-if ($tmp['spam'] == true) { //if SPAM...
-  $spam_class = ' spam' . ucfirst($even_odd_class); //spamOdd or spamEven
-}
+//if SPAM...
+if ($tmp['spam'] == true) $spam_class = ' spam' . ucfirst($even_odd_class); //spamOdd or spamEven
 
 $target_blank = '';
-
 if (isset($user_prefs->seperate_msg_win) && $user_prefs->seperate_msg_win) $target_blank = ' target="_blank"';
 
 echo '<tr class="' . $row_class . '">';

@@ -9,8 +9,8 @@
  */
 
 require_once './common.php';
-require_once './classes/NVLL_Contacts.php';
 require_once './utils/proxy.php';
+require_once './classes/NVLL_Contacts.php';
 
 header("Content-type: text/html; Charset=UTF-8");
 

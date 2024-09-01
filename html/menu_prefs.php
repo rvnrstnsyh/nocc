@@ -6,14 +6,10 @@
       <li><a href="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_back); ?></a></li>
     <?php } ?>
     <li>
-
       <?php
       $jumpInbox = "";
-      if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) {
-        $jumpInbox = "&folder=" . $user_prefs->getInboxFolderName();
-      }
+      if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) $jumpInbox = "&folder=" . $user_prefs->getInboxFolderName();
       ?>
-
       <a href="api.php?<?php echo NVLL_Session::getUrlGetSession() . $jumpInbox; ?>"><?php echo convertLang2Html($html_inbox); ?><span class="inbox_changed" style="display:none;color:darkred;">!</span></a>
     </li>
     <li>

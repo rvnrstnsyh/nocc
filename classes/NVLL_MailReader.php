@@ -9,11 +9,11 @@
  */
 
 require_once 'NVLL_SMTP.php';
-require_once 'NVLL_MailStructure.php';
+require_once 'NVLL_Header.php';
 require_once 'NVLL_MailPart.php';
 require_once 'NVLL_MailParts.php';
 require_once 'NVLL_HeaderInfo.php';
-require_once 'NVLL_Header.php';
+require_once 'NVLL_MailStructure.php';
 
 /**
  * Reading details from a mail
@@ -131,14 +131,13 @@ class NVLL_MailReader
         $mailstructure = $pop->fetchstructure($msgno);
 
         $this->_mailparts = null;
-        if ($fullDetails == true) { //if read full details...
-            $this->_mailparts = new NVLL_MailParts($mailstructure);
-        }
+        //if read full details...
+        if ($fullDetails == true) $this->_mailparts = new NVLL_MailParts($mailstructure);
 
         $this->_charset = $mailstructure->getCharset('ISO-8859-1');
         $this->_size = $mailstructure->getSize();
-
         $this->_hasAttachments = false;
+
         if ($mailstructure->getInternetMediaType()->isMultipart() || $mailstructure->getInternetMediaType()->isApplication()) { //if "multipart" or "application" message...
             if (!$mailstructure->getInternetMediaType()->isAlternative() && !$mailstructure->getInternetMediaType()->isRelated()) {
                 $this->_hasAttachments = true;
@@ -158,9 +157,9 @@ class NVLL_MailReader
         $this->_ccaddress = $mailheaderinfo->getCcAddress();
         $this->_replytoaddress = $mailheaderinfo->getReplyToAddress();
         $this->_timestamp = $mailheaderinfo->getTimestamp();
-
         $this->_isunseen = false;
         $this->_isflagged = false;
+
         if ($pop->is_imap()) {
             $this->_isunseen = $mailheaderinfo->isUnseen();
             $this->_isflagged = $mailheaderinfo->isFlagged();
@@ -189,9 +188,8 @@ class NVLL_MailReader
      */
     public function getBodyPart()
     {
-        if (!empty($this->_mailparts)) { //if mail parts exists...
-            return $this->_mailparts->getBodyPart();
-        }
+        //if mail parts exists...
+        if (!empty($this->_mailparts)) return $this->_mailparts->getBodyPart();
         return null;
     }
 
@@ -201,9 +199,8 @@ class NVLL_MailReader
      */
     public function getAttachmentParts()
     {
-        if (!empty($this->_mailparts)) { //if mail parts exists...
-            return $this->_mailparts->getAttachmentParts();
-        }
+        //if mail parts exists...
+        if (!empty($this->_mailparts)) return $this->_mailparts->getAttachmentParts();
         return array();
     }
 
@@ -316,9 +313,7 @@ class NVLL_MailReader
      */
     public function isUnseenUcb()
     {
-        if ($this->_header->getStatus() == '') {
-            return true;
-        }
+        if ($this->_header->getStatus() == '') return true;
         return false;
     }
 

@@ -51,6 +51,7 @@ const marked_row = {};
  */
 function markInboxRowsInit() {
   const inboxTable = document.getElementById("inboxTable");
+
   if (!inboxTable) return;
 
   const rows = inboxTable.getElementsByTagName("tr");
@@ -59,7 +60,6 @@ function markInboxRowsInit() {
     const className = row.className;
 
     if (!className.startsWith("odd") && !className.startsWith("even")) return;
-
     if (navigator.appName === "Microsoft Internet Explorer") {
       row.onmouseover = () => row.classList.add("hover");
       row.onmouseout = () => row.classList.remove("hover");

@@ -3,6 +3,7 @@ if (!isset($conf->loaded)) die('Hacking attempt');
 
 $service = NVLL_Request::getStringValue('service');
 $selected = 0;
+
 switch ($service) {
   case '':
   case 'login':
@@ -32,6 +33,7 @@ switch ($service) {
     break;
 }
 ?>
+
 <div class="mainmenu">
   <ul>
     <?php if ($selected != 1 && $user_prefs->getUseInboxFolder()) { ?>
@@ -41,10 +43,7 @@ switch ($service) {
     else echo '<li>'; ?>
     <?php
     $jumpInbox = "";
-    if (
-      $user_prefs->getUseInboxFolder()
-      && strlen($user_prefs->getInboxFolderName()) > 0
-    ) {
+    if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) {
       $jumpInbox = "&folder=" . $user_prefs->getInboxFolderName();
     }
     ?>

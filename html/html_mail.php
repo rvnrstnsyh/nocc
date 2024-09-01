@@ -73,12 +73,15 @@
             echo '</optgroup>';
             $optgroupOpen = false;
           }
+
           if ($group != '') { //if group exists...
             echo '<optgroup label="' . $group . '">';
             $optgroupOpen = true;
           }
         }
+
         echo '<option value="' . $charset_array[$i]->charset . '"';
+
         if (
           isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] == $charset_array[$i]->charset
           || ((!isset($_REQUEST['user_charset']) || $_REQUEST['user_charset'] == '') && strtolower($content['charset']) == strtolower($charset_array[$i]->charset))

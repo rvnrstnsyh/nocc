@@ -55,10 +55,13 @@ class NVLL_Theme
         $name = strip_tags($name);
         $name = str_replace('..', '', $name);
         $name = str_replace('/', '', $name);
+
         if (!empty($name)) { //if the name exists...
             $this->_name = $name;
+
             $path = 'themes/' . $name;
             $realpath = realpath($path);
+
             if (!empty($realpath)) { //if the real path exists...
                 $this->_path = $path;
                 $this->_realpath = $realpath;
@@ -109,9 +112,8 @@ class NVLL_Theme
      */
     public function getStylesheet()
     {
-        if ($this->_exists) { //if exists...
-            return $this->_path . '/style.css';
-        }
+        //if exists...
+        if ($this->_exists) return $this->_path . '/style.css';
         return '';
     }
 
@@ -121,9 +123,8 @@ class NVLL_Theme
      */
     public function getPrintStylesheet()
     {
-        if ($this->_exists) { //if exists...
-            return $this->_path . '/print.css';
-        }
+        //if exists...
+        if ($this->_exists) return $this->_path . '/print.css';
         return '';
     }
 
@@ -133,10 +134,13 @@ class NVLL_Theme
      */
     public function getFavicon()
     {
-        if (file_exists($this->_realpath . '/favicon.ico')) //if theme favicon exists...
+        //if theme favicon exists...
+        if (file_exists($this->_realpath . '/favicon.ico')) {
             return $this->_path . '/favicon.ico';
-        else //if NO theme favicon exists...
+            //if NO theme favicon exists...
+        } else {
             return 'favicon.ico';
+        }
     }
 
     /**
@@ -145,9 +149,8 @@ class NVLL_Theme
      */
     public function getCustomHeader()
     {
-        if ($this->_exists) { //if exists...
-            return $this->_realpath . '/header.php';
-        }
+        //if exists...
+        if ($this->_exists) return $this->_realpath . '/header.php';
         return '';
     }
 
@@ -157,9 +160,8 @@ class NVLL_Theme
      */
     public function getCustomFooter()
     {
-        if ($this->_exists) { //if exists...
-            return $this->_realpath . '/footer.php';
-        }
+        //if exists...
+        if ($this->_exists) return $this->_realpath . '/footer.php';
         return '';
     }
 

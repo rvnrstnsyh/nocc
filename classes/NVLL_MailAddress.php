@@ -85,9 +85,7 @@ class NVLL_MailAddress
      */
     public function setName($name)
     {
-        if (isset($name) && is_string($name)) {
-            $this->_name = $name;
-        }
+        if (isset($name) && is_string($name)) $this->_name = $name;
     }
 
     /**
@@ -114,9 +112,7 @@ class NVLL_MailAddress
      */
     public function setAddress($address)
     {
-        if (isset($address) && is_string($address)) {
-            $this->_address = $address;
-        }
+        if (isset($address) && is_string($address)) $this->_address = $address;
     }
 
     /**
@@ -124,10 +120,7 @@ class NVLL_MailAddress
      */
     public function __toString()
     {
-        if (!$this->hasAddress()) {
-            return '';
-        }
-
+        if (!$this->hasAddress()) return '';
         if ($this->hasName()) {
             $name = $this->getName();
             if (strpos($name, ' ') !== false) {
@@ -136,7 +129,6 @@ class NVLL_MailAddress
                 return $name . ' <' . $this->getAddress() . '>';
             }
         }
-
         return $this->getAddress();
     }
 
@@ -166,22 +158,18 @@ class NVLL_MailAddress
      */
     public static function compareAddress($a, $b)
     {
-        if (!isset($a) || !isset($b)) {
-            return -1;
-        }
+        if (!isset($a) || !isset($b)) return -1;
+
         $mailAddressA = new NVLL_MailAddress($a);
-        if (!$mailAddressA->hasAddress()) {
-            return -1;
-        }
+        if (!$mailAddressA->hasAddress()) return -1;
+
         $mailAddressB = new NVLL_MailAddress($b);
-        if (!$mailAddressB->hasAddress()) {
-            return -1;
-        }
+        if (!$mailAddressB->hasAddress()) return -1;
+
         $addressA = mb_strtolower($mailAddressA->getAddress(), 'UTF-8');
         $addressB = mb_strtolower($mailAddressB->getAddress(), 'UTF-8');
-        if ($addressA == $addressB) {
-            return 1;
-        }
+
+        if ($addressA == $addressB) return 1;
         return 0;
     }
 

@@ -1,10 +1,10 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
-
-if (file_exists('./utils/proxy.php'))
+if (file_exists('./utils/proxy.php')) {
 	require_once './utils/proxy.php';
-else
+} else {
 	die('./utils/proxy.php is missing');
+}
 
 header("Content-type: text/html; Charset=UTF-8");
 

@@ -86,26 +86,11 @@ if (isset($_REQUEST['only_one'])) {
     $msg_to_forward = '';
     for ($i = $num_messages; $i >= 1; $i--) {
         if (isset($_REQUEST['msg-' . $i])) {
-            if (isset($_REQUEST['move_mode']) && $target_folder != $folder) {
-                $pop->mail_move($i, $target_folder);
-            }
-
-            if (isset($_REQUEST['bottom_move_mode']) && $bottom_target_folder != $folder) {
-                $pop->mail_move($i, $bottom_target_folder);
-            }
-
-            if (isset($_REQUEST['copy_mode']) && $target_folder != $folder) {
-                $pop->mail_copy($i, $target_folder);
-            }
-
-            if (isset($_REQUEST['bottom_copy_mode']) && $bottom_target_folder != $folder) {
-                $pop->mail_copy($i, $bottom_target_folder);
-            }
-
-            if (isset($_REQUEST['forward_mode']) || isset($_REQUEST['bottom_forward_mode'])) {
-                $msg_to_forward .= '$' . $i;
-            }
-
+            if (isset($_REQUEST['move_mode']) && $target_folder != $folder) $pop->mail_move($i, $target_folder);
+            if (isset($_REQUEST['bottom_move_mode']) && $bottom_target_folder != $folder) $pop->mail_move($i, $bottom_target_folder);
+            if (isset($_REQUEST['copy_mode']) && $target_folder != $folder) $pop->mail_copy($i, $target_folder);
+            if (isset($_REQUEST['bottom_copy_mode']) && $bottom_target_folder != $folder) $pop->mail_copy($i, $bottom_target_folder);
+            if (isset($_REQUEST['forward_mode']) || isset($_REQUEST['bottom_forward_mode'])) $msg_to_forward .= '$' . $i;
             if (isset($_REQUEST['delete_mode']) || isset($_REQUEST['bottom_delete_mode'])) {
                 $_SESSION['message_deleted'] = "true";
                 $target_folder = $_SESSION['imap_namespace'] . $user_prefs->getTrashFolderName();

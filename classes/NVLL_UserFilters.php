@@ -23,7 +23,6 @@ class NVLL_UserFilters
     var $key;
     // TODO: Hide behind get/setFilterset()?
     var $filterset;
-
     // Set when preferences have not been commit
     // TODO: Hide behind get/setIsDirty()!
     var $dirty_flag;
@@ -72,8 +71,8 @@ class NVLL_UserFilters
         if (!file_exists($filename)) {
             $filters->dirty_flag = 1;
             $filters->commit($ev);
-            if (NVLL_Exception::isException($ev))
-                return;
+
+            if (NVLL_Exception::isException($ev)) return;
         }
 
         $file = fopen($filename, 'r');
@@ -86,18 +85,17 @@ class NVLL_UserFilters
         while (!feof($file)) {
             $line = trim(fgets($file, 1024));
             $pipeAt = strpos($line, '|');
+
             if ($pipeAt <= 0) continue;
 
             $name = substr($line, 0, $pipeAt);
             $type = substr($line, $pipeAt + 1, 6);
             $value = substr($line, $pipeAt + 8);
 
-            if (strlen($name) > 0) {
-                $filters->filterset[$name][$type] = $value;
-            }
+            if (strlen($name) > 0) $filters->filterset[$name][$type] = $value;
         }
-        fclose($file);
 
+        fclose($file);
         $filters->dirty_flag = 0;
         return $filters;
     }
@@ -121,10 +119,12 @@ class NVLL_UserFilters
             $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
+
         if (!is_writeable($conf->prefs_dir)) {
             $ev = new NVLL_Exception($html_prefs_file_error);
             return;
         }
+
         $file = fopen($filename, 'w');
         if (!$file) {
             $ev = new NVLL_Exception($html_prefs_file_error);
@@ -141,7 +141,6 @@ class NVLL_UserFilters
         }
 
         fclose($file);
-
         $this->dirty_flag = 0;
     }
 

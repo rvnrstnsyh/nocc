@@ -34,7 +34,7 @@ class NVLL_HeaderInfo
      * @param string $defaultcharset Default charset
      * @todo Throw exception, if no vaild header info? 
      */
-    public function __construct($headerinfo, $defaultcharset = 'ISO-8859-1')
+    public function __construct($headerinfo, $defaultcharset = 'UTF-8')
     {
         $this->_headerinfo = $headerinfo;
         $this->_defaultcharset = $defaultcharset;
@@ -64,9 +64,7 @@ class NVLL_HeaderInfo
      */
     public function getMessageId()
     {
-        if (isset($this->_headerinfo->message_id)) {
-            return $this->_headerinfo->message_id;
-        }
+        if (isset($this->_headerinfo->message_id)) return $this->_headerinfo->message_id;
         return '';
     }
 
@@ -76,9 +74,7 @@ class NVLL_HeaderInfo
      */
     public function getSubject()
     {
-        if (isset($this->_headerinfo->subject)) {
-            return $this->_decodeMimeHeader($this->_headerinfo->subject, $this->_defaultcharset);
-        }
+        if (isset($this->_headerinfo->subject)) return $this->_decodeMimeHeader($this->_headerinfo->subject, $this->_defaultcharset);
         return '';
     }
 

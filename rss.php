@@ -52,9 +52,7 @@ require_once './common.php';
 require_once './classes/NVLL_IMAP.php';
 require_once './classes/NVLL_RSSFeed.php';
 
-if (! isRssAllowed()) {
-  exit;
-}
+if (!isRssAllowed()) exit;
 
 try {
   $pop = new NVLL_IMAP();
@@ -74,8 +72,8 @@ if ($pop->num_msg() > 0) {
     $ev = new NVLL_Exception($ex->getMessage());
   }
 }
-$tab_mail_bak = $tab_mail;
 
+$tab_mail_bak = $tab_mail;
 if (NVLL_Exception::isException($ev)) {
   require './html/error.php';
   exit;
@@ -85,20 +83,17 @@ $rssfeed = new NVLL_RSSFeed();
 $rssfeed->setTitle('Non-Violable Liberty Layers | Webmail - ' . $_SESSION['nvll_folder'] . ' ' . $_SESSION['nvll_login']);
 $rssfeed->setDescription('Your mailbox');
 $rssfeed->setLink($conf->base_url);
+
 while ($tmp = array_shift($tab_mail)) { //for all mails...
   try {
     $content = aff_mail($pop, $tmp['number'], false);
-
     $mail_summery = '';
-    if ($tmp['attach'] == true) { //if has attachments...
-      $mail_summery .= '<img src="' . $conf->base_url . 'themes/' . $_SESSION['nvll_theme'] . '/img/attach.png" alt="" />';
-    }
+    //if has attachments...
+    if ($tmp['attach'] == true) $mail_summery .= '<img src="' . $conf->base_url . 'themes/' . $_SESSION['nvll_theme'] . '/img/attach.png" alt="" />';
+
     $mail_summery .= $html_size . ': ' . $tmp['size'] . ' ' . $html_kb . '<br /><br />';
-
     $rssDescription = $mail_summery . substr(strip_tags($content['body'], '<br />'), 0, 200) . '&hellip;';
-
     $rssContent = $mail_summery . $content['body'];
-
     $rssfeeditem = new NVLL_RSSFeed_Item();
     $rssfeeditem->setTitle(htmlspecialchars($tmp['subject'], ENT_COMPAT | ENT_SUBSTITUTE));
     $rssfeeditem->setDescription($rssDescription);

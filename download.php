@@ -82,14 +82,11 @@ try {
 	//    }
 
 	$rfc822 = false;
-	if ($mime == "message-rfc822") {
-		$rfc822 = true;
-	}
+
+	if ($mime == "message-rfc822") $rfc822 = true;
 
 	$file = $pop->fetchbody($mail, $part, $part, false, $rfc822);
-
 	$file = NVLL_IMAP::decode($file, $transfer);
-
 	$pop->close();
 
 	header('Content-Length: ' . strlen($file));

@@ -63,9 +63,8 @@ class NVLL_Themes
                     closedir($handle);
                 }
 
-                if ($this->exists($defaultThemeName)) { //if the theme exists...
-                    $this->_defaultThemeName = strtolower($defaultThemeName);
-                }
+                //if the theme exists...
+                if ($this->exists($defaultThemeName)) $this->_defaultThemeName = strtolower($defaultThemeName);
             }
         }
     }
@@ -86,9 +85,9 @@ class NVLL_Themes
      */
     public function exists($themeName)
     {
-        if (isset($themeName) && is_string($themeName) && !empty($themeName)) { //if theme name is set...
+        //if theme name is set...
+        if (isset($themeName) && is_string($themeName) && !empty($themeName)) {
             $themeName = strtolower($themeName);
-
             return array_key_exists($themeName, $this->_themes);
         }
         return false;
@@ -132,9 +131,8 @@ class NVLL_Themes
      */
     public function getSelectedThemeName()
     {
-        if (!empty($this->_selectedThemeName)) { //if a theme is selected...
-            return $this->_selectedThemeName;
-        }
+        //if a theme is selected...
+        if (!empty($this->_selectedThemeName)) return $this->_selectedThemeName;
         return $this->_defaultThemeName;
     }
 

@@ -34,9 +34,8 @@ class NVLL_Encoding
     public function __construct($encoding = null)
     {
         $this->_encoding = -1;
-        if (is_int($encoding)) { //if valid type...
-            $this->_encoding = $encoding;
-        }
+        //if valid type...
+        if (is_int($encoding)) $this->_encoding = $encoding;
     }
 
     /**

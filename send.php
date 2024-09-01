@@ -12,8 +12,8 @@ require_once './common.php';
 
 $mail_from = get_default_from_address();
 if (
-    (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change)
-    || (! isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
+    (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) ||
+    (!isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
 ) {
     $mail_from = NVLL_Request::getStringValue('mail_from');
 }
@@ -26,9 +26,7 @@ $mail_body = NVLL_Request::getStringValue('mail_body');
 
 if (strlen(NVLL_Request::getStringValue('nvll_attach_array')) > 0) {
     $mail_att = unserialize(base64_decode(NVLL_Request::getStringValue('nvll_attach_array')));
-    if (! is_array($mail_att)) {
-        unset($mail_att);
-    }
+    if (!is_array($mail_att)) unset($mail_att);
 }
 
 $mail_receipt = isset($_REQUEST['receipt']);
@@ -61,17 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     header('Location: ' . $conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession());
     return;
 }
+
 require_once './classes/NVLL_MIME.php';
 require_once './classes/NVLL_SMTP.php';
 
-if (ini_get("file_uploads")) {
-    if (isset($_FILES['mail_att'])) {
-        $mail_att = $_FILES['mail_att'];
-    }
-}
-if (NVLL_Session::getSendHtmlMail()) {
-    $mail_body = '<html><head></head><body>' . $mail_body . '</body></html>';
-}
+if (ini_get("file_uploads") && isset($_FILES['mail_att'])) $_FILES['mail_att'];
+if (NVLL_Session::getSendHtmlMail()) $mail_body = '<html><head></head><body>' . $mail_body . '</body></html>';
 
 switch ($_REQUEST['sendaction']) {
     case unhtmlentities($html_attach):
@@ -97,8 +90,6 @@ switch ($_REQUEST['sendaction']) {
         // Registering the attachments array into the session
         $_SESSION['nvll_attach_array'] = $attach_array;
         $_SESSION['send_backup']['mail_att'] = $attach_array;
-
-
         // Displaying the sending form with the new attachments array
         //header("Content-type: text/html; Charset=UTF-8");
         require './html/header.php';
@@ -117,14 +108,11 @@ switch ($_REQUEST['sendaction']) {
         $mail_receipt = "";
         $mail_priority = "";
 
-        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
-            unset($_SESSION['send_backup']);
-        }
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) unset($_SESSION['send_backup']);
 
         clear_attachments();
         require_once './utils/proxy.php';
         header('Location: ' . $conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession());
-
         //require './html/header.php';
         //require './html/menu_inbox.php';
         //require './html/send.php';
@@ -132,7 +120,6 @@ switch ($_REQUEST['sendaction']) {
         //require './html/footer.php';
 
         break;
-
     case unhtmlentities($html_send):
         $mail = new NVLL_MIME();
         $mail->crlf = $conf->crlf;
@@ -157,11 +144,10 @@ switch ($_REQUEST['sendaction']) {
         $user_prefs = NVLL_Session::getUserPrefs();
 
         if ($user_prefs->getBccSelf()) array_unshift($mail->bcc, $mail->from);
-
         if ($user_prefs->getCollect() == 1 || $user_prefs->getCollect() == 3) {
             require_once './classes/NVLL_Contacts.php';
-            $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
 
+            $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
             $contacts_object = new NVLL_Contacts();
             $all_to = $mail_to . ";" . $mail_cc . ";" . $mail_bcc;
             $contacts = $contacts_object->add_contact($path, $all_to);
@@ -189,22 +175,22 @@ switch ($_REQUEST['sendaction']) {
         if (isset($conf->ad)) {
             $ad = $conf->ad;
             $crlf = $mail->crlf;
+
             if ($user_prefs->getSendHtmlMail()) {
                 $crlf = "<br />";
                 $ad = preg_replace("/\r\n/", "\n", $ad);
                 $ad = preg_replace("/\r/", "\n", $ad);
                 $ad = preg_replace("/\n/", $crlf, $ad);
             }
+
             if ($mail_body != '') {
                 $mail->body = $mail->body . $crlf . $crlf . $ad;
             } else {
                 $mail->body = $ad;
             }
         }
-
         // Handle dots for SMTP protocol
         $mail->body = escape_dots($mail->body);
-
         // Getting the attachments
         if (isset($_SESSION['nvll_attach_array'])) {
             $attach_array = $_SESSION['nvll_attach_array'];
@@ -218,7 +204,6 @@ switch ($_REQUEST['sendaction']) {
                 }
             }
         }
-
         // Add original message as attachment?
         if (isset($_REQUEST['forward_msgnum']) && $_REQUEST['forward_msgnum'] != "") {
             try {
@@ -274,16 +259,14 @@ switch ($_REQUEST['sendaction']) {
                     }
                 }
             }
-            if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
-                unset($_SESSION['send_backup']);
-            }
+            if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) unset($_SESSION['send_backup']);
+
             clear_attachments();
             // Redirect user to inbox
             require_once './utils/proxy.php';
             header("Location: " . $conf->base_url . "api.php?successfulsend=true&" . NVLL_Session::getUrlGetSession());
         }
         break;
-
     case unhtmlentities($html_attach_delete):
         // Rebuilding the attachments array with only the files the user wants to keep
         $tmp_array = array();
@@ -310,7 +293,6 @@ switch ($_REQUEST['sendaction']) {
         require './html/menu_inbox.php';
         require './html/footer.php';
         break;
-
     default:
         // Nothing was set in the sendaction (e.g. no javascript enabled)
         header("Content-type: text/html; Charset=UTF-8");

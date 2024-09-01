@@ -9,18 +9,13 @@
       <td>
         <p><?php echo convertLang2Html($ev->getMessage()); ?></p>
         <p>
-          <?php
-          if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
-          ?>
+          <?php if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) { ?>
             <a href=""><?php echo convertLang2Html($html_retry) ?></a>&nbsp;&nbsp;
             <a href="logout.php?<?php echo NVLL_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_logout) ?></a>
           <?php
-          } else {
-          ?>
+          } else { ?>
             <a href="logout.php?<?php echo NVLL_Session::getUrlGetSession(); ?>"><?php echo convertLang2Html($html_back) ?></a>
-          <?php
-          }
-          ?>
+          <?php } ?>
         </p>
       </td>
     </tr>

@@ -22,12 +22,7 @@ class NVLL_Request
      */
     public static function getStringValue($key, $defaultValue = '')
     {
-        if (isset($_REQUEST[$key])) {
-            //if (get_magic_quotes_gpc()) {  // returns always false since php 5.4
-            //    return stripslashes($_REQUEST[$key]);
-            //}
-            return $_REQUEST[$key];
-        }
+        if (isset($_REQUEST[$key])) return $_REQUEST[$key];
         return $defaultValue;
     }
 
@@ -40,9 +35,7 @@ class NVLL_Request
      */
     public static function getBoolValue($key, $defaultValue = false)
     {
-        if (isset($_REQUEST[$key])) {
-            return NVLL_Request::convertToBool($_REQUEST[$key]);
-        }
+        if (isset($_REQUEST[$key])) return NVLL_Request::convertToBool($_REQUEST[$key]);
         return NVLL_Request::convertToBool($defaultValue);
     }
 
@@ -54,9 +47,7 @@ class NVLL_Request
      */
     public static function convertToBool($value)
     {
-        if ($value === true || $value === 1 || strtolower($value) === 'true' || $value === '1') {
-            return true;
-        }
+        if ($value === true || $value === 1 || strtolower($value) === 'true' || $value === '1') return true;
         return false;
     }
 }

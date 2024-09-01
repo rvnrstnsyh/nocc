@@ -170,10 +170,9 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         $body = $pop->fetchbody($mail, $bodyPart->getPartNumber(), $bodyPart->getMimeId(), false);
         $body = NVLL_IMAP::decode($body, $bodyPart->getEncoding()->__toString());
         $body_charset = detect_body_charset($body, $bodyPartStructure->getCharset());
+
         // If user has selected another charset, we'll use it
-        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-            $body_charset = $_REQUEST['user_charset'];
-        }
+        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') $body_charset = $_REQUEST['user_charset'];
 
         $body = remove_stuff($body, $body_mime, $body_charset);
         //TODO: Move to a own function!?
@@ -228,7 +227,6 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         'msgnum' => $mail,
         'charset' => $body_charset
     );
-
     return ($content);
 }
 
@@ -372,20 +370,7 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
     $hp_config = HTMLPurifier_Config::createDefault();
     $hp_config->set('Core.Encoding', $charset);
     $hp_config->set('Attr.DefaultImageAlt', '');
-    $hp_config->set(
-        'URI.AllowedSchemes',
-        array(
-            'http' => true,
-            'https' => true,
-            'mailto' => true,
-            'ftp' => true,
-            'nntp' => true,
-            'news' => true,
-            'tel' => true,
-            'cid' => true
-        )
-    );
-
+    $hp_config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true, 'tel' => true, 'cid' => true));
     $hp_purifier = new HTMLPurifier($hp_config);
     $body = $hp_purifier->purify($body);
 
@@ -403,7 +388,9 @@ function remove_stuff($body, $mime, $charset = 'UTF-8')
 function link_att($mail, $attach_tab)
 {
     global $html_kb;
+
     sort($attach_tab);
+
     $html = '<ul class="attachments">';
 
     while ($tmp = array_shift($attach_tab)) {
@@ -450,7 +437,6 @@ function format_date(&$date, &$lang)
 
     // handle bad inputs
     if (empty($date)) return '';
-
     // if locale can't be set, use default for no locale
     if (!setlocale(LC_TIME, $lang_locale)) $default_date_format = $no_locale_date_format;
 
@@ -519,6 +505,7 @@ function semisplit_address_list($adresses, &$emails, $sep = ',')
     $all_emails = array();
     $all_first = array();
     $all_last = array();
+
     split_address_list($adresses, $all_emails, $all_first, $all_last, $sep);
 
     for ($j = 0; $j < count($all_emails); $j++) {
@@ -712,7 +699,6 @@ function cut_address($addr, $charset)
 
     for ($i = 0; $i < strlen($addr); $i++) {
         $c = substr($addr, $i, 1);
-
         // Are we entering/leaving escaped mode
         if ($c == '"') $quote_esc = !$quote_esc;
         // Is this an address seperator (comma/semicolon)
@@ -899,12 +885,12 @@ function mailquote(&$body, $from = '', $html_wrote = '', $mime = 'text/html')
             $rewrap_pre = true;
             $body = $tmp_body;
         }
+
         $body = preg_replace("/<br\s*>/iU", "<br />", $body);
         $body = preg_replace("/<br\s*\/\s*>/iU", "<br />", $body);
         $body = preg_replace("/(\S+)\s*" . $crlf . "\s*<br \/>/iU", "$1<br />", $body);
         $body = preg_replace("/<br \/>\s*" . $crlf . "/iU", "<br />", $body);
         $body = preg_replace("/<br \/>/Ui", "<br />" . $crlf, $body);
-
         $body = trim($body) . $crlf;
 
         $wrap_msg = $user_prefs->getWrapMessages();
@@ -914,23 +900,16 @@ function mailquote(&$body, $from = '', $html_wrote = '', $mime = 'text/html')
             $body = "> " . preg_replace("|" . $crlf . "|", $crlf . "> ", $body);
         }
 
-        if ($mime == 'text/html') {
-            $body = preg_replace('/((>\s*?)+' . $crlf . '){2,}/', '$1$1', $body);
-        }
-
-        if ($rewrap_pre) {
-            $body = '<pre style="overflow:auto">' . $body . "</pre>";
-            //$body='<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">'.$body.'</span>';
-        }
+        if ($mime == 'text/html') $body = preg_replace('/((>\s*?)+' . $crlf . '){2,}/', '$1$1', $body);
+        if ($rewrap_pre) $body = '<pre style="overflow:auto">' . $body . "</pre>";
     }
 
     if ($from != '') {
         $from = trim(preg_replace("|&lt;.*&gt;|", "", str_replace("\"", "", $from)));
         $from = trim(preg_replace("/<.*>/", "", $from));
     }
-    if ($html_wrote != '') {
-        $body = $from . ' ' . $html_wrote . " :" . $crlf . $crlf . $body;
-    }
+    if ($html_wrote != '') $body = $from . ' ' . $html_wrote . " :" . $crlf . $crlf . $body;
+
     return ($body);
 }
 
@@ -1002,9 +981,7 @@ function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = ""
             }
         }
 
-        if (!$user_prefs->getSendHtmlMail() || strlen(trim($new_line)) > 0) {
-            $msg = $msg . $new_line . $crlf;
-        }
+        if (!$user_prefs->getSendHtmlMail() || strlen(trim($new_line)) > 0) $msg = $msg . $new_line . $crlf;
     }
 
     return $msg;

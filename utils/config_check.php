@@ -14,6 +14,7 @@ require_once './classes/NVLL_MailAddress.php';
 function get_default_from_address()
 {
 	global $conf;
+
 	if (!NVLL_Session::existsUserPrefs()) return '';
 
 	$user_prefs = NVLL_Session::getUserPrefs();
@@ -48,11 +49,12 @@ function get_default_from_address()
 // Detect base url
 if (!isset($conf->base_url) || $conf->base_url == '') {
 	$path_info = pathinfo($_SERVER['SCRIPT_NAME']);
-
-	if (substr($path_info['dirname'], -1, 1) == '/')
+	if (substr($path_info['dirname'], -1, 1) == '/') {
 		$dir_name = $path_info['dirname'];
-	else
+	} else {
 		$dir_name = $path_info['dirname'] . '/';
+	}
+
 	//Prevent a buggy behavior from PHP under Windows
 	if ($path_info['dirname'] == '\\') $dir_name = '/';
 

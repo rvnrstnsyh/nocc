@@ -25,7 +25,6 @@ class NVLL_Session
 		global $conf;
 
 		$cookie_lifetime = 0;
-
 		if ($persistent == 1) {
 			$cookie_lifetime = 60 * 60 * 24 * 7 * 4; //4weeks
 			if (isset($conf->max_session_lifetime)) {
@@ -36,9 +35,9 @@ class NVLL_Session
 		$session_has_expired = 0;
 		NVLL_Session::remove_old_sessions();
 
-		if (!isset($_REQUEST['_vmbox']) || (strlen($_REQUEST['_vmbox']) > 0 && preg_match("/^NVLL_/", $_REQUEST['_vmbox']))) {
+		if (!isset($_REQUEST['_vmbox']) || (strlen($_REQUEST['_vmbox']) > 0 && preg_match("/^NEXT_/", $_REQUEST['_vmbox']))) {
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
-				if (preg_match("/^NVLL_/", $cookie_key)) {
+				if (preg_match("/^NEXT_/", $cookie_key)) {
 					$_vmbox = $cookie_key;
 					session_name($_vmbox);
 					session_set_cookie_params($cookie_lifetime, '/', '', false);
@@ -77,13 +76,13 @@ class NVLL_Session
 		//else {
 		if (isset($_REQUEST['_vmbox']) && strlen($_REQUEST['_vmbox']) > 0) {
 			$_vmbox = $_REQUEST['_vmbox'];
+
 			session_name($_vmbox);
 			session_set_cookie_params($cookie_lifetime, '/', '', false);
 			session_start();
 
-			if (isset($_SESSION['send_backup']) && ! isset($_GET['discard'])) {
-				$send_backup = $_SESSION['send_backup'];
-			}
+			if (isset($_SESSION['send_backup']) && ! isset($_GET['discard'])) $send_backup = $_SESSION['send_backup'];
+
 			$_vmboxvalue = session_id();
 			$_SESSION['_vmbox'] = $_vmbox;
 			$_SESSION['_vmboxvalue'] = $_vmboxvalue;
@@ -102,7 +101,9 @@ class NVLL_Session
 					$session_has_expired = 1;
 				}
 			}
+
 			if (isset($_SESSION['_vmbox']) && $_SESSION['_vmbox'] == "RSS") {
+				//
 			} else {
 				if ($found_session && NVLL_Session::check_session_age()) {
 					NVLL_Session::destroy();
@@ -121,12 +122,13 @@ class NVLL_Session
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
 				if (preg_match("/^IM_/", $cookie_key)) {
 					$_vmbox = $cookie_key;
+
 					session_name($_vmbox);
 					session_set_cookie_params($cookie_lifetime, '/', '', false);
 					session_start();
-					if (isset($_SESSION['send_backup'])) {
-						$send_backup = $_SESSION['send_backup'];
-					}
+
+					if (isset($_SESSION['send_backup'])) $send_backup = $_SESSION['send_backup'];
+
 					$_vmboxvalue = session_id();
 					$_SESSION['_vmbox'] = $_vmbox;
 					$_SESSION['_vmboxvalue'] = $_vmboxvalue;
@@ -143,11 +145,13 @@ class NVLL_Session
 					}
 				}
 			}
+
 			if ($found_session && NVLL_Session::check_session_age()) {
 				NVLL_Session::destroy();
 				$session_has_expired = 1;
 				$found_session = false;
 			}
+
 			if ($found_session && isset($conf->check_client_ip) && $conf->check_client_ip) {
 				if ($_SESSION['remote_addr'] != $_SERVER['REMOTE_ADDR']) {
 					NVLL_Session::destroy();
@@ -160,20 +164,17 @@ class NVLL_Session
 		//   RSS-QUESTION
 		//
 		//}
-		if (! $found_session) {
+		if (!$found_session) {
 			NVLL_Session::new_session($persistent);
 			if (isset($send_backup)) {
 				$_SESSION['send_backup'] = $send_backup;
 			}
 		}
-		if (! isset($_SESSION['persistent'])) {
-			$_SESSION['persistent'] = -1;
-		}
-		if ($persistent == 1) {
-			$_SESSION['persistent'] = 1;
-		}
-		NVLL_Session::remove_old_session_tmp_file();
 
+		if (!isset($_SESSION['persistent'])) $_SESSION['persistent'] = -1;
+		if ($persistent == 1) $_SESSION['persistent'] = 1;
+
+		NVLL_Session::remove_old_session_tmp_file();
 		$_SESSION['remote_addr'] = $_SERVER['REMOTE_ADDR'];
 
 		return $session_has_expired;
@@ -186,24 +187,19 @@ class NVLL_Session
 	public static function check_session_age()
 	{
 		global $conf;
+
 		$session_expired = true;
-		$max_session_age = 60 * 60 * 6;  //6 hours
-		if (isset($conf->min_session_lifetime)) {
-			$max_session_age = $conf->min_session_lifetime;
-		}
+		$max_session_age = 60 * 60 * 12;  //12 hours
+
+		if (isset($conf->min_session_lifetime)) $max_session_age = $conf->min_session_lifetime;
 		if (isset($_SESSION['persistent']) && $_SESSION['persistent'] == 1) {
-			$max_session_age = 4 * 7 * 24 * 60 * 60;  //4 weeks
-			if (isset($conf->max_session_lifetime)) {
-				$max_session_age = $conf->max_session_lifetime;
-			}
+			$max_session_age = 60 * 60 * 24 * 7 * 4;  //4 weeks
+			if (isset($conf->max_session_lifetime)) $max_session_age = $conf->max_session_lifetime;
 		}
+
 		if (isset($_SESSION['creation_time'])) {
-			if (time() - $_SESSION['creation_time'] <= $max_session_age) {
-				$session_expired = false;
-			}
-			if (! $session_expired && (! isset($_SESSION['persistent']) || $_SESSION['persistent'] != 1)) {
-				$_SESSION['creation_time'] = time();
-			}
+			if (time() - $_SESSION['creation_time'] <= $max_session_age) $session_expired = false;
+			if (!$session_expired && (! isset($_SESSION['persistent']) || $_SESSION['persistent'] != 1)) $_SESSION['creation_time'] = time();
 		}
 		return $session_expired;
 	}
@@ -215,11 +211,11 @@ class NVLL_Session
 	public static function remove_old_sessions()
 	{
 		global $conf;
+
 		$max_age = 60 * 60 * 24 * 7 * 4;  //4 weeks
-		if (isset($conf->max_session_lifetime)) {
-			$max_age = $conf->max_session_lifetime;
-		}
-		if (! isset($conf->prune_sessions) || ! $conf->prune_sessions == 0) {
+
+		if (isset($conf->max_session_lifetime)) $max_age = $conf->max_session_lifetime;
+		if (!isset($conf->prune_sessions) || ! $conf->prune_sessions == 0) {
 			if (!empty($conf->prefs_dir)) {
 				$old_session_files = glob($conf->prefs_dir . '/' . "IM_*");
 				if (is_array($old_session_files) && count($old_session_files) > 0) {
@@ -242,6 +238,7 @@ class NVLL_Session
 	public static function remove_old_session_tmp_file()
 	{
 		global $conf;
+
 		if (!empty($conf->tmpdir) && isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
 			$available_session_files = glob($conf->tmpdir . '/' . $_SESSION['_vmbox'] . "_*");
 			if (is_array($available_session_files) && count($available_session_files) > 0) {
@@ -268,6 +265,7 @@ class NVLL_Session
 					}
 				}
 			}
+
 			$old_session_files = glob($conf->tmpdir . '/' . "php*.att");
 			if (is_array($old_session_files) && count($old_session_files) > 0) {
 				foreach ($old_session_files as $filename) {
@@ -291,20 +289,19 @@ class NVLL_Session
 		$current_name = session_name();
 		$set_next = false;
 		$next_name = "";
+
 		foreach ($_COOKIE as $cookie_key => $cookie_value) {
 			if (preg_match("/^IM_/", $cookie_key)) {
 				if ($set_next) {
 					$next_name = $cookie_key;
 					break;
 				}
-				if ($current_name == $cookie_key) {
-					$set_next = true;
-				}
+				if ($current_name == $cookie_key) $set_next = true;
 			}
 		}
-		if (strlen($next_name) == 0) {
-			$next_name = 'NVLL_' . md5(uniqid(rand(), true));
-		}
+
+		if (strlen($next_name) == 0) $next_name = 'NEXT_' . md5(uniqid(rand(), true));
+
 		$next_name = "_vmbox=" . $next_name;
 		return $next_name;
 	}
@@ -316,10 +313,11 @@ class NVLL_Session
 	public static function rename_session()
 	{
 		$old_vmbox = session_name();
-		if (preg_match("/^NVLL_/", $old_vmbox)) {
+		if (preg_match("/^NEXT_/", $old_vmbox)) {
 			$_vmbox = 'IM_' . md5(uniqid(rand(), true));
 			//session_name($_vmbox);
 			session_regenerate_id(true);
+
 			$_vmboxvalue = session_id();
 			$_SESSION['_vmbox'] = $_vmbox;
 			$_SESSION['_vmboxvalue'] = $_vmboxvalue;
@@ -340,17 +338,19 @@ class NVLL_Session
 	public static function new_session($persistent = 0)
 	{
 		global $conf;
+
 		$cookie_lifetime = 0;
 		if ($persistent == 1) {
 			$cookie_lifetime = 60 * 60 * 24 * 7 * 4; //4weeks
-			if (isset($conf->max_session_lifetime)) {
-				$cookie_lifetime = $conf->max_session_lifetime;
-			}
+			if (isset($conf->max_session_lifetime)) $cookie_lifetime = $conf->max_session_lifetime;
 		}
-		$_vmbox = 'NVLL_' . md5(uniqid(rand(), true));
+
+		$_vmbox = 'NEXT_' . md5(uniqid(rand(), true));
+
 		session_name($_vmbox);
 		session_set_cookie_params($cookie_lifetime, '/', '', false);
 		session_start();
+
 		$_vmboxvalue = session_id();
 		$_SESSION['_vmbox'] = $_vmbox;
 		$_SESSION['_vmboxvalue'] = $_vmboxvalue;
@@ -364,8 +364,8 @@ class NVLL_Session
 	public static function save_session()
 	{
 		global $conf;
-		if (!empty($conf->prefs_dir)) {
 
+		if (!empty($conf->prefs_dir)) {
 			// generate string with session information
 			$save_string = session_id();
 			$save_string .= " " . $_SESSION['nvll_user'];
@@ -387,28 +387,20 @@ class NVLL_Session
 			$save_string .= " " . $_SESSION['creation_time'];
 			$save_string .= " " . $_SESSION['persistent'];
 			$save_string .= " " . $_SESSION['remote_addr'];
-
 			// encode string to base64
 			$save_string = base64_encode($save_string);
-
 			// save string to file
 			$filename = $conf->prefs_dir . '/' . $_SESSION['_vmbox'] . '.session';
 
-			if (file_exists($filename) && !is_writable($filename)) {
-				// $ev = new NVLL_Exception($html_session_file_error);
-				return false;
-			}
-			if (!is_writable($conf->prefs_dir)) {
-				// $ev = new NVLL_Exception($html_session_file_error);
-				return false;
-			}
+			if (file_exists($filename) && !is_writable($filename)) return false;
+			if (!is_writable($conf->prefs_dir)) return false;
+
 			$file = fopen($filename, 'w');
-			if (!$file) {
-				// $ev = new NVLL_Exception($html_session_file_error);
-				return false;
-			}
+			if (!$file) return false;
+
 			fwrite($file, $save_string . "\n");
 			fclose($file);
+
 			return true;
 		}
 		return false;
@@ -421,19 +413,14 @@ class NVLL_Session
 	public static function load_session_file($_vmbox)
 	{
 		global $conf;
-		if (empty($conf->prefs_dir)) {
-			return false;
-		}
+
+		if (empty($conf->prefs_dir)) return false;
 
 		$filename = $conf->prefs_dir . '/' . $_vmbox . '.session';
-		if (!file_exists($filename)) {
-			return false;
-		}
+		if (!file_exists($filename)) return false;
 
 		$file = fopen($filename, 'r');
-		if (!$file) {
-			return false;
-		}
+		if (!$file) return false;
 
 		$line = trim(fgets($file, 1024));
 		fclose($file);
@@ -448,15 +435,14 @@ class NVLL_Session
 	public static function load_session()
 	{
 		global $conf;
-		if (empty($conf->prefs_dir)) {
-			return false;
-		}
+
+		if (empty($conf->prefs_dir)) return false;
 
 		$_vmbox = session_name();
 		$line = NVLL_Session::load_session_file($_vmbox);
-		if (! $line) {
-			return false;
-		}
+
+		if (!$line) return false;
+
 		list(
 			$session_id,
 			$_SESSION['nvll_user'],
@@ -495,12 +481,12 @@ class NVLL_Session
 	public static function remove_session_file()
 	{
 		global $conf;
+
 		if (isset($conf->prefs_dir)) {
 			$_vmbox = session_name();
 			$filename = $conf->prefs_dir . '/' . $_vmbox . '.session';
-			if (file_exists($filename)) {
-				unlink($filename);
-			}
+
+			if (file_exists($filename)) unlink($filename);
 		}
 	}
 
@@ -512,17 +498,17 @@ class NVLL_Session
 	public static function destroy($forceSessionStart = false)
 	{
 		$_vmbox = 'NVLLSESSID';
-		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
-			$_vmbox = $_SESSION['_vmbox'];
-		}
+
+		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) $_vmbox = $_SESSION['_vmbox'];
 		//session_name($_vmbox);
 		NVLL_Session::remove_session_file();
+
 		if ($forceSessionStart) {
 			session_set_cookie_params(0, '/', '', false);
 			session_start();
 		}
-		setcookie($_vmbox, '', time() - 3600, '/', '', false);
 
+		setcookie($_vmbox, '', time() - 3600, '/', '', false);
 		$_SESSION = array();
 		session_destroy();
 	}
@@ -534,6 +520,7 @@ class NVLL_Session
 	public static function createCookie($persistent = 0)
 	{
 		global $conf;
+
 		$cookie_lifetime = 0;
 		if ($persistent == 1) {
 			$cookie_lifetime = time() + 60 * 60 * 24 * 7 * 4; //4weeks
@@ -541,10 +528,10 @@ class NVLL_Session
 				$cookie_lifetime = time() + $conf->max_session_lifetime;
 			}
 		}
+
 		$_vmbox = 'NVLLSESSID';
-		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
-			$_vmbox = $_SESSION['_vmbox'];
-		}
+		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) $_vmbox = $_SESSION['_vmbox'];
+
 		$_vmboxvalue = session_id();
 		setcookie($_vmbox, $_vmboxvalue, $cookie_lifetime, '/', '', false);
 	}
@@ -556,9 +543,7 @@ class NVLL_Session
 	public static function deleteCookie()
 	{
 		$_vmbox = 'NVLLSESSID';
-		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) {
-			$_vmbox = $_SESSION['_vmbox'];
-		}
+		if (isset($_SESSION['_vmbox']) && strlen($_SESSION['_vmbox']) > 0) $_vmbox = $_SESSION['_vmbox'];
 		setcookie($_vmbox, '', time() - 3600, '/', '', false);
 	}
 
@@ -600,9 +585,7 @@ class NVLL_Session
 	 */
 	public static function getSmtpServer()
 	{
-		if (isset($_SESSION['nvll_smtp_server'])) {
-			return $_SESSION['nvll_smtp_server'];
-		}
+		if (isset($_SESSION['nvll_smtp_server'])) return $_SESSION['nvll_smtp_server'];
 		return '';
 	}
 
@@ -623,9 +606,7 @@ class NVLL_Session
 	 */
 	public static function getQuotaEnable()
 	{
-		if (isset($_SESSION['quota_enable']) && $_SESSION['quota_enable']) {
-			return true;
-		}
+		if (isset($_SESSION['quota_enable']) && $_SESSION['quota_enable']) return true;
 		return false;
 	}
 
@@ -647,9 +628,7 @@ class NVLL_Session
 	 */
 	public static function getQuotaType()
 	{
-		if (isset($_SESSION['quota_type'])) {
-			return $_SESSION['quota_type'];
-		}
+		if (isset($_SESSION['quota_type'])) return $_SESSION['quota_type'];
 		return 'STORAGE';
 	}
 
@@ -686,9 +665,7 @@ class NVLL_Session
 	 */
 	public static function getUserPrefs()
 	{
-		if (NVLL_Session::existsUserPrefs()) {
-			return $_SESSION['nvll_userprefs'];
-		}
+		if (NVLL_Session::existsUserPrefs()) return $_SESSION['nvll_userprefs'];
 		return new NVLL_UserPrefs('');
 	}
 
@@ -710,9 +687,7 @@ class NVLL_Session
 	 */
 	public static function getSendHtmlMail()
 	{
-		if (isset($_SESSION['html_mail_send']) && $_SESSION['html_mail_send']) {
-			return true;
-		}
+		if (isset($_SESSION['html_mail_send']) && $_SESSION['html_mail_send']) return true;
 		return false;
 	}
 

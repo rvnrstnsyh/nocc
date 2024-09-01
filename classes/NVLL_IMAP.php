@@ -11,13 +11,13 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_MailStructure.php';
-require_once 'NVLL_HeaderInfo.php';
 require_once 'NVLL_Header.php';
 require_once 'NVLL_Exception.php';
+require_once 'NVLL_HeaderInfo.php';
+require_once 'NVLL_MailStructure.php';
 
-require_once './utils/detect_cyr_charset.php';
 require_once './utils/crypt.php';
+require_once './utils/detect_cyr_charset.php';
 
 class result
 {
@@ -208,9 +208,7 @@ class NVLL_IMAP
 	 */
 	public function fetchheader($msgnum)
 	{
-		$header = imap_fetchheader($this->conn, $msgnum);
-
-		return new NVLL_Header($header);
+		return new NVLL_Header(imap_fetchheader($this->conn, $msgnum));
 	}
 
 	/**
@@ -403,7 +401,7 @@ class NVLL_IMAP
 			unset($_SESSION['fd_message']);
 			$ev = new NVLL_Exception("tmp folder tmpdir is not set in config/php.conf.");
 			return;
-		} else if (! is_writable($conf->tmpdir)) {
+		} else if (!is_writable($conf->tmpdir)) {
 			$_SESSION['nvll_folder'] = $remember_folder;
 			unset($_SESSION['fd_message']);
 			$ev = new NVLL_Exception("tmp folder " . $conf->tmpdir . " is not writeable.");
@@ -516,11 +514,11 @@ class NVLL_IMAP
 				if (strstr($HTTP_USER_AGENT, 'compatible; MSIE 6') !== false && strstr($HTTP_USER_AGENT, 'Opera') === false) $isIE6 = 1;
 				if ($isIE) {
 					$filename = rawurlencode($filename);
+
 					header("Pragma: public");
 					header("Cache-Control: no-store, max-age=0, no-cache, must-revalidate"); // HTTP/1.1
 					header("Cache-Control: post-check=0, pre-check=0", false);
 					header("Cache-Control: private");
-
 					//set the inline header for IE, we'll add the attachment header later if we need it
 					header("Content-Disposition: inline; filename=$filename");
 				}
@@ -536,7 +534,6 @@ class NVLL_IMAP
 				header('Content-Length: ' . $file_size);
 
 				$_SESSION[$tmpFile] = $_SESSION[$tmpFile] + 1;
-
 				$chunksize = 1 * (1024 * 1024); // how many bytes per chunk
 				if ($file_size > $chunksize) {
 					$handle = fopen($tmpFile, 'rb');
@@ -551,7 +548,6 @@ class NVLL_IMAP
 				} else {
 					readfile($tmpFile);
 				}
-
 				exit; // Don't fall into HTML page - we're downloading and need to exit
 			} else {
 				unset($_SESSION['fd_tmpfile']);
@@ -600,7 +596,7 @@ class NVLL_IMAP
 		if (preg_match("/:/", $mailbox)) {
 			$remote = explode(":", $mailbox);
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
-				if (preg_match("/^NVLL_/", $cookie_key)) {
+				if (preg_match("/^NEXT_/", $cookie_key)) {
 					$_vmbox = $cookie_key;
 					if ($line = NVLL_Session::load_session_file($_vmbox)) {
 						list(
@@ -650,7 +646,7 @@ class NVLL_IMAP
 						}
 					}
 				}
-				if (! $is_mb_local) {
+				if (!$is_mb_local) {
 					break;
 				}
 			}
@@ -700,6 +696,7 @@ class NVLL_IMAP
 	{
 		$TMP_SESSION = array();
 		$is_mb_local = $this->check_mb_local($TMP_SESSION, $mailbox);
+
 		if ($is_mb_local) {
 			return imap_mail_copy($this->conn, $msgnum, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), 0);
 		} else {
@@ -745,6 +742,7 @@ class NVLL_IMAP
 	{
 		$TMP_SESSION = array();
 		$is_mb_local = $this->check_mb_local($TMP_SESSION, $mailbox);
+
 		if ($is_mb_local) {
 			return imap_mail_move($this->conn, $msgnum, mb_convert_encoding($mailbox, 'UTF7-IMAP', 'UTF-8'), 0);
 		} else {
@@ -868,13 +866,11 @@ class NVLL_IMAP
 	public function getmailboxes()
 	{
 		$mailboxes = @imap_getmailboxes($this->conn, '{' . $this->server . '}', '*');
-
 		if (!is_array($mailboxes)) {
 			throw new Exception('imap_getmailboxes() did not return an array.');
 		} else {
 			sort($mailboxes);
 		}
-
 		return $mailboxes;
 	}
 
@@ -888,6 +884,7 @@ class NVLL_IMAP
 		try {
 			$mailboxes = $this->getmailboxes();
 			$names = array();
+
 			foreach ($mailboxes as $mailbox) { //for all mailboxes...
 				$name = str_replace('{' . $this->server . '}', '', mb_convert_encoding($mailbox->name, 'UTF-8', 'UTF7-IMAP'));
 				//TODO: Why not add names with more the 32 chars?
@@ -909,13 +906,11 @@ class NVLL_IMAP
 	public function getsubscribed()
 	{
 		$subscribed = @imap_getsubscribed($this->conn, '{' . $this->server . '}', '*');
-
 		if (!is_array($subscribed)) {
 			throw new Exception('imap_getsubscribed() did not return an array.');
 		} else {
 			sort($subscribed);
 		}
-
 		return $subscribed;
 	}
 
@@ -928,7 +923,6 @@ class NVLL_IMAP
 	{
 		try {
 			$subscribed = $this->getsubscribed();
-
 			$names = array();
 			foreach ($subscribed as $mailbox) { //for all mailboxes...
 				$name = str_replace('{' . $this->server . '}', '', mb_convert_encoding($mailbox->name, 'UTF-8', 'UTF7-IMAP'));
@@ -1038,9 +1032,7 @@ class NVLL_IMAP
 		$source = imap_mime_header_decode($header);
 
 		for ($j = 0; $j < count($source); $j++) {
-			if ($source[$j]->charset == 'utf-16') {
-				$do_pre_decoding = true;
-			}
+			if ($source[$j]->charset == 'utf-16') $do_pre_decoding = true;
 		}
 
 		if ($do_pre_decoding) {
@@ -1052,7 +1044,6 @@ class NVLL_IMAP
 		}
 
 		$source = imap_mime_header_decode($header);
-
 		for ($j = 0; $j < count($source); $j++) {
 			$element_charset = ($source[$j]->charset == 'default') ? detect_charset($source[$j]->text) : $source[$j]->charset;
 			if ($element_charset == '' || $element_charset == null) {
@@ -1110,20 +1101,17 @@ class NVLL_IMAP
 	public function html_folder_select($value, $selected = '')
 	{
 		global $conf;
+
 		$folders = $this->getsubscribednames();
-		if (!is_array($folders) || count($folders) < 1) {
-			return "<p class=\"error\">Not currently subscribed to any mailboxes</p>";
-		}
+		if (!is_array($folders) || count($folders) < 1) return "<p class=\"error\">Not currently subscribed to any mailboxes</p>";
+
 		reset($folders);
 
 		$html_select = "<select class=\"button\" id=\"$value\" name=\"$value\">\n";
 
-		foreach ($folders as $folder) {
-			$html_select .= "\t<option " . ($folder == $selected ? "selected=\"selected\"" : "") . " value=\"$folder\">" . $folder . "</option>\n";
-		}
-
+		foreach ($folders as $folder) $html_select .= "\t<option " . ($folder == $selected ? "selected=\"selected\"" : "") . " value=\"$folder\">" . $folder . "</option>\n";
 		foreach ($_COOKIE as $cookie_key => $cookie_value) {
-			if (preg_match("/^NVLL_/", $cookie_key)) {
+			if (preg_match("/^NEXT_/", $cookie_key)) {
 				$_vmbox = $cookie_key;
 				if ($line = NVLL_Session::load_session_file($_vmbox)) {
 					list(
@@ -1151,7 +1139,6 @@ class NVLL_IMAP
 
 					//unclear if INBOX is always the best default, but we don't have available folders of another server session
 					$TMP_SESSION['nvll_folder'] = 'INBOX';
-
 					if ($session_id == $cookie_value && $TMP_SESSION['nvll_servr'] != $_SESSION['nvll_servr']) {
 						foreach ($conf->domains as $index => $domain) {
 							if (isset($conf->domains[$index]->in) && $conf->domains[$index]->in == $TMP_SESSION['nvll_servr']) {
@@ -1190,12 +1177,11 @@ class NVLL_IMAP
 	 */
 	public function get_page_count($num_messages)
 	{
-		if (!is_int($num_messages)) { //if NO integer...
-			return 0;
-		}
-		if ($num_messages == 0) { //if 0 messages...
-			return 0;
-		}
+		//if NO integer...
+		if (!is_int($num_messages)) return 0;
+		//if 0 messages...
+		if ($num_messages == 0) return 0;
+
 		return ceil($num_messages / get_per_page());
 	}
 

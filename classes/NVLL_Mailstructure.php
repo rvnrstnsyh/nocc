@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_Internetmediatype.php';
 require_once 'NVLL_Encoding.php';
+require_once 'NVLL_Internetmediatype.php';
 
 /**
  * Wrapping a imap_fetchstructure() object
@@ -90,10 +90,7 @@ class NVLL_MailStructure
      */
     public function getDescription()
     {
-        if ($this->_structure->ifdescription) {
-            return $this->_structure->description;
-        }
-
+        if ($this->_structure->ifdescription) return $this->_structure->description;
         return '';
     }
 
@@ -104,7 +101,6 @@ class NVLL_MailStructure
     public function getId()
     {
         $result = "";
-
         if ($this->_structure->ifid) $result = $this->_structure->id;
 
         return $result;
@@ -138,10 +134,7 @@ class NVLL_MailStructure
      */
     public function getBytes()
     {
-        if (isset($this->_structure->bytes)) {
-            return $this->_structure->bytes;
-        }
-
+        if (isset($this->_structure->bytes)) return $this->_structure->bytes;
         return 0;
     }
 
@@ -171,10 +164,8 @@ class NVLL_MailStructure
     public function getSize()
     {
         $totalBytes = $this->getTotalBytes();
-
-        if ($totalBytes > 1024) { //if more then 1024 bytes...
-            return ceil($totalBytes / 1024);
-        }
+        //if more then 1024 bytes...
+        if ($totalBytes > 1024) return ceil($totalBytes / 1024);
         return 1;
     }
 
@@ -184,10 +175,7 @@ class NVLL_MailStructure
      */
     public function getDisposition()
     {
-        if ($this->_structure->ifdisposition) {
-            return $this->_structure->disposition;
-        }
-
+        if ($this->_structure->ifdisposition) return $this->_structure->disposition;
         return '';
     }
 
@@ -212,12 +200,9 @@ class NVLL_MailStructure
     public function getValueFromDparameters($attribute, $defaultvalue = '')
     {
         $attribute = strtolower($attribute);
-
         if ($this->_structure->ifdparameters) {
             foreach ($this->_structure->dparameters as $parameter) { //for all parameters...
-                if (strtolower($parameter->attribute) == $attribute) {
-                    return $parameter->value;
-                }
+                if (strtolower($parameter->attribute) == $attribute) return $parameter->value;
             }
         }
 
@@ -245,15 +230,11 @@ class NVLL_MailStructure
     public function getValueFromParameters($attribute, $defaultvalue = '')
     {
         $attribute = strtolower($attribute);
-
         if ($this->_structure->ifparameters) {
             foreach ($this->_structure->parameters as $parameter) { //for all parameters...
-                if (strtolower($parameter->attribute) == $attribute) {
-                    return $parameter->value;
-                }
+                if (strtolower($parameter->attribute) == $attribute) return $parameter->value;
             }
         }
-
         return $defaultvalue;
     }
 
@@ -264,11 +245,8 @@ class NVLL_MailStructure
     public function hasParts()
     {
         if (isset($this->_structure->parts)) {
-            if (count($this->_structure->parts) > 0) {
-                return true;
-            }
+            if (count($this->_structure->parts) > 0) return true;
         }
-
         return false;
     }
 
@@ -278,10 +256,7 @@ class NVLL_MailStructure
      */
     public function getParts()
     {
-        if ($this->hasParts()) {
-            return $this->_structure->parts;
-        }
-
+        if ($this->hasParts()) return $this->_structure->parts;
         return array();
     }
 
@@ -298,9 +273,8 @@ class NVLL_MailStructure
             return $name;
         } else { //if "name" parameter NOT exists...
             $filename = $this->getValueFromDparameters('filename');
-            if (!empty($filename)) { //if "filename" parameter exists...
-                return $filename;
-            }
+            //if "filename" parameter exists...
+            if (!empty($filename)) return $filename;
         }
         return $defaultname;
     }
@@ -330,9 +304,8 @@ class NVLL_MailStructure
      */
     public function isAttachment()
     {
-        if (strtolower($this->getDisposition()) == 'attachment') { //if attachment...
-            return true;
-        }
+        //if attachment...
+        if (strtolower($this->getDisposition()) == 'attachment') return true;
         return false;
     }
 
@@ -342,9 +315,8 @@ class NVLL_MailStructure
      */
     public function isInline()
     {
-        if (strtolower($this->getDisposition()) == 'inline') { //if inline...
-            return true;
-        }
+        //if inline...
+        if (strtolower($this->getDisposition()) == 'inline') return true;
         return false;
     }
 
@@ -355,10 +327,7 @@ class NVLL_MailStructure
      */
     public static function getInternetMediaTypeFromStructure($structure)
     {
-        if (isset($structure->type) && isset($structure->subtype)) {
-            return new NVLL_InternetMediaType($structure->type, $structure->subtype);
-        }
-
+        if (isset($structure->type) && isset($structure->subtype)) return new NVLL_InternetMediaType($structure->type, $structure->subtype);
         return new NVLL_InternetMediaType();
     }
 
@@ -369,10 +338,7 @@ class NVLL_MailStructure
      */
     public static function getEncodingFromStructure($structure, $parts_info = array())
     {
-        if (isset($structure->encoding)) {
-            return new NVLL_Encoding($structure->encoding);
-        }
-
+        if (isset($structure->encoding)) return new NVLL_Encoding($structure->encoding);
         return new NVLL_Encoding();
     }
 }

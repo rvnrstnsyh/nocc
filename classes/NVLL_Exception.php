@@ -44,8 +44,6 @@ class NVLL_Exception
      */
     public static function isException($data)
     {
-        return (bool)(is_object($data) &&
-            ((get_class($data) == "NVLL_Exception") ||
-                (get_class($data) == "nvllexception")));
+        return (bool)(is_object($data) && ((get_class($data) == "NVLL_Exception") || (get_class($data) == "nvllexception")));
     }
 }

@@ -8,15 +8,14 @@ if (isset($content['body'])) $has_images = NVLL_Security::hasDisabledHtmlImages(
 
 // out-commented: dont allow display_image in edit mode, all user input would be lost
 $display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
-
 $service_request = "";
+
 if (isset($_REQUEST['service'])) $service_request = $_REQUEST['service'];
 
 $req_mail = "";
 if (isset($_REQUEST['mail'])) $req_mail = $_REQUEST['mail'];
 
 $req_display_images = "";
-
 if (isset($_REQUEST['display_images'])) $req_display_images = $_REQUEST['display_images'];
 
 // Default e-mail address on send form
@@ -66,8 +65,7 @@ $mail_from = get_default_from_address();
             (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change)
             || (! isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
           );
-          if ($prefs_show_email) {
-          ?>
+          if ($prefs_show_email) { ?>
             <input class="button" type="text" name="mail_from" id="mail_from" size="60" value="<?php echo htmlspecialchars($mail_from, ENT_COMPAT | ENT_SUBSTITUTE) ?>" />
           <?php } else {
             echo htmlspecialchars($mail_from, ENT_COMPAT | ENT_SUBSTITUTE);
@@ -191,8 +189,7 @@ $mail_from = get_default_from_address();
         } else {
           echo '&nbsp;';
         }
-      }
-      ?>
+      } ?>
       <?php
       if ($has_images && $display_images != 1 && $html_mail) {
         echo ('<tr><td colspan="2"><div class="nopic">');
@@ -202,8 +199,7 @@ $mail_from = get_default_from_address();
         //echo('<a href="api.php?'.NVLL_Session::getUrlGetSession().'&service='.$service.'&mail='.$content['msgnum'].'&verbose='.$verbose.'&display_images=1">'.$html_images_display.'</a>');
         echo ('</td></tr></div>');
       }
-      echo '<tr>'
-      ?>
+      echo '<tr>' ?>
       <td>&nbsp;</td>
       <td class="sendData">
         <textarea name="mail_body" cols="59" rows="20" placeholder="..."><?php echo (isset($mail_body) ? htmlspecialchars($mail_body, ENT_COMPAT | ENT_SUBSTITUTE) : '') ?></textarea>
@@ -227,16 +223,13 @@ $mail_from = get_default_from_address();
   let btnClicked;
 
   function validate(f) {
-    if (checkSendDelay() == false) {
-      return (false);
-    }
+    if (checkSendDelay() == false) return (false);
     if (btnClicked.value == "<?php echo unhtmlentities($html_cancel) ?>") {
       retVal = confirm("<?php echo $reset_clicked ?>");
-      if (retVal == false) {
-        return false;
-      }
+      if (retVal == false) return false;
       return true;
     }
+
     if (btnClicked.value == "<?php echo unhtmlentities($html_attach) ?>") {
       if (f.elements['mail_att'].value == "") {
         alert('<?php echo unhtmlentities($html_attach_none) ?>');
@@ -245,9 +238,8 @@ $mail_from = get_default_from_address();
         return (true);
       }
     }
-    if (btnClicked.value == "<?php echo unhtmlentities($html_attach_delete) ?>") {
-      return (true);
-    }
+
+    if (btnClicked.value == "<?php echo unhtmlentities($html_attach_delete) ?>") return (true);
     if (window.RegExp) {
       let reg = new RegExp("[0-9A-Za-z]+", "g");
       if (!reg.test(f.elements['mail_to'].value)) {
@@ -256,6 +248,7 @@ $mail_from = get_default_from_address();
         return (false);
       }
     }
+
     if (f.elements['mail_att'].value != "") {
       alert("<?php echo unhtmlentities($html_attach_forget) ?>")
       return (false);

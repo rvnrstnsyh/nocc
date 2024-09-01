@@ -9,13 +9,14 @@ This is a modified version of an existing program, and GitHub has done an excell
     A. Requirements
 
     1)  PHP v7.4.30 or newer
-    2)  c-client (compiled with PHP or as module)
-    3)  iconv (compiled with PHP or as module)
-    4)  mbstring (compiled with PHP or as module)
-    5)  sodium (compiled with PHP or as module)
-    6)  openssl (compiled with PHP or as module)
-    7)  gd (compiled with PHP or as module)
-    8)  mysqli and pdo_mysql (compiled with PHP or as module)
+    2)  imap (compiled with PHP or as module)
+    3)  c-client (compiled with PHP or as module)
+    4)  iconv (compiled with PHP or as module)
+    5)  mbstring (compiled with PHP or as module)
+    6)  sodium (compiled with PHP or as module)
+    7)  openssl (compiled with PHP or as module)
+    8)  gd (compiled with PHP or as module)
+    9)  mysqli and pdo_mysql (compiled with PHP or as module)
 
     B. Installation
 

@@ -25,6 +25,7 @@ try {
     } else {
         header('Content-type: image/' . $mime);
     }
+
     echo $img;
 } catch (Exception $ex) {
     //TODO: Show error without NVLL_Exception!

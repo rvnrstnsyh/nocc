@@ -180,9 +180,7 @@ class NVLL_Header
         $aValue = preg_split('/\s/', trim($sValue));
         $value = strtolower(array_shift($aValue));
 
-        if (is_numeric($value)) {
-            return $value;
-        }
+        if (is_numeric($value)) return $value;
         if ($value == 'urgent' || $value == 'high') {
             return 2;
         } elseif ($value == 'non-urgent' || $value == 'low') {

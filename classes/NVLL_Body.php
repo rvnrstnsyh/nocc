@@ -29,6 +29,7 @@ class NVLL_Body
                 $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
             }
         }
+
         $body = preg_replace("|href=\"mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)\"|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
         $body = preg_replace("|href=mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
 

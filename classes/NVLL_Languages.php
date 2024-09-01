@@ -36,9 +36,7 @@ class NVLL_Languages
 
     private function loadLanguageFile($filePath)
     {
-        if (file_exists($filePath)) {
-            return include $filePath;
-        }
+        if (file_exists($filePath)) return include $filePath;
         return [];
     }
 
@@ -55,16 +53,11 @@ class NVLL_Languages
 
         if (isset($path) && is_string($path) && !empty($path)) {
             if (is_dir($path)) {
-                if (substr($path, -1) != '/') {
-                    $path .= '/';
-                }
-
+                if (substr($path, -1) != '/') $path .= '/';
                 $files = glob($path . '[a-z][a-z].php');
                 foreach ($files as $file) {
                     $basename = strtolower(basename($file, '.php'));
-                    if ($allowedLanguages === null || in_array($basename, $allowedLanguages)) {
-                        $this->_languages[$basename] = $this->loadLanguageFile($file);
-                    }
+                    if ($allowedLanguages === null || in_array($basename, $allowedLanguages)) $this->_languages[$basename] = $this->loadLanguageFile($file);
                 }
 
                 if ($this->exists($defaultLangId)) {
@@ -72,9 +65,7 @@ class NVLL_Languages
                     $this->_selectedLangId = $this->_defaultLangId;
                 }
 
-                if (!isset($this->_languages['default'])) {
-                    $this->_languages['default'] = $this->_languages[$this->_defaultLangId];
-                }
+                if (!isset($this->_languages['default'])) $this->_languages['default'] = $this->_languages[$this->_defaultLangId];
             }
         }
     }
@@ -95,9 +86,9 @@ class NVLL_Languages
      */
     public function exists($langId)
     {
-        if (isset($langId) && is_string($langId) && !empty($langId)) { //if language ID is set...
+        //if language ID is set...
+        if (isset($langId) && is_string($langId) && !empty($langId)) {
             $langId = strtolower($langId);
-
             return array_key_exists($langId, $this->_languages);
         }
         return false;
@@ -151,9 +142,8 @@ class NVLL_Languages
      */
     public function getSelectedLangId()
     {
-        if (!empty($this->_selectedLangId)) { //if a language is selected...
-            return $this->_selectedLangId;
-        }
+        //if a language is selected...
+        if (!empty($this->_selectedLangId)) return $this->_selectedLangId;
         return $this->_defaultLangId;
     }
 
@@ -184,17 +174,15 @@ class NVLL_Languages
             $acceptLanguageHeader = strtolower($acceptLanguageHeader);
             $acceptLanguageHeader = str_replace(' ', '', $acceptLanguageHeader);
             $acceptLanguageHeader = str_replace('q=', '', $acceptLanguageHeader);
-
             $langQuality = '1.0';
             $acceptedLanguages = explode(',', $acceptLanguageHeader);
+
             foreach ($acceptedLanguages as $acceptedLanguage) { //for all accepted languages...
                 $tmp = explode(';', $acceptedLanguage);
-
                 if (isset($tmp[0]) && !empty($tmp[0])) { //if found language ID...
                     $lang_id = $tmp[0];
-                    if (isset($tmp[1]) && !empty($tmp[1])) { //if found language quality...
-                        $langQuality = $tmp[1];
-                    }
+                    //if found language quality...
+                    if (isset($tmp[1]) && !empty($tmp[1])) $langQuality = $tmp[1];
                     $languages[$lang_id] = $langQuality;
                 }
             }

@@ -48,9 +48,7 @@ if ($service == 'logout') {
 
 if ($service == 'inbox_changed') {
     $_SESSION['ajxfolder'] = "INBOX";
-    if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) {
-        $_SESSION['ajxfolder'] = $user_prefs->getInboxFolderName();
-    }
+    if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) $_SESSION['ajxfolder'] = $user_prefs->getInboxFolderName();
 }
 
 try {
@@ -139,38 +137,21 @@ switch ($service) {
         //--------------------------------------------------------------------------------
     case 'compose':
         if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
-            if (isset($_SESSION['send_backup']['mail_to'])) {
-                $mail_to = $_SESSION['send_backup']['mail_to'];
-            }
-            if (isset($_SESSION['send_backup']['mail_cc'])) {
-                $mail_cc = $_SESSION['send_backup']['mail_cc'];
-            }
-            if (isset($_SESSION['send_backup']['mail_bcc'])) {
-                $mail_bcc = $_SESSION['send_backup']['mail_bcc'];
-            }
-            if (isset($_SESSION['send_backup']['mail_subject'])) {
-                $mail_subject = $_SESSION['send_backup']['mail_subject'];
-            }
-            if (isset($_SESSION['send_backup']['mail_body'])) {
-                $mail_body = $_SESSION['send_backup']['mail_body'];
-            }
-            if (isset($_SESSION['send_backup']['mail_att'])) {
-                $_SESSION['nvll_attach_array'] = $_SESSION['send_backup']['mail_att'];
-            }
-            if (isset($_SESSION['send_backup']['mail_receipt'])) {
-                $mail_receipt = $_SESSION['send_backup']['mail_receipt'];
-            }
-            if (isset($_SESSION['send_backup']['mail_priority'])) {
-                $mail_priority = $_SESSION['send_backup']['mail_priority'];
-            }
+            if (isset($_SESSION['send_backup']['mail_to'])) $mail_to = $_SESSION['send_backup']['mail_to'];
+            if (isset($_SESSION['send_backup']['mail_cc'])) $mail_cc = $_SESSION['send_backup']['mail_cc'];
+            if (isset($_SESSION['send_backup']['mail_bcc'])) $mail_bcc = $_SESSION['send_backup']['mail_bcc'];
+            if (isset($_SESSION['send_backup']['mail_subject'])) $mail_subject = $_SESSION['send_backup']['mail_subject'];
+            if (isset($_SESSION['send_backup']['mail_body'])) $mail_body = $_SESSION['send_backup']['mail_body'];
+            if (isset($_SESSION['send_backup']['mail_att'])) $_SESSION['nvll_attach_array'] = $_SESSION['send_backup']['mail_att'];
+            if (isset($_SESSION['send_backup']['mail_receipt'])) $mail_receipt = $_SESSION['send_backup']['mail_receipt'];
+            if (isset($_SESSION['send_backup']['mail_priority'])) $mail_priority = $_SESSION['send_backup']['mail_priority'];
+
             unset($_SESSION['send_backup']);
         }
 
-        if (isset($_REQUEST['mail_to']) && $_REQUEST['mail_to'] != "") {
-            $mail_to = $_REQUEST['mail_to'];
-        }
-        $pop->close();
+        if (isset($_REQUEST['mail_to']) && $_REQUEST['mail_to'] != "") $mail_to = $_REQUEST['mail_to'];
 
+        $pop->close();
         // Add signature
         add_signature($mail_body);
 
@@ -187,10 +168,10 @@ switch ($service) {
         //--------------------------------------------------------------------------------
     case 'reply':
     case 'reply_all':
-        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
-            unset($_SESSION['send_backup']);
-        }
+        if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) unset($_SESSION['send_backup']);
+
         clear_attachments();
+
         $attachmentParts = array();
         try {
             $content = aff_mail($pop, $_REQUEST['mail'], NVLL_Request::getBoolValue('verbose'), $attachmentParts);
@@ -222,7 +203,6 @@ switch ($service) {
         }
 
         $mail_subject = add_reply_to_subject($content['subject']);
-
         // Add quoting
         add_quoting($mail_body, $content);
         // Add signature
@@ -315,13 +295,9 @@ switch ($service) {
                     }
                 }
                 break;
-
             case 'subscribe_folder':
-                if ($_REQUEST['subscribenewbox']) {
-                    $pop->subscribe($_REQUEST['subscribenewbox'], false);
-                }
+                if ($_REQUEST['subscribenewbox']) $pop->subscribe($_REQUEST['subscribenewbox'], false);
                 break;
-
             case 'remove_folder':
                 if ($_REQUEST['removeoldbox']) {
                     // Don't want to remove, just unsubscribe.
@@ -330,7 +306,6 @@ switch ($service) {
                     $pop->unsubscribe($_REQUEST['removeoldbox']);
                 }
                 break;
-
             case 'rename_folder':
                 if ($_REQUEST['renamenewbox'] && $_REQUEST['renameoldbox']) {
                     if ($pop->renamemailbox($_REQUEST['renameoldbox'], $_REQUEST['renamenewbox'])) {
@@ -339,7 +314,6 @@ switch ($service) {
                     }
                 }
                 break;
-
             case 'download_folder':
                 if ($_REQUEST['downloadbox']) {
                     $pop->downloadmailbox($_REQUEST['downloadbox'], $ev);
@@ -350,7 +324,6 @@ switch ($service) {
                 $pop->downloadtmpfile($ev);
                 if (NVLL_Exception::isException($ev)) break;
                 break;
-
             case 'delete_folder':
                 if ($_REQUEST['deletebox']) {
                     $pop->unsubscribe($_REQUEST['deletebox']);
@@ -401,9 +374,7 @@ switch ($service) {
                     break;
 
                 case 'create':
-                    if (!$_REQUEST['filtername']) {
-                        break;
-                    }
+                    if (!$_REQUEST['filtername']) break;
 
                     if ($_REQUEST['thing1'] == '-') {
                         break;
@@ -412,15 +383,8 @@ switch ($service) {
                             $_REQUEST['thing1'] . ' "' . $_REQUEST['contains1'] . '"';
                     }
 
-                    if ($_REQUEST['thing2'] != '-') {
-                        $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] .=
-                            ' ' . $_REQUEST['thing2'] . ' "' . $_REQUEST['contains2'] . '"';
-                    }
-
-                    if ($_REQUEST['thing3'] != '-') {
-                        $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] .=
-                            ' ' . $_REQUEST['thing3'] . ' "' . $_REQUEST['contains3'] . '"';
-                    }
+                    if ($_REQUEST['thing2'] != '-') $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] .= ' ' . $_REQUEST['thing2'] . ' "' . $_REQUEST['contains2'] . '"';
+                    if ($_REQUEST['thing3'] != '-') $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] .= ' ' . $_REQUEST['thing3'] . ' "' . $_REQUEST['contains3'] . '"';
 
                     if ($_REQUEST['filter_action'] == 'DELETE') {
                         $filterset->filterset[$_REQUEST['filtername']]['ACTION'] = 'DELETE';
@@ -432,6 +396,7 @@ switch ($service) {
 
                     $filterset->dirty_flag = 1;
                     $filterset->commit($ev);
+
                     if (NVLL_Exception::isException($ev)) {
                         require './html/header.php';
                         require './html/error.php';
@@ -668,9 +633,7 @@ switch ($service) {
             $_SESSION['inbox_num_msg'] = $num_msg;
             $_SESSION['inbox_alert'] = true;
         }
-
-        if (isset($_REQUEST['skip']))
-            $skip = $_REQUEST['skip'];
+        if (isset($_REQUEST['skip'])) $skip = $_REQUEST['skip'];
         if ($num_msg > 0) {
             //TODO: Remove later try/catch block!
             try {
@@ -698,7 +661,6 @@ switch ($service) {
         }
 
         $list_of_folders = '';
-
         // If we show it twice, the bottom folder select is sent, and might be
         // wrong.
         if ($pop->is_imap()) {
@@ -761,6 +723,7 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         //$header=$pop->fetchbody($_REQUEST['mail'],$partNumber.'.0',$partNumber,true,true);
         $header = $pop->fetchbody($_REQUEST['mail'], $partNumber . '.0', $mimeID, true, true);
     }
+
     if ($partStructure->getInternetMediaType()->isHtmlText() || $partStructure->getInternetMediaType()->isPlainText()) {
         $body = $pop->fetchbody($_REQUEST['mail'], $partNumber, $mimeID, false, true);
         $charset = $partStructure->getCharset();
@@ -783,9 +746,8 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
             $charset = $match[1];
             $subject = iconv_mime_decode($subject, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset);
         }
-        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-            $charset = $_REQUEST['user_charset'];
-        }
+
+        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') $charset = $_REQUEST['user_charset'];
 
         $subject = os_iconv($charset, 'UTF-8', $subject);
         $content = $content . $html_subject_label . " " . $subject . '<br />';
@@ -798,9 +760,8 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
             $charset = $match[1];
             $from = iconv_mime_decode($from, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset);
         }
-        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-            $charset = $_REQUEST['user_charset'];
-        }
+
+        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') $charset = $_REQUEST['user_charset'];
 
         $from = os_iconv($charset, 'UTF-8', $from);
         $from = htmlentities($from, ENT_COMPAT, 'UTF-8');
@@ -816,9 +777,8 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
             $charset = $match[1];
             $to = iconv_mime_decode($to, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset);
         }
-        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') {
-            $charset = $_REQUEST['user_charset'];
-        }
+
+        if (isset($_REQUEST['user_charset']) && $_REQUEST['user_charset'] != '') $charset = $_REQUEST['user_charset'];
 
         $to = os_iconv($charset, 'UTF-8', $to);
         $to = htmlentities($to, ENT_COMPAT, 'UTF-8');
@@ -829,20 +789,19 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
     } else if ($partStructure->hasParts()) {
         $parts = $partStructure->getParts();
         $body_index = -1;
+
         for ($i = 0; $i < count($parts); $i++) {
             $bodyPartStructure = new NVLL_MailStructure($parts[$i], $parts_info);
-            if (! $bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isHtmlText()) {
-                $body_index = $i;
-            }
+            if (!$bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isHtmlText()) $body_index = $i;
         }
+
         if ($body_index == -1) {
             for ($i = 0; $i < count($parts); $i++) {
                 $bodyPartStructure = new NVLL_MailStructure($parts[$i], $parts_info);
-                if (! $bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isPlainText()) {
-                    $body_index = $i;
-                }
+                if (!$bodyPartStructure->isAttachment() && $bodyPartStructure->getInternetMediaType()->isPlainText()) $body_index = $i;
             }
         }
+
         if ($body_index >= 0) {
             $bodyPartStructure = new NVLL_MailStructure($parts[$body_index], $parts_info);
             $part = new NVLL_MailPart($bodyPartStructure, $body_index);
@@ -980,8 +939,10 @@ function add_quoting(&$mail_body, $content)
 
     $from = $content['from'];
     $to = $content['to'];
+
     if ($user_prefs->getSendHtmlMail()) {
         $stripped_content = $content['body'];
+
         if (strtolower($content['body_mime']) == "text/plain") {
             $stripped_content = preg_replace("/<br \/>\s*\n/i", "\n", $stripped_content);
             $stripped_content = preg_replace("/<br \/>\s*\r/i", "\r", $stripped_content);
@@ -990,6 +951,7 @@ function add_quoting(&$mail_body, $content)
             $stripped_content = preg_replace("/\n/i", "<br />", $stripped_content);
             $stripped_content = preg_replace("/\r/i", "<br />", $stripped_content);
         }
+
         $from = preg_replace("/</", "&lt;", $from);
         $from = preg_replace("/>/", "&gt;", $from);
         $to = preg_replace("/</", "&lt;", $to);
@@ -1026,9 +988,8 @@ function add_reply_to_subject($subject)
     global $html_reply_short;
 
     $subjectStart = substr($subject, 0, strlen($html_reply_short));
-    if (strcasecmp($subjectStart, $html_reply_short) != 0) { //if NOT start with localized "Re:" ...
-        return $html_reply_short . ' ' . $subject;
-    }
+    //if NOT start with localized "Re:" ...
+    if (strcasecmp($subjectStart, $html_reply_short) != 0) return $html_reply_short . ' ' . $subject;
     return $subject;
 }
 
@@ -1040,9 +1001,7 @@ function add_reply_to_subject($subject)
  */
 function set_list_of_folders($pop, $subscribed)
 {
-    if (isset($_REQUEST['sort']) && isset($_SESSION['list_of_folders'])) {
-        return $_SESSION['list_of_folders'];
-    }
+    if (isset($_REQUEST['sort']) && isset($_SESSION['list_of_folders'])) return $_SESSION['list_of_folders'];
 
     $new_folders = array();
     $list_of_folders = '';
@@ -1050,9 +1009,8 @@ function set_list_of_folders($pop, $subscribed)
         $folder_name = substr(strstr($folder->name, '}'), 1);
         $status = $pop->status($folder->name);
         $unseen = 0;
-        if (isset($status['unseen']) && $status['unseen'] > 0) {
-            $unseen = $status['unseen'];
-        }
+
+        if (isset($status['unseen']) && $status['unseen'] > 0) $unseen = $status['unseen'];
         if ($unseen > 0) {
             if (!in_array($folder_name, $new_folders)) {
                 $list_of_folders .= ' <a href="api.php?' . NVLL_Session::getUrlGetSession() . '&amp;folder=' . $folder_name . '">' . $folder_name . " ($unseen)" . '</a>';

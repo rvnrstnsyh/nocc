@@ -24,6 +24,7 @@ class NVLL_Contacts
 		$contact_emails = array();
 		$contacts = array();
 		$all_to = trim($all_to);
+
 		if (strlen($path) > 0 && strlen($all_to) > 0) {
 			$contacts = $this->loadList($path);
 			foreach ($contacts as $buffer) {
@@ -37,11 +38,11 @@ class NVLL_Contacts
 
 			$remove = array();
 			$all = reformat_address_list($all_to, $remove, ";");
-
 			$all_emails = array();
 			$all_firstnames = array();
 			$all_lastnames = array();
 			split_address_list($all, $all_emails, $all_firstnames, $all_lastnames, ";");
+
 			for ($i = 0; $i < count($all_emails); $i++) {
 				$email = trim($all_emails[$i]);
 				$check_email = strtolower($email);
@@ -67,8 +68,8 @@ class NVLL_Contacts
 	public static function loadList($path, &$lists = 0)
 	{
 		$fp = @fopen($path, 'r');
-		if (!$fp)
-			return array();
+
+		if (!$fp) return array();
 
 		$contacts = array();
 
@@ -76,23 +77,20 @@ class NVLL_Contacts
 			$buffer = trim(fgets($fp), " \n\r\0\x0B");
 			if ($buffer != '') {
 				$contact = explode("\t", $buffer);
-				if (count($contact) < 4) {
-					$contact = array_pad($contact, -4, "");
-				}
+
+				if (count($contact) < 4) $contact = array_pad($contact, -4, "");
 				if (count($contact) == 4) {
 					array_push($contact, ''); //empty string
 					array_push($contact, 0); //0=not an email list,1=list of emails
 				}
-				if (is_array($lists) && $contact[5] == 1) {
-					array_push($lists, $contact);
-				}
+				if (is_array($lists) && $contact[5] == 1) array_push($lists, $contact);
+
 				array_push($contacts, $contact);
 				//array_push($contacts, $buffer);
 			}
 		}
 
 		usort($contacts, "NVLL_Contacts::cmp_sort_contacts_list");
-
 		fclose($fp);
 		return $contacts;
 	}
@@ -188,17 +186,12 @@ class NVLL_Contacts
 		$r = 0;
 		$cmp_a = "";
 		//nick name highest sort priority
-		if (strlen($a[2]) > 0) {
-			$cmp_a = $a[2];
-		}
+		if (strlen($a[2]) > 0) $cmp_a = $a[2];
 		//last name next sort priority
-		else if (strlen($a[1]) > 0) {
-			$cmp_a = $a[1];
-		}
+		else if (strlen($a[1]) > 0) $cmp_a = $a[1];
 		//last email last sort priority
-		else if (strlen($a[3]) > 0) {
-			$cmp_a = $a[3];
-		}
+		else if (strlen($a[3]) > 0) $cmp_a = $a[3];
+
 		$cmp_b = "";
 		if (strlen($b[2]) > 0) {
 			$cmp_b = $b[2];
@@ -224,22 +217,25 @@ class NVLL_Contacts
 	public static function saveList($path, $contacts, $conf, &$ev)
 	{
 		global $html_err_file_contacts;
+
 		if (file_exists($path) && !is_writable($path)) {
 			$ev = new NVLL_Exception($html_err_file_contacts);
 			return false;
 		}
+
 		if (!is_writeable($conf->prefs_dir)) {
 			$ev = new NVLL_Exception($html_err_file_contacts);
 			return false;
 		}
-		$fp = fopen($path, 'w');
 
+		$fp = fopen($path, 'w');
 		for ($i = 0; $i < count($contacts); ++$i) {
 			$contact = $contacts[$i];
 			$line = '';
 			for ($j = 0; $j < count($contact) - 1; $j++) {
 				$line = $line . trim($contact[$j]) . "\t";
 			}
+
 			$line = $line . trim($contact[count($contact) - 1]);
 			if (trim($line) != '') {
 				//fwrite($fp, $contacts[$i] . "\n");

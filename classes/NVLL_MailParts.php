@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_MailStructure.php';
 require_once 'NVLL_MailPart.php';
+require_once 'NVLL_MailStructure.php';
 
 /**
  * Wrapping mail parts
@@ -106,11 +106,13 @@ class NVLL_MailParts
 		$mailstructure_parts = $mailstructure->getParts();
 		$parts_info = $mailstructure->getPartsInfo();
 		$internetMediaType = $mailstructure->getInternetMediaType();
+
 		if ($internetMediaType->isMultipart()) { //if multipart...
 			//$num_parts = count($this_part->parts);
 			$num_parts = count($mailstructure_parts);
 			$found_plain = false;
 			$found_html = false;
+
 			if ($internetMediaType->isAlternativeMultipart()) {
 				// check if alternative consists of PLAIN and HTML, if yes we skip the PLAIN
 				for ($i = 0; $i < $num_parts; $i++) {
@@ -124,12 +126,14 @@ class NVLL_MailParts
 					}
 				}
 			}
+
 			for ($i = 0; $i < $num_parts; $i++) {
 				$subtype = strtolower($mailstructure_parts[$i]->subtype);
 
 				if ($partNumber != '') {
 					if (substr($partNumber, -1) != '.') $partNumber = $partNumber . '.';
 				}
+
 				if ($found_plain == true && $found_html == true) {
 					if ($subtype != "plain") {
 						$this->_fillArrayWithParts($parts, new NVLL_MailStructure($mailstructure_parts[$i], $parts_info), $partNumber . ($i + 1), $skip_message);

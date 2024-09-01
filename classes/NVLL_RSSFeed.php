@@ -144,13 +144,16 @@ class NVLL_RSSFeed
         echo "    <sy:updateBase>" . $date . "</sy:updateBase>\n";
         echo "    <items>\n";
         echo "      <rdf:Seq>\n";
-        foreach ($this->_items as $item) { //for all items...
-            echo "        <rdf:li rdf:resource=\"" . $item->getLink() . "\" />\n";
-        }
+
+        //for all items...
+        foreach ($this->_items as $item) echo "        <rdf:li rdf:resource=\"" . $item->getLink() . "\" />\n";
+
         echo "      </rdf:Seq>\n";
         echo "    </items>\n";
         echo "  </channel>\n";
-        foreach ($this->_items as $item) { //for all items...
+
+        //for all items...
+        foreach ($this->_items as $item) {
             echo "  <item rdf:about=\"" . $item->getLink() . "\">\n";
             echo "    <title>" . $item->getTitle() . "</title>\n";
             echo "    <link>" . $item->getLink() . "</link>\n";
@@ -182,9 +185,8 @@ class NVLL_RSSFeed
      */
     public static function getIso8601Date($timestamp = null)
     {
-        if (!isset($timestamp)) { //if timestamp exists...
-            $timestamp = time();
-        }
+        //if timestamp exists...
+        if (!isset($timestamp)) $timestamp = time();
         return date('c', $timestamp);
     }
 }

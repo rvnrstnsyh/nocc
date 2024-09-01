@@ -47,24 +47,20 @@ class NVLL_SMTP
 	{
 		$error = false;
 		$response = '';
-		if ($this->pipelining && ($cmd == "MAIL" || $cmd == "RCPT" || $cmd == "DATA")) {
-			$this->pipelining_count++;
-		}
+
+		if ($this->pipelining && ($cmd == "MAIL" || $cmd == "RCPT" || $cmd == "DATA")) $this->pipelining_count++;
 		if (! $this->pipelining || ($cmd != "MAIL" && $cmd != "RCPT")) {
 			do {
 				$line = fgets($smtp, 1024);
 				if ($line != false) {
-					if ($this->pipelining && $this->pipelining_count > 0) {
-						$this->pipelining_count--;
-					}
+					if ($this->pipelining && $this->pipelining_count > 0) $this->pipelining_count--;
 					if (substr($line, 4, 10) == "PIPELINING") {
 						$this->pipelining = true;
 						$this->pipelining_count = 0;
 					}
+
 					$response = $response . $cmd . ':' . trim($line) . " | ";
-					if ($line[0] != '2' && $line[0] != '3') {
-						$error = true;
-					}
+					if ($line[0] != '2' && $line[0] != '3') $error = true;
 				}
 			} while ($line != false && (
 				empty($line) || substr($line, 3, 1) == '-' || ($this->pipelining && $this->pipelining_count > 0)
@@ -101,13 +97,11 @@ class NVLL_SMTP
 
 		$remote_socket = $this->smtp_server . ":" . $this->port;
 		$smtp = stream_socket_client($remote_socket, $errno, $errstr, ini_get("default_socket_timeout"), STREAM_CLIENT_CONNECT, $context);
-		if (!$smtp)
-			return new NVLL_Exception($html_smtp_error_no_conn . ' : ' . $errstr);
+
+		if (!$smtp) return new NVLL_Exception($html_smtp_error_no_conn . ' : ' . $errstr);
 
 		$response = "";
-		if ($this->check_response("OPEN", $smtp, $response)) {
-			return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-		}
+		if ($this->check_response("OPEN", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 		return $smtp;
 	}
@@ -119,10 +113,7 @@ class NVLL_SMTP
 		fputs($smtp, "helo " . $_SERVER['SERVER_NAME'] . "\r\n");
 
 		$response = "";
-		if ($this->check_response("HELO", $smtp, $response)) {
-			return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-		}
-
+		if ($this->check_response("HELO", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		return (true);
 	}
 
@@ -133,10 +124,7 @@ class NVLL_SMTP
 		fputs($smtp, "ehlo " . $_SERVER['SERVER_NAME'] . "\r\n");
 
 		$response = "";
-		if ($this->check_response("EHLO", $smtp, $response)) {
-			return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-		}
-
+		if ($this->check_response("EHLO", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		return true;
 	}
 
@@ -176,96 +164,87 @@ class NVLL_SMTP
 		switch ($_SESSION['smtp_auth']) {
 			case 'LOGIN':
 				fputs($smtp, "auth login\r\n");
+
 				$response = "";
-				if ($this->check_response("LOGIN", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("LOGIN", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
+
 				fputs($smtp, base64_encode($user) . "\r\n");
+
 				$response = "";
-				if ($this->check_response("LOGIN USER", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("LOGIN USER", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
+
 				fputs($smtp, base64_encode($password) . "\r\n");
+
 				$response = "";
-				if ($this->check_response("LOGIN PASS", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("LOGIN PASS", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
+
 				return (true);
 				break;
 			case 'NTLM':
 				fputs($smtp, "helo " . $_SERVER['SERVER_NAME'] . "\r\n");
+
 				$response = "";
-				if ($this->check_response("STARTTLS HELO", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("STARTTLS HELO", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
+
 				fputs($smtp, "AUTH NTLM\r\n");
+
 				$response = "";
-				if ($this->check_response("STARTTLS AUTH NTLM", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("STARTTLS AUTH NTLM", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 				$message = NTLM_type1message();
 				fputs($smtp, base64_encode($message) . "\r\n");
 				$response = "";
-				if ($this->check_response("NTLMSSP", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
-				$matches = array();
-				if (preg_match("/^NTLMSSP:334\s+(.*)\s+|$/", $response, $matches)) {
-					$response = $matches[1];
-				}
-				$response = base64_decode($response);
 
+				if ($this->check_response("NTLMSSP", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
+
+				$matches = array();
+				if (preg_match("/^NTLMSSP:334\s+(.*)\s+|$/", $response, $matches)) $response = $matches[1];
+
+				$response = base64_decode($response);
 				$message = NTLM_type3message($response, "", "", $user, $password);
+
 				fputs($smtp, base64_encode($message) . "\r\n");
+
 				$response = "";
-				if ($this->check_response("NTLMSSP", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("NTLMSSP", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 				return (true);
 				break;
 			case 'TLS':
 				fputs($smtp, "STARTTLS\r\n");
+
 				$response = "";
-				if ($this->check_response("STARTTLS", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("STARTTLS", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 				//stream_socket_enable_crypto( $smtp,true,STREAM_CRYPTO_METHOD_SSLv23_CLIENT);
 				stream_socket_enable_crypto($smtp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-
 				fputs($smtp, "helo " . $_SERVER['SERVER_NAME'] . "\r\n");
+
 				$response = "";
-				if ($this->check_response("STARTTLS HELO", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("STARTTLS HELO", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 				fputs($smtp, "auth login\r\n");
+
 				$response = "";
-				if ($this->check_response("STARTTLS LOGIN", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("STARTTLS LOGIN", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
+
 				fputs($smtp, base64_encode($user) . "\r\n");
+
 				$response = "";
-				if ($this->check_response("STARTTLS LOGIN USER", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("STARTTLS LOGIN USER", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 				fputs($smtp, base64_encode($password) . "\r\n");
+
 				$response = "";
-				if ($this->check_response("STARTTLS LOGIN PASS", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("STARTTLS LOGIN PASS", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 				return (true);
 				break;
 			case 'PLAIN':
 				fputs($smtp, "auth plain " . base64_encode($user . chr(0) . $user . chr(0) . $password) . "\r\n");
+
 				$response = "";
-				if ($this->check_response("PLAIN", $smtp, $response)) {
-					return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-				}
+				if ($this->check_response("PLAIN", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 				return (true);
 				break;
@@ -280,11 +259,9 @@ class NVLL_SMTP
 		global $html_smtp_error_unexpected;
 
 		fputs($smtp, "MAIL FROM:$this->from\r\n");
-		$response = "";
-		if ($this->check_response("MAIL", $smtp, $response)) {
-			return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-		}
 
+		$response = "";
+		if ($this->check_response("MAIL", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		return true;
 	}
 
@@ -294,31 +271,28 @@ class NVLL_SMTP
 
 		// Modified by nicocha to use to, cc and bcc field
 		while ($tmp = array_shift($this->to)) {
-			if ($tmp == '' || $tmp == '<>')
-				continue;
+			if ($tmp == '' || $tmp == '<>') continue;
+
 			fputs($smtp, "RCPT TO:$tmp\r\n");
+
 			$response = "";
-			if ($this->check_response("RCPT", $smtp, $response)) {
-				return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-			}
+			if ($this->check_response("RCPT", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		}
 		while ($tmp = array_shift($this->cc)) {
-			if ($tmp == '' || $tmp == '<>')
-				continue;
+			if ($tmp == '' || $tmp == '<>') continue;
+
 			fputs($smtp, "RCPT TO:$tmp\r\n");
+
 			$response = "";
-			if ($this->check_response("RCPT", $smtp, $response)) {
-				return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-			}
+			if ($this->check_response("RCPT", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		}
 		while ($tmp = array_shift($this->bcc)) {
-			if ($tmp == '' || $tmp == '<>')
-				continue;
+			if ($tmp == '' || $tmp == '<>') continue;
+
 			fputs($smtp, "RCPT TO:$tmp\r\n");
+
 			$response = "";
-			if ($this->check_response("RCPT", $smtp, $response)) {
-				return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-			}
+			if ($this->check_response("RCPT", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		}
 		return true;
 	}
@@ -328,18 +302,15 @@ class NVLL_SMTP
 		global $html_smtp_error_unexpected;
 
 		fputs($smtp, "DATA\r\n");
+
 		$response = "";
-		if ($this->check_response("DATA", $smtp, $response)) {
-			return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-		}
+		if ($this->check_response("DATA", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 
 		fputs($smtp, "$this->data");
 		fputs($smtp, "\r\n.\r\n");
-		$response = "";
-		if ($this->check_response("RCVD DATA", $smtp, $response)) {
-			return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-		}
 
+		$response = "";
+		if ($this->check_response("RCVD DATA", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		return true;
 	}
 
@@ -348,42 +319,45 @@ class NVLL_SMTP
 		global $html_smtp_error_unexpected;
 
 		fputs($smtp, "QUIT\r\n");
-		$response = "";
-		if ($this->check_response("QUIT", $smtp, $response)) {
-			return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
-		}
 
+		$response = "";
+		if ($this->check_response("QUIT", $smtp, $response)) return new NVLL_Exception($html_smtp_error_unexpected . ' : ' . $response);
 		return true;
 	}
 
 	public function send()
 	{
 		$smtp = $this->smtp_open();
-		if (NVLL_Exception::isException($smtp))
-			return $smtp;
+		if (NVLL_Exception::isException($smtp)) return $smtp;
+
 		unset($ev);
+
 		$ev = $this->smtp_ehlo($smtp);
-		if (NVLL_Exception::isException($ev))
-			return $ev;
+		if (NVLL_Exception::isException($ev)) return $ev;
+
 		unset($ev);
+
 		$ev = $this->smtp_auth($smtp);
-		if (NVLL_Exception::isException($ev))
-			return $ev;
+		if (NVLL_Exception::isException($ev)) return $ev;
+
 		unset($ev);
+
 		$ev = $this->smtp_mail_from($smtp);
-		if (NVLL_Exception::isException($ev))
-			return $ev;
+		if (NVLL_Exception::isException($ev)) return $ev;
+
 		unset($ev);
+
 		$ev = $this->smtp_rcpt_to($smtp);
-		if (NVLL_Exception::isException($ev))
-			return $ev;
+		if (NVLL_Exception::isException($ev)) return $ev;
+
 		unset($ev);
+
 		$ev = $this->smtp_data($smtp);
-		if (NVLL_Exception::isException($ev))
-			return $ev;
+		if (NVLL_Exception::isException($ev)) return $ev;
+
 		unset($ev);
+
 		$ev = $this->smtp_quit($smtp);
-		if (NVLL_Exception::isException($ev))
-			return $ev;
+		if (NVLL_Exception::isException($ev)) return $ev;
 	}
 }

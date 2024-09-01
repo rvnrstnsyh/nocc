@@ -35,9 +35,7 @@ class NVLL_QuotaUsage
      */
     public function getStorageUsage()
     {
-        if (isset($this->_quotausage['STORAGE']['usage'])) {
-            return $this->_quotausage['STORAGE']['usage'];
-        }
+        if (isset($this->_quotausage['STORAGE']['usage'])) return $this->_quotausage['STORAGE']['usage'];
         return 0;
     }
 
@@ -56,9 +54,7 @@ class NVLL_QuotaUsage
      */
     public function getStorageLimit()
     {
-        if (isset($this->_quotausage['STORAGE']['limit'])) {
-            return $this->_quotausage['STORAGE']['limit'];
-        }
+        if (isset($this->_quotausage['STORAGE']['limit'])) return $this->_quotausage['STORAGE']['limit'];
         return 0;
     }
 
@@ -77,9 +73,7 @@ class NVLL_QuotaUsage
      */
     public function getMessageUsage()
     {
-        if (isset($this->_quotausage['MESSAGE']['usage'])) {
-            return $this->_quotausage['MESSAGE']['usage'];
-        }
+        if (isset($this->_quotausage['MESSAGE']['usage'])) return $this->_quotausage['MESSAGE']['usage'];
         return 0;
     }
 
@@ -89,9 +83,7 @@ class NVLL_QuotaUsage
      */
     public function getMessageLimit()
     {
-        if (isset($this->_quotausage['MESSAGE']['limit'])) {
-            return $this->_quotausage['MESSAGE']['limit'];
-        }
+        if (isset($this->_quotausage['MESSAGE']['limit'])) return $this->_quotausage['MESSAGE']['limit'];
         return 0;
     }
 

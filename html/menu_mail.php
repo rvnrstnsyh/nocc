@@ -8,10 +8,7 @@
     <li>
       <?php
       $jumpInbox = "";
-      if (
-        $user_prefs->getUseInboxFolder()
-        && strlen($user_prefs->getInboxFolderName()) > 0
-      ) {
+      if ($user_prefs->getUseInboxFolder() && strlen($user_prefs->getInboxFolderName()) > 0) {
         $jumpInbox = "&folder=" . $user_prefs->getInboxFolderName();
       }
       ?>

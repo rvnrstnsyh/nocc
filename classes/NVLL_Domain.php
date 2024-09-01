@@ -39,9 +39,7 @@ class NVLL_Domain
      */
     public function hasAllowedLogins()
     {
-        if (isset($this->entry->login_allowed) && !empty($this->entry->login_allowed)) {
-            return true;
-        }
+        if (isset($this->entry->login_allowed) && !empty($this->entry->login_allowed)) return true;
         return false;
     }
 
@@ -51,9 +49,7 @@ class NVLL_Domain
      */
     private function hasAllowedLoginsArray()
     {
-        if ($this->hasAllowedLogins() && is_array($this->entry->login_allowed)) {
-            return true;
-        }
+        if ($this->hasAllowedLogins() && is_array($this->entry->login_allowed)) return true;
         return false;
     }
 
@@ -64,9 +60,7 @@ class NVLL_Domain
      */
     private function isLoginFromAllowedArray($login)
     {
-        if ($this->hasAllowedLoginsArray()) {
-            return array_key_exists($login, $this->entry->login_allowed);
-        }
+        if ($this->hasAllowedLoginsArray()) return array_key_exists($login, $this->entry->login_allowed);
         return true;
     }
 
@@ -76,9 +70,7 @@ class NVLL_Domain
      */
     private function hasAllowedLoginsFile()
     {
-        if ($this->hasAllowedLogins() && is_string($this->entry->login_allowed)) {
-            return file_exists(substr($this->entry->login_allowed, 1));
-        }
+        if ($this->hasAllowedLogins() && is_string($this->entry->login_allowed)) return file_exists(substr($this->entry->login_allowed, 1));
         return false;
     }
 
@@ -91,10 +83,7 @@ class NVLL_Domain
     {
         if ($this->hasAllowedLoginsFile()) {
             include substr($this->entry->login_allowed, 1);
-
-            if (isset($login_allowed) && is_array($login_allowed)) {
-                return array_key_exists($login, $login_allowed);
-            }
+            if (isset($login_allowed) && is_array($login_allowed)) return array_key_exists($login, $login_allowed);
         }
         return true;
     }
@@ -120,9 +109,7 @@ class NVLL_Domain
      */
     public function hasLoginAliases()
     {
-        if (isset($this->entry->login_aliases) && !empty($this->entry->login_aliases)) {
-            return true;
-        }
+        if (isset($this->entry->login_aliases) && !empty($this->entry->login_aliases)) return true;
         return false;
     }
 
@@ -132,9 +119,7 @@ class NVLL_Domain
      */
     private function hasLoginAliasesArray()
     {
-        if ($this->hasLoginAliases() && is_array($this->entry->login_aliases)) {
-            return true;
-        }
+        if ($this->hasLoginAliases() && is_array($this->entry->login_aliases)) return true;
         return false;
     }
 
@@ -160,9 +145,7 @@ class NVLL_Domain
      */
     private function hasLoginAliasesFile()
     {
-        if ($this->hasLoginAliases() && is_string($this->entry->login_aliases)) {
-            return file_exists(substr($this->entry->login_aliases, 1));
-        }
+        if ($this->hasLoginAliases() && is_string($this->entry->login_aliases)) return file_exists(substr($this->entry->login_aliases, 1));
         return false;
     }
 
@@ -175,7 +158,6 @@ class NVLL_Domain
     {
         if ($this->hasLoginAliasesFile()) {
             include substr($this->entry->login_aliases, 1);
-
             if (isset($login_alias) && is_array($login_alias)) {
                 $aliasLogins = array_keys($login_alias);
                 $realLogins = array_values($login_alias);
@@ -207,9 +189,7 @@ class NVLL_Domain
      */
     public function useLoginWithDomain()
     {
-        if (isset($this->entry->login_with_domain) && $this->entry->login_with_domain == true) {
-            return true;
-        }
+        if (isset($this->entry->login_with_domain) && $this->entry->login_with_domain == true) return true;
         return false;
     }
 
@@ -219,9 +199,7 @@ class NVLL_Domain
      */
     public function hasLoginWithDomainCharacter()
     {
-        if (isset($this->entry->login_with_domain_character) && !empty($this->entry->login_with_domain_character)) {
-            return true;
-        }
+        if (isset($this->entry->login_with_domain_character) && !empty($this->entry->login_with_domain_character)) return true;
         return false;
     }
 
@@ -231,9 +209,7 @@ class NVLL_Domain
      */
     public function getLoginWithDomainCharacter()
     {
-        if ($this->hasLoginWithDomainCharacter() && is_string($this->entry->login_with_domain_character)) {
-            return $this->entry->login_with_domain_character;
-        }
+        if ($this->hasLoginWithDomainCharacter() && is_string($this->entry->login_with_domain_character)) return $this->entry->login_with_domain_character;
         return '@';
     }
 
@@ -243,9 +219,7 @@ class NVLL_Domain
      */
     public function hasLoginPrefix()
     {
-        if (isset($this->entry->login_prefix) && !empty($this->entry->login_prefix)) {
-            return true;
-        }
+        if (isset($this->entry->login_prefix) && !empty($this->entry->login_prefix)) return true;
         return false;
     }
 
@@ -255,9 +229,7 @@ class NVLL_Domain
      */
     public function getLoginPrefix()
     {
-        if ($this->hasLoginPrefix() && is_string($this->entry->login_prefix)) {
-            return $this->entry->login_prefix;
-        }
+        if ($this->hasLoginPrefix() && is_string($this->entry->login_prefix)) return $this->entry->login_prefix;
         return '';
     }
 
@@ -277,9 +249,7 @@ class NVLL_Domain
      */
     public function hasLoginSuffix()
     {
-        if (isset($this->entry->login_suffix) && !empty($this->entry->login_suffix)) {
-            return true;
-        }
+        if (isset($this->entry->login_suffix) && !empty($this->entry->login_suffix)) return true;
         return false;
     }
 
@@ -289,9 +259,7 @@ class NVLL_Domain
      */
     public function getLoginSuffix()
     {
-        if ($this->hasLoginSuffix() && is_string($this->entry->login_suffix)) {
-            return $this->entry->login_suffix;
-        }
+        if ($this->hasLoginSuffix() && is_string($this->entry->login_suffix)) return $this->entry->login_suffix;
         return '';
     }
 

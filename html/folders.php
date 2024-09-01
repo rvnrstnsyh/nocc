@@ -16,8 +16,8 @@ if (count($big_list) > 1) {
     array_push($select_list, "\t<option " . $selected . " value=\"" . $big_list[$i] . "\">" . $big_list[$i] . "</option>\n");
   }
 }
-
 ?>
+
 <div class="prefs">
   <?php if (isset($_REQUEST['submit_folders'])) echo '<p class="success-message-bg">' . convertLang2Html($html_folders_updated) . '</p>'; ?>
   <br>

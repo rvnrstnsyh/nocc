@@ -341,9 +341,7 @@ if (count($big_list) > 1) {
           </tr>
         </table>
       </fieldset>
-      <?php
-      if (NVLL_Exception::isException($ev)) {
-      ?>
+      <?php if (NVLL_Exception::isException($ev)) { ?>
         <div class="error">
           <table class="errorTable">
             <tr class="errorTitle">
@@ -356,8 +354,7 @@ if (count($big_list) > 1) {
             </tr>
           </table>
         </div>
-      <?php
-      } ?>
+      <?php } ?>
       <p class="prefsSubmitButtonsRight">
         <input type="submit" class="button" value="<?php echo convertLang2Html($html_save) ?>" />
         &nbsp;&nbsp;

@@ -11,38 +11,33 @@
 define('NVLL_DEBUG_LEVEL', 0);
 if (NVLL_DEBUG_LEVEL > 0) define('NVLL_START_TIME', microtime(true));
 
-if (version_compare(phpversion(), '5.4', '<')) {
-    if (!defined('ENT_SUBSTITUTE')) {
-        define('ENT_SUBSTITUTE', 8);
-    }
+if (version_compare(phpversion(), '7.4.30', '<')) {
+    if (!defined('ENT_SUBSTITUTE')) define('ENT_SUBSTITUTE', 8);
 }
 
 // Define variables
 if (!isset($from_rss)) $from_rss = false;
-
 if (file_exists('./config/conf.php')) {
     require_once './config/conf.php';
-
     // code extraction from conf.php, legacy code support
-    if ((file_exists('./utils/config_check.php')) && (!function_exists('get_default_from_address'))) {
-        require_once './utils/config_check.php';
-    }
+    if ((file_exists('./utils/config_check.php')) && (!function_exists('get_default_from_address'))) require_once './utils/config_check.php';
 } else {
     //TODO: Make error msg translateble and show nicer error...
     print("The main configuration file (./config/conf.php) couldn't be found! <p />Please rename the file './config/conf.php.dist' to './config/conf.php'. ");
     die();
 }
 
+require_once './classes/NVLL_Body.php';
+require_once './classes/NVLL_Themes.php';
+require_once './classes/NVLL_Domain.php';
 require_once './classes/NVLL_Request.php';
 require_once './classes/NVLL_Session.php';
 require_once './classes/NVLL_Security.php';
-require_once './classes/NVLL_Body.php';
 require_once './classes/NVLL_Languages.php';
-require_once './classes/NVLL_Themes.php';
-require_once './classes/NVLL_Domain.php';
-require_once './classes/NVLL_AttachedFile.php';
 require_once './classes/NVLL_UserPrefs.php';
 require_once './classes/NVLL_UserFilters.php';
+require_once './classes/NVLL_AttachedFile.php';
+
 require_once './utils/functions.php';
 require_once './utils/crypt.php';
 require_once './utils/translation.php';
@@ -64,16 +59,15 @@ if ($from_rss == false) $session_has_expired = NVLL_Session::start($persistent);
 if (isset($_REQUEST['folder'])) $_SESSION['nvll_folder'] = $_REQUEST['folder'];
 if (!isset($_SESSION['nvll_folder'])) $_SESSION['nvll_folder'] = $conf->default_inbox_folder;
 if (isset($_POST['folder']) || ! isset($_SESSION['goto_folder'])) $_SESSION['goto_folder'] = $_SESSION['nvll_folder'];
-
 // Have we changed sort order?
 if (!isset($_SESSION['nvll_sort'])) $_SESSION['nvll_sort'] = $conf->default_sort;
 if (!isset($_SESSION['nvll_sortdir'])) $_SESSION['nvll_sortdir'] = $conf->default_sortdir;
-
 // Override session variables from request, if supplied
 if (isset($_REQUEST['user']) && !isset($_SESSION['nvll_loggedin'])) {
     unset($_SESSION['nvll_login']);
     $_SESSION['nvll_user'] = NVLL_Request::getStringValue('user');
-    if (! isset($conf->utf8_decode) || $conf->utf8_decode) {
+
+    if (!isset($conf->utf8_decode) || $conf->utf8_decode) {
         if (mb_detect_encoding($_SESSION['nvll_user'], 'UTF-8', true) == "UTF-8") {
             //deprecated in php8.2
             //$_SESSION['nvll_user'] = utf8_decode($_SESSION['nvll_user']);
@@ -84,10 +78,11 @@ if (isset($_REQUEST['user']) && !isset($_SESSION['nvll_loggedin'])) {
 
 if (isset($_REQUEST['passwd'])) {
     $_SESSION['nvll_passwd'] = NVLL_Request::getStringValue('passwd');
-    if (! isset($conf->utf8_decode) || $conf->utf8_decode) {
+
+    if (!isset($conf->utf8_decode) || $conf->utf8_decode) {
         if (mb_detect_encoding($_SESSION['nvll_passwd'], 'UTF-8', true) == "UTF-8") {
             //deprecated in php8.2
-            //$_SESSION['nvll_passwd'] = utf8_decode($_SESSION['nvll_passwd']);
+            // $_SESSION['nvll_passwd'] = utf8_decode($_SESSION['nvll_passwd']);
             $_SESSION['nvll_passwd'] = iconv('UTF-8', 'ISO-8859-1', $_SESSION['nvll_passwd']);
         }
     }
@@ -106,9 +101,8 @@ $languages = new NVLL_Languages('./languages/', $conf->default_lang);
 
 //TODO: Check $_REQUEST['lang'] also when force_default_lang?
 if (isset($_REQUEST['lang'])) { //if a language is requested...
-    if ($languages->setSelectedLangId($_REQUEST['lang']) || $_REQUEST['lang'] == "default") { //if the language exists...
-        $_SESSION['nvll_lang'] = $languages->getSelectedLangId();
-    }
+    //if the language exists...
+    if ($languages->setSelectedLangId($_REQUEST['lang']) || $_REQUEST['lang'] == "default") $_SESSION['nvll_lang'] = $languages->getSelectedLangId();
 }
 if (isset($_SESSION['nvll_lang']) && $_SESSION['nvll_lang'] != "default") { //if session language already set...
     $languages->setSelectedLangId($_SESSION['nvll_lang']);
@@ -122,9 +116,7 @@ if (isset($_SESSION['nvll_lang']) && $_SESSION['nvll_lang'] != "default") { //if
             $languages->setSelectedLangId('en');
         }
     }
-    if (! isset($_SESSION['nvll_lang']) || $_SESSION['nvll_lang'] != "default") {
-        $_SESSION['nvll_lang'] = $languages->getSelectedLangId();
-    }
+    if (!isset($_SESSION['nvll_lang']) || $_SESSION['nvll_lang'] != "default") $_SESSION['nvll_lang'] = $languages->getSelectedLangId();
 }
 
 $lang = $languages->getSelectedLangId();
@@ -147,9 +139,8 @@ $themes = new NVLL_Themes('./themes/', $conf->default_theme);
 
 //TODO: Check $_REQUEST['theme'] also when NOT use_theme?
 if (isset($_REQUEST['theme']) && isset($conf->use_theme) && $conf->use_theme) {
-    if ($themes->setSelectedThemeName($_REQUEST['theme'])) { //if the theme exists...
-        $_SESSION['nvll_theme'] = $themes->getSelectedThemeName();
-    }
+    //if the theme exists...
+    if ($themes->setSelectedThemeName($_REQUEST['theme'])) $_SESSION['nvll_theme'] = $themes->getSelectedThemeName();
 }
 
 $default_theme_set = false;
@@ -170,8 +161,8 @@ if (isset($_SESSION['nvll_passwd']) && $_SESSION['nvll_passwd'] === false) {
 if ($session_has_expired > 0) {
     $_SESSION['nvll_login'] = "";
 
-    if ($session_has_expired == 1) $ev = new NVLL_Exception($html_session_expired . ".");
-    if ($session_has_expired == 2) $ev = new NVLL_Exception($html_session_expired . " " . $html_session_ip_changed . ".");
+    if ($session_has_expired == 1) $ev = new NVLL_Exception($html_session_expired);
+    if ($session_has_expired == 2) $ev = new NVLL_Exception($html_session_expired . " " . $html_session_ip_changed);
 
     require './html/header.php';
     require './html/error.php';
@@ -184,7 +175,6 @@ if (empty($_SESSION['nvll_smtp_server'])) $_SESSION['nvll_smtp_server'] = $conf-
 if (empty($_SESSION['nvll_smtp_port'])) $_SESSION['nvll_smtp_port'] = $conf->default_smtp_port;
 // Default login to just the username
 if (isset($_SESSION['nvll_user']) && !isset($_SESSION['nvll_login'])) $_SESSION['nvll_login'] = $_SESSION['nvll_user'];
-
 // Check allowed chars for login
 if (
     isset($_SESSION['nvll_login']) && $_SESSION['nvll_login'] != ''
@@ -201,8 +191,7 @@ if (
 // Were we provided with a fillindomain to use?
 if (isset($_REQUEST['fillindomain']) && isset($conf->typed_domain_login)) {
     for ($count = 0; $count < count($conf->domains); $count++) {
-        if ($_REQUEST['fillindomain'] == $conf->domains[$count]->domain)
-            $_REQUEST['domain_index'] = $count;
+        if ($_REQUEST['fillindomain'] == $conf->domains[$count]->domain) $_REQUEST['domain_index'] = $count;
     }
 }
 
@@ -236,10 +225,10 @@ if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
         //don't change text or rules may fail
         $log_string = 'NVLL: failed login from rhost=' . $_SERVER['REMOTE_ADDR'] . ' to server=' . $_SESSION['nvll_servr'] . ' as user=' . $_SESSION['nvll_login'] . '';
         error_log($log_string);
-        if (isset($conf->syslog) && $conf->syslog) {
-            syslog(LOG_INFO, $log_string);
-        }
+
+        if (isset($conf->syslog) && $conf->syslog) syslog(LOG_INFO, $log_string);
         $ev = new NVLL_Exception($html_login_not_allowed);
+
         require './html/header.php';
         require './html/error.php';
         require './html/footer.php';
@@ -248,7 +237,6 @@ if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
 
     //Do we have login aliases?
     $_SESSION['nvll_login'] = $domain->replaceLoginAlias($_SESSION['nvll_login']);
-
     // Do we provide the domain with the login?
     if ($domain->useLoginWithDomain()) {
         if ($domain->hasLoginWithDomainCharacter()) {
@@ -266,7 +254,6 @@ if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
 
     //append prefix to login
     $_SESSION['nvll_login'] = $domain->addLoginPrefix($_SESSION['nvll_login']);
-
     //append suffix to login
     $_SESSION['nvll_login'] = $domain->addLoginSuffix($_SESSION['nvll_login']);
 
@@ -279,7 +266,6 @@ if (isset($_REQUEST['server'])) {
     $servtype = strtolower($_REQUEST['servtype']);
     $port = NVLL_Request::getStringValue('port');
     $servr = $server . '/' . $servtype . ':' . $port;
-
     // Use as default domain for user's address
     $_SESSION['nvll_domain'] = $server;
     $_SESSION['nvll_servr'] = $servr;
@@ -289,9 +275,7 @@ if (isset($_REQUEST['server'])) {
 if (isset($_SESSION['nvll_user']) && isset($_SESSION['nvll_domain'])) {
     //is user in auto update list?
     if (isset($conf->auto_update['user'][0])) {
-        if ($conf->auto_update['user'][0] == "all" || in_array($_SESSION['nvll_user'] . '@' . $_SESSION['nvll_domain'], $conf->auto_update['user'])) {
-            $_SESSION['auto_update'] = true;
-        }
+        if ($conf->auto_update['user'][0] == "all" || in_array($_SESSION['nvll_user'] . '@' . $_SESSION['nvll_domain'], $conf->auto_update['user'])) $_SESSION['auto_update'] = true;
     }
 
     //TODO: Move to NVLL_Session::loadUserPrefs()?

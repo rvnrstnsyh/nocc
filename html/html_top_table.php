@@ -4,7 +4,6 @@ if (!isset($conf->loaded)) die('Hacking attempt');
 $arrow = ($_SESSION['nvll_sortdir'] == 0) ? 'up' : 'down';
 $new_sortdir = ($_SESSION['nvll_sortdir'] == 0) ? 1 : 0;
 $skip = (isset($_REQUEST['skip'])) ? $_REQUEST['skip'] : '0';
-
 $pages = $pop->get_page_count($num_msg);
 $page_line = '';
 
@@ -30,6 +29,7 @@ if ($pop->is_imap()) {
   }
 }
 ?>
+
 <div class="messageSummary">
   <table>
     <tr>
