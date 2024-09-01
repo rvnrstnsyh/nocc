@@ -4,7 +4,20 @@
 
 This is a modified version of an existing program, and GitHub has done an excellent job explaining its source.
 
-## Installation
+## Requirements and Installation
+
+    A. Requirements
+
+    1)  PHP v7.4.30 or newer
+    2)  c-client (compiled with PHP or as module)
+    3)  iconv (compiled with PHP or as module)
+    4)  mbstring (compiled with PHP or as module)
+    5)  sodium (compiled with PHP or as module)
+    6)  openssl (compiled with PHP or as module)
+    7)  gd (compiled with PHP or as module)
+    8)  mysqli and pdo_mysql (compiled with PHP or as module)
+
+    B. Installation
 
     1)  Download retrmail-x.y.tar.gz (where x and y are branch or version numbers)
         (or retrmail-x.y.zip for Windows' users).

@@ -20,79 +20,47 @@
 function NTLM_type3message($type2message = "", $realm = "", $workstation = "", $user = "", $password = "")
 {
 	// https://davenport.sourceforge.net/ntlm.html
-	if (strlen($realm) == 0) {
-		$realm = "unknown";
-	}
-	if (strlen($workstation) == 0) {
-		$workstation = "unknown";
-	}
-	if (strlen($type2message) == 0) {
-		return "";
-	}
+	if (strlen($realm) == 0) $realm = "unknown";
+	if (strlen($workstation) == 0) $workstation = "unknown";
+	if (strlen($type2message) == 0) return "";
 
 	$tn_sbuffer = unpack("vlength/vsize/Voffset", substr($type2message, 12, 8));
 	$flags = substr($type2message, 20, 4);
-
 	$domain = $realm;
+
 	if ($flags && 0x0100) {  // Flag Target Type Domain (0x00010000) in little endian: 0x00000100
 		$tn_data = substr($type2message, $tn_sbuffer['offset'], $tn_sbuffer['size']);
 		$domain = mb_convert_encoding($tn_data, "ASCII", "UCS-2LE");
 	}
 
 	$challenge = substr($type2message, 24, 8);
-
 	$pw_uni = mb_convert_encoding($password, "UCS-2LE");
-
 	$message = "";
 
-	if (
-		extension_loaded("openssl") && function_exists("openssl_encrypt")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("md4", hash_algos())
-		&& count(preg_grep("/^des-ecb$/i", openssl_get_cipher_methods(true))) > 0
-	) {
-		$md4 = hash("md4", $pw_uni, false);
-		$md4 = hex2bin($md4);
-		$pad = $md4 . str_repeat(chr(0), 21 - strlen($md4));
+	// Separate conditions for better readability
+	$openssl_loaded = extension_loaded("openssl");
+	$openssl_encrypt_exists = function_exists("openssl_encrypt");
+	$hash_loaded = extension_loaded("hash");
+	$hash_function_exists = function_exists("hash");
+	$md4_algo_available = in_array("md4", hash_algos());
+	$des_ecb_available = count(preg_grep("/^des-ecb$/i", openssl_get_cipher_methods(true))) > 0;
 
-		$iv_size = openssl_cipher_iv_length("des-ecb");
-		$iv = "";
+	// Combine all conditions
+	if ($openssl_loaded && $openssl_encrypt_exists && $hash_loaded && $hash_function_exists && $md4_algo_available && $des_ecb_available) {
+		$md4 = hash("md4", $pw_uni, true);
+		$pad = $md4 . str_repeat(chr(0), 21 - strlen($md4));
+		$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length("des-ecb"));
+
 		for ($i = 0; $i < 21; $i += 7) {
 			$packed = "";
-			for ($p = $i; $p < $i + 7; $p++) {
-				$packed .= str_pad(decbin(ord(substr($pad, $p, 1))), 8, "0", STR_PAD_LEFT);
-			}
+			for ($p = $i; $p < $i + 7; $p++) $packed .= str_pad(decbin(ord(substr($pad, $p, 1))), 8, "0", STR_PAD_LEFT);
 			$key = "";
 			for ($p = 0; $p < strlen($packed); $p += 7) {
 				$s = substr($packed, $p, 7);
 				$b = $s . ((substr_count($s, "1") % 2) ? "0" : "1");
 				$key .= chr(bindec($b));
 			}
-			$message .= openssl_encrypt($challenge, "des-ecb", $key, $options = OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
-		}
-	} else if (
-		extension_loaded("mcrypt") && function_exists("mcrypt_encrypt")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("md4", hash_algos())
-	) {
-		$md4 = hash("md4", $pw_uni, false);
-		$md4 = hex2bin($md4);
-		$pad = $md4 . str_repeat(chr(0), 21 - strlen($md4));
-
-		$iv_size = mcrypt_get_iv_size(MCRYPT_DES, MCRYPT_MODE_ECB);
-		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-		for ($i = 0; $i < 21; $i += 7) {
-			$packed = "";
-			for ($p = $i; $p < $i + 7; $p++) {
-				$packed .= str_pad(decbin(ord(substr($pad, $p, 1))), 8, "0", STR_PAD_LEFT);
-			}
-			$key = "";
-			for ($p = 0; $p < strlen($packed); $p += 7) {
-				$s = substr($packed, $p, 7);
-				$b = $s . ((substr_count($s, "1") % 2) ? "0" : "1");
-				$key .= chr(bindec($b));
-			}
-			$message .= mcrypt_encrypt(MCRYPT_DES, $key, $challenge, MCRYPT_MODE_ECB, $iv);
+			$message .= openssl_encrypt($challenge, "des-ecb", $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
 		}
 	} else {
 		return "";
@@ -116,7 +84,6 @@ function NTLM_type3message($type2message = "", $realm = "", $workstation = "", $
 	$session = "";
 	$session_length = strlen($session);
 	$session_offset = $ntlm_offset + $ntlm_length;
-
 	$message = "NTLMSSP\0" .
 		"\x03\x00\x00\x00" .
 		pack("v", $lm_length) .
@@ -156,12 +123,9 @@ function NTLM_type3message($type2message = "", $realm = "", $workstation = "", $
 function NTLM_type1message($realm = "", $workstation = "")
 {
 	// https://davenport.sourceforge.net/ntlm.html
-	if (strlen($realm) == 0) {
-		$realm = "unknown";
-	}
-	if (strlen($workstation) == 0) {
-		$workstation = "unknown";
-	}
+	if (strlen($realm) == 0) $realm = "unknown";
+	if (strlen($workstation) == 0) $workstation = "unknown";
+
 	$r_length = strlen($realm);
 	$ws_length = strlen($workstation);
 	$ws_offset = 32;
@@ -201,99 +165,86 @@ function decrXOR($string, $key)
 }
 
 /**
+ * Checks if required extensions and functions are available
+ * @return array Associative array of availability flags
+ */
+function checkAvailability()
+{
+	static $availability = null;
+	if ($availability === null) {
+		$availability = [
+			'openssl' => extension_loaded("openssl") &&
+				function_exists("openssl_encrypt") &&
+				function_exists("openssl_decrypt") &&
+				in_array("aes-256-gcm", openssl_get_cipher_methods()),
+			'sodium' => extension_loaded("sodium") &&
+				function_exists("sodium_crypto_aead_aes256gcm_encrypt") &&
+				function_exists("sodium_memzero") &&
+				sodium_crypto_aead_aes256gcm_is_available(),
+			'hash' => extension_loaded("hash") &&
+				function_exists("hash") &&
+				in_array("sha256", hash_algos())
+		];
+	}
+	return $availability;
+}
+
+/**
  * Returns encrypted password
  * @param string $passwd Password
  * @param string $rkey Master key
- * @return string Encrypted password
+ * @return string|false Encrypted password or false on failure
  */
 function encpass($passwd, $rkey)
 {
-	if (
-		extension_loaded("openssl") && function_exists("openssl_encrypt") && function_exists("openssl_decrypt")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("sha256", hash_algos())
-		&& count(preg_grep("/^aes256$/i", openssl_get_cipher_methods(true))) > 0
-	) {
-		$key = hash("SHA256", $rkey, true);
-		$iv_size = openssl_cipher_iv_length("AES256");
-		$iv = openssl_random_pseudo_bytes($iv_size);
-		$encpasswd = openssl_encrypt($passwd, "AES256", $key, $options = 0, $iv);
-		$encpasswd = base64_encode($iv . $encpasswd);
-	} else if (
-		extension_loaded("sodium") && function_exists("sodium_crypto_secretbox") && function_exists("sodium_memzero")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("sha256", hash_algos())
-	) {
-		$key = hash("SHA256", $rkey, true);
-		$nonce = random_bytes(
-			SODIUM_CRYPTO_SECRETBOX_NONCEBYTES
-		);
-		$encpasswd = base64_encode($nonce . sodium_crypto_secretbox($passwd, $nonce, $key));
+	$availability = checkAvailability();
+
+	if (!$availability['hash']) return false;
+
+	$key = hash("SHA256", $rkey, true);
+	if ($availability['openssl']) {
+		$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length("aes-256-gcm"));
+		$tag = "";
+		$encrypted = openssl_encrypt($passwd, "aes-256-gcm", $key, OPENSSL_RAW_DATA, $iv, $tag);
+		return base64_encode($iv . $tag . $encrypted);
+	} elseif ($availability['sodium']) {
+		$nonce = random_bytes(SODIUM_CRYPTO_AEAD_AES256GCM_NPUBBYTES);
+		$encrypted = sodium_crypto_aead_aes256gcm_encrypt($passwd, "", $nonce, $key);
+		$result = base64_encode($nonce . $encrypted);
 		sodium_memzero($passwd);
 		sodium_memzero($key);
-	} else if (
-		extension_loaded("mcrypt") && function_exists("mcrypt_encrypt") && function_exists("mcrypt_decrypt")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("sha256", hash_algos())
-		&& in_array("rijndael-128", mcrypt_list_algorithms())
-	) {
-		$key = hash("SHA256", $rkey, true);
-		$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-		$encpasswd = base64_encode($iv . mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $passwd, MCRYPT_MODE_CBC, $iv));
-	} else {
-		$encpasswd = false; //don't allow unsecure encyption anymore
+		return $result;
 	}
-	return $encpasswd;
+	return false; // don't allow unsecure encryption
 }
 
 /**
  * Returns decrypted password
  * @param string $cipher Cipher
  * @param string $rkey Master key
- * @return string Decrypted password
+ * @return string|false Decrypted password or false on failure
  */
 function decpass($cipher, $rkey)
 {
-	if (
-		extension_loaded("openssl") && function_exists("openssl_encrypt") && function_exists("openssl_decrypt")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("sha256", hash_algos())
-		&& count(preg_grep("/^aes256$/i", openssl_get_cipher_methods(true))) > 0
-	) {
-		$key = hash("SHA256", $rkey, true);
-		$iv_size = openssl_cipher_iv_length("AES256");
-		$ciphertext_dec = base64_decode($cipher);
-		$iv_dec = substr($ciphertext_dec, 0, $iv_size);
-		$ciphertext_dec = substr($ciphertext_dec, $iv_size);
-		$decpasswd = openssl_decrypt($ciphertext_dec, "AES256", $key, $options = 0, $iv_dec);
-	} else if (
-		extension_loaded("sodium") && function_exists("sodium_crypto_secretbox") && function_exists("sodium_memzero")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("sha256", hash_algos())
-	) {
-		$key = hash("SHA256", $rkey, true);
-		$decoded = base64_decode($cipher);
-		$nonce = mb_substr($decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit');
-		$ciphertext = mb_substr($decoded, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit');
-		$decpasswd = sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
+	$availability = checkAvailability();
+
+	if (!$availability['hash']) return false;
+
+	$key = hash("SHA256", $rkey, true);
+	$decoded = base64_decode($cipher);
+	if ($availability['openssl']) {
+		$iv_length = openssl_cipher_iv_length("aes-256-gcm");
+		$iv = substr($decoded, 0, $iv_length);
+		$tag = substr($decoded, $iv_length, 16);
+		$ciphertext = substr($decoded, $iv_length + 16);
+		return openssl_decrypt($ciphertext, "aes-256-gcm", $key, OPENSSL_RAW_DATA, $iv, $tag);
+	} elseif ($availability['sodium']) {
+		$nonce = mb_substr($decoded, 0, SODIUM_CRYPTO_AEAD_AES256GCM_NPUBBYTES, '8bit');
+		$ciphertext = mb_substr($decoded, SODIUM_CRYPTO_AEAD_AES256GCM_NPUBBYTES, null, '8bit');
+		$decrypted = sodium_crypto_aead_aes256gcm_decrypt($ciphertext, "", $nonce, $key);
 		sodium_memzero($ciphertext);
 		sodium_memzero($key);
-	} else if (
-		extension_loaded("mcrypt") && function_exists("mcrypt_encrypt") && function_exists("mcrypt_decrypt")
-		&& extension_loaded("hash") && function_exists("hash")
-		&& in_array("sha256", hash_algos())
-		&& in_array("rijndael-128", mcrypt_list_algorithms())
-	) {
-		$key = hash("SHA256", $rkey, true);
-		$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-		$ciphertext_dec = base64_decode($cipher);
-		$iv_dec = substr($ciphertext_dec, 0, $iv_size);
-		$ciphertext_dec = substr($ciphertext_dec, $iv_size);
-		$decpasswd = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $ciphertext_dec, MCRYPT_MODE_CBC, $iv_dec);
-	} else {
-		//don't allow unsecure encyption anymore
-		$decpasswd = false;
+		return $decrypted;
 	}
-	return $decpasswd;
+	return false; // don't allow unsecure decryption
 }

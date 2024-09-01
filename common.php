@@ -9,9 +9,7 @@
  */
 
 define('NVLL_DEBUG_LEVEL', 0);
-if (NVLL_DEBUG_LEVEL > 0) {
-    define('NVLL_START_TIME', microtime(true));
-}
+if (NVLL_DEBUG_LEVEL > 0) define('NVLL_START_TIME', microtime(true));
 
 if (version_compare(phpversion(), '5.4', '<')) {
     if (!defined('ENT_SUBSTITUTE')) {
@@ -20,9 +18,7 @@ if (version_compare(phpversion(), '5.4', '<')) {
 }
 
 // Define variables
-if (!isset($from_rss)) {
-    $from_rss = false;
-}
+if (!isset($from_rss)) $from_rss = false;
 
 if (file_exists('./config/conf.php')) {
     require_once './config/conf.php';
@@ -56,36 +52,22 @@ $conf->nvll_version = '1.9.15-dev';
 $conf->nvll_url = 'https://nvll.me';
 
 $pwd_to_encrypt = false;
-if (isset($_REQUEST['service']) && $_REQUEST['service'] == 'login') {
-    $pwd_to_encrypt = true;
-}
+if (isset($_REQUEST['service']) && $_REQUEST['service'] == 'login') $pwd_to_encrypt = true;
 
 $persistent = 0;
-if (isset($_REQUEST['remember']) && $_REQUEST['remember'] == true) {
-    $persistent = 1;
-}
+if (isset($_REQUEST['remember']) && $_REQUEST['remember'] == true) $persistent = 1;
 
 $session_has_expired = 0;
-if ($from_rss == false) {
-    $session_has_expired = NVLL_Session::start($persistent);
-}
+if ($from_rss == false) $session_has_expired = NVLL_Session::start($persistent);
 
 // Set defaults
-if (isset($_REQUEST['folder'])) {
-    $_SESSION['nvll_folder'] = $_REQUEST['folder'];
-}
-if (!isset($_SESSION['nvll_folder'])) {
-    $_SESSION['nvll_folder'] = $conf->default_inbox_folder;
-}
-if (isset($_POST['folder']) || ! isset($_SESSION['goto_folder'])) {
-    $_SESSION['goto_folder'] = $_SESSION['nvll_folder'];
-}
+if (isset($_REQUEST['folder'])) $_SESSION['nvll_folder'] = $_REQUEST['folder'];
+if (!isset($_SESSION['nvll_folder'])) $_SESSION['nvll_folder'] = $conf->default_inbox_folder;
+if (isset($_POST['folder']) || ! isset($_SESSION['goto_folder'])) $_SESSION['goto_folder'] = $_SESSION['nvll_folder'];
 
 // Have we changed sort order?
-if (!isset($_SESSION['nvll_sort']))
-    $_SESSION['nvll_sort'] = $conf->default_sort;
-if (!isset($_SESSION['nvll_sortdir']))
-    $_SESSION['nvll_sortdir'] = $conf->default_sortdir;
+if (!isset($_SESSION['nvll_sort'])) $_SESSION['nvll_sort'] = $conf->default_sort;
+if (!isset($_SESSION['nvll_sortdir'])) $_SESSION['nvll_sortdir'] = $conf->default_sortdir;
 
 // Override session variables from request, if supplied
 if (isset($_REQUEST['user']) && !isset($_SESSION['nvll_loggedin'])) {
@@ -111,17 +93,11 @@ if (isset($_REQUEST['passwd'])) {
     }
     $pwd_to_encrypt = true;
 }
+// Encrypt session password and store into session encrypted password
+if ($pwd_to_encrypt == true) $_SESSION['nvll_passwd'] = encpass($_SESSION['nvll_passwd'], $conf->master_key);
 
-if ($pwd_to_encrypt == true) {
-    /* encrypt session password */
-    /* store into session encrypted password */
-    $_SESSION['nvll_passwd'] = encpass($_SESSION['nvll_passwd'], $conf->master_key);
-}
-
-if (isset($_REQUEST['sort']))
-    $_SESSION['nvll_sort'] = NVLL_Request::getStringValue('sort');
-if (isset($_REQUEST['sortdir']))
-    $_SESSION['nvll_sortdir'] = NVLL_Request::getStringValue('sortdir');
+if (isset($_REQUEST['sort'])) $_SESSION['nvll_sort'] = NVLL_Request::getStringValue('sort');
+if (isset($_REQUEST['sortdir'])) $_SESSION['nvll_sortdir'] = NVLL_Request::getStringValue('sortdir');
 
 //--------------------------------------------------------------------------------
 // Set and load the language...
@@ -193,12 +169,10 @@ if (isset($_SESSION['nvll_passwd']) && $_SESSION['nvll_passwd'] === false) {
 
 if ($session_has_expired > 0) {
     $_SESSION['nvll_login'] = "";
-    if ($session_has_expired == 1) {
-        $ev = new NVLL_Exception($html_session_expired . ".");
-    }
-    if ($session_has_expired == 2) {
-        $ev = new NVLL_Exception($html_session_expired . " " . $html_session_ip_changed . ".");
-    }
+
+    if ($session_has_expired == 1) $ev = new NVLL_Exception($html_session_expired . ".");
+    if ($session_has_expired == 2) $ev = new NVLL_Exception($html_session_expired . " " . $html_session_ip_changed . ".");
+
     require './html/header.php';
     require './html/error.php';
     require './html/footer.php';
@@ -206,14 +180,10 @@ if ($session_has_expired > 0) {
 }
 
 // Start with default smtp server/port, override later
-if (empty($_SESSION['nvll_smtp_server']))
-    $_SESSION['nvll_smtp_server'] = $conf->default_smtp_server;
-if (empty($_SESSION['nvll_smtp_port']))
-    $_SESSION['nvll_smtp_port'] = $conf->default_smtp_port;
-
+if (empty($_SESSION['nvll_smtp_server'])) $_SESSION['nvll_smtp_server'] = $conf->default_smtp_server;
+if (empty($_SESSION['nvll_smtp_port'])) $_SESSION['nvll_smtp_port'] = $conf->default_smtp_port;
 // Default login to just the username
-if (isset($_SESSION['nvll_user']) && !isset($_SESSION['nvll_login']))
-    $_SESSION['nvll_login'] = $_SESSION['nvll_user'];
+if (isset($_SESSION['nvll_user']) && !isset($_SESSION['nvll_login'])) $_SESSION['nvll_login'] = $_SESSION['nvll_user'];
 
 // Check allowed chars for login
 if (
@@ -317,13 +287,9 @@ if (isset($_REQUEST['server'])) {
 
 // Cache the user's preferences/filters
 if (isset($_SESSION['nvll_user']) && isset($_SESSION['nvll_domain'])) {
-
     //is user in auto update list?
     if (isset($conf->auto_update['user'][0])) {
-        if (
-            $conf->auto_update['user'][0] == "all" ||
-            in_array($_SESSION['nvll_user'] . '@' . $_SESSION['nvll_domain'], $conf->auto_update['user'])
-        ) {
+        if ($conf->auto_update['user'][0] == "all" || in_array($_SESSION['nvll_user'] . '@' . $_SESSION['nvll_domain'], $conf->auto_update['user'])) {
             $_SESSION['auto_update'] = true;
         }
     }
@@ -398,6 +364,4 @@ require_once './config/conf_charset.php';
 
 // allow PHP script to consume more memory than default setting for
 // big attachments
-if (isset($conf->memory_limit) && $conf->memory_limit != '') {
-    @ini_set("memory_limit", $conf->memory_limit);
-}
+if (isset($conf->memory_limit) && $conf->memory_limit != '') @ini_set("memory_limit", $conf->memory_limit);
