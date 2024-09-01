@@ -103,6 +103,7 @@ switch ($service) {
                 $content['body'] = NVLL_Body::prepareTextLinks($content['body']);
 
                 if ($user_prefs->getColoredQuotes()) $content['body'] = NVLL_Body::addColoredQuotes($content['body']);
+                if ($user_prefs->getDisplayStructuredText()) $content['body'] = NVLL_Body::addStructuredText($content['body']);
 
                 $content['body'] = trim($content['body']);
                 $content['body'] = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $content['body'] . '</span>';

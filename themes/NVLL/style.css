@@ -934,19 +934,155 @@ hr.mailAttachSep {
 
 /* colored quotes */
 .quoteLevel1 {
-  color: navy;
+  color: #000080; /* Navy */
 }
 .quoteLevel2 {
-  color: maroon;
+  color: #001a66; /* Very Dark Blue */
 }
 .quoteLevel3 {
-  color: green;
+  color: #003366; /* Dark Blue */
 }
 .quoteLevel4 {
-  color: purple;
+  color: #004080; /* Strong Blue */
 }
 .quoteLevel5 {
-  color: teal;
+  color: #004d99; /* Deep Blue */
+}
+.quoteLevel6 {
+  color: #0059b3; /* Medium Blue */
+}
+.quoteLevel7 {
+  color: #0066cc; /* Bright Blue */
+}
+.quoteLevel8 {
+  color: #0073e6; /* Lighter Blue */
+}
+.quoteLevel9 {
+  color: #3385ff; /* Light Blue */
+}
+.quoteLevel10 {
+  color: #4d94ff; /* Very Light Blue */
+}
+.quoteLevel11 {
+  color: #66a3ff; /* Sky Blue */
+}
+.quoteLevel12 {
+  color: #80b3ff; /* Light Sky Blue */
+}
+.quoteLevel13 {
+  color: #99c2ff; /* Pale Blue */
+}
+.quoteLevel14 {
+  color: #b3d1ff; /* Pastel Blue */
+}
+.quoteLevel15 {
+  color: #cce0ff; /* Very Pale Blue */
+}
+.quoteLevel16 {
+  color: #e0eaff; /* Almost White Blue */
+}
+.quoteLevel17 {
+  color: #e6f0ff; /* Lightest Blue */
+}
+.quoteLevel18 {
+  color: #f2f5ff; /* Soft Blue */
+}
+.quoteLevel19 {
+  color: #f5faff; /* Very Soft Blue */
+}
+.quoteLevel20 {
+  color: #f9fdff; /* Pure White Blue */
+}
+.quoteLevel21 {
+  color: #fcfcff; /* Almost White */
+}
+.quoteLevel22 {
+  color: #ffffff; /* White */
+}
+.quoteLevel23 {
+  color: #f9f9ff; /* Very Light Blue */
+}
+.quoteLevel24 {
+  color: #f2f2ff; /* Lightest Blue */
+}
+.quoteLevel25 {
+  color: #ebebff; /* Almost White Blue */
+}
+.quoteLevel26 {
+  color: #e3e3ff; /* Pale Blue */
+}
+.quoteLevel27 {
+  color: #dcdcff; /* Very Light Blue */
+}
+.quoteLevel28 {
+  color: #d4d4ff; /* Softest Blue */
+}
+.quoteLevel29 {
+  color: #cfcfff; /* Lightest Blue */
+}
+.quoteLevel30 {
+  color: #c9c9ff; /* Very Pale Blue */
+}
+.quoteLevel31 {
+  color: #bfbfff; /* Light Blue */
+}
+.quoteLevel32 {
+  color: #b3b3ff; /* Bright Blue */
+}
+.quoteLevel33 {
+  color: #a6a6ff; /* Medium Blue */
+}
+.quoteLevel34 {
+  color: #9b9bff; /* Deep Blue */
+}
+.quoteLevel35 {
+  color: #8f8fff; /* Strong Blue */
+}
+.quoteLevel36 {
+  color: #8484ff; /* Lighter Blue */
+}
+.quoteLevel37 {
+  color: #7a7aff; /* Very Light Blue */
+}
+.quoteLevel38 {
+  color: #6b6bff; /* Sky Blue */
+}
+.quoteLevel39 {
+  color: #5f5fff; /* Light Sky Blue */
+}
+.quoteLevel40 {
+  color: #5252ff; /* Pale Blue */
+}
+.quoteLevel41 {
+  color: #4b4bff; /* Pastel Blue */
+}
+.quoteLevel42 {
+  color: #4242ff; /* Very Pale Blue */
+}
+.quoteLevel43 {
+  color: #3939ff; /* Almost White Blue */
+}
+.quoteLevel44 {
+  color: #3333ff; /* Lightest Blue */
+}
+.quoteLevel45 {
+  color: #2e2eff; /* Softest Blue */
+}
+.quoteLevel46 {
+  color: #2929ff; /* Very Light Blue */
+}
+.quoteLevel47 {
+  color: #2424ff; /* Pure White Blue */
+}
+.quoteLevel48 {
+  color: #1e1eff; /* Almost White */
+}
+.quoteLevel49 {
+  color: #1919ff; /* Lightest Blue */
+}
+.quoteLevel50,
+.quoteLevelDefault {
+  color: #1414ff; /* Very Light Blue */
 }
 
 .debug {

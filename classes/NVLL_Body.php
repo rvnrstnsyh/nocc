@@ -77,12 +77,15 @@ class NVLL_Body
      */
     public static function addColoredQuotes($body)
     {
-        $body = preg_replace('/^(&gt; *&gt; *&gt; *&gt; *&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel5">\\1\\2</span>\\3', $body);
-        $body = preg_replace('/^(&gt; *&gt; *&gt; *&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel4">\\1\\2</span>\\3', $body);
-        $body = preg_replace('/^(&gt; *&gt; *&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel3">\\1\\2</span>\\3', $body);
-        $body = preg_replace('/^(&gt; *&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel2">\\1\\2</span>\\3', $body);
-        $body = preg_replace('/^(&gt;)(.*?)(\r?\n)/m', '<span class="quoteLevel1">\\1\\2</span>\\3', $body);
-
+        $body = preg_replace_callback(
+            '/(^|\r?\n)((&gt; *)+)(.*?)(\r?\n|$)/m',
+            function ($matches) {
+                $level = substr_count($matches[2], '&gt;');
+                $class = $level > 50 ? 'quoteLevelDefault' : 'quoteLevel' . $level;
+                return $matches[1] . '<span class="' . $class . '">' . $matches[2] . $matches[4] . '</span>' . $matches[5];
+            },
+            $body
+        );
         return $body;
     }
 
