@@ -178,7 +178,8 @@ if (count($big_list) > 1) {
           <tr>
             <td class="prefsLabel">&nbsp;</td>
             <td class="prefsData">
-              <input type="checkbox" name="outlook_quoting" id="outlook_quoting" value="on" <?php if ($user_prefs->getOutlookQuoting()) echo 'checked="checked"'; ?> /><label for="outlook_quoting"><?php echo convertLang2Html($html_outlook_quoting) ?></label>
+              <input type="checkbox" name="outlook_quoting" id="outlook_quoting" value="on" <?php if ($user_prefs->getOutlookQuoting()) echo 'checked="checked"'; ?> />
+              <label for="outlook_quoting"><?php echo convertLang2Html($html_outlook_quoting) ?></label>
             </td>
           </tr>
         </table>
@@ -301,17 +302,13 @@ if (count($big_list) > 1) {
                 <select class="button" name="theme" id="theme">
                   <?php
                   echo '<option value="default"';
-                  if (! isset($user_prefs->theme) || $user_prefs->theme == "default") {
-                    echo ' selected="selected"';
-                  }
+                  if (!isset($user_prefs->theme) || $user_prefs->theme == "default") echo ' selected="selected"';
                   echo '>' . convertLang2Html($html_default) . '</option>';
                   $handle = opendir('./themes');
                   while (($file = readdir($handle)) != false) {
                     if (($file != '.') && ($file != '..') && ($file != '.svn')) {
                       echo '<option value="' . $file . '"';
-                      if (isset($user_prefs->theme) && $user_prefs->theme == $file) {
-                        echo ' selected="selected"';
-                      }
+                      if (isset($user_prefs->theme) && $user_prefs->theme == $file) echo ' selected="selected"';
                       echo '>' . $file . '</option>';
                     }
                   }
@@ -337,6 +334,13 @@ if (count($big_list) > 1) {
                 <option value="2" <?php if (2 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option2) ?></option>
                 <option value="3" <?php if (3 == $user_prefs->getCollect()) echo " selected"; ?>><?php echo convertLang2Html($html_collect_option3) ?></option>
               </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="prefsLabel">&nbsp;</td>
+            <td class="prefsData">
+              <input type="checkbox" name="use_javascript" id="use_javascript" value="on" <?php if ($user_prefs->getUseJavaScript()) echo 'checked="checked"'; ?> />
+              <label for="use_javascript"><?php echo convertLang2Html($html_use_javascript) ?></label>
             </td>
           </tr>
         </table>

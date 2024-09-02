@@ -60,6 +60,12 @@ class NVLL_UserPrefs
      */
     private $_outlookQuoting;
     /**
+     * Use JavaScript?
+     * @var boolean
+     * @access private
+     */
+    private $_useJavaScript;
+    /**
      * Colored quotes?
      * @var boolean
      * @access private
@@ -172,6 +178,7 @@ class NVLL_UserPrefs
         $this->_hideAddresses = false;
         $this->_showAlert = true;
         $this->_outlookQuoting = false;
+        $this->_useJavaScript = true;
         $this->_coloredQuotes = true;
         $this->_displayStructuredText = false;
         $this->_wrapMessages = 0;
@@ -310,6 +317,24 @@ class NVLL_UserPrefs
     public function setOutlookQuoting($value)
     {
         $this->_outlookQuoting = $this->_convertToFalse($value);
+    }
+
+    /**
+     * Get JavaScript from user preferences
+     * @return boolean Use JavaScript?
+     */
+    public function getUseJavaScript()
+    {
+        return $this->_useJavaScript;
+    }
+
+    /**
+     * Set JavaScript from user preferences
+     * @param mixed $value Use JavaScript?
+     */
+    public function setUseJavaScript($value)
+    {
+        $this->_useJavaScript = $this->_convertToFalse($value);
     }
 
     /**
@@ -773,6 +798,7 @@ class NVLL_UserPrefs
         fwrite($file, "hide_addresses=" . $this->_hideAddresses . "\n");
         fwrite($file, "show_alert=" . $this->_showAlert . "\n");
         fwrite($file, "outlook_quoting=" . $this->_outlookQuoting . "\n");
+        fwrite($file, "use_javascript=" . $this->_useJavaScript . "\n");
         fwrite($file, "colored_quotes=" . $this->_coloredQuotes . "\n");
         fwrite($file, "display_struct=" . $this->_displayStructuredText . "\n");
         fwrite($file, "seperate_msg_win=" . $this->seperate_msg_win . "\n");

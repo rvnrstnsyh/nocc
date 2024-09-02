@@ -55,6 +55,7 @@ $html_email_address_label = 'Email Address:';
 $html_bccself = 'Bcc self';
 $html_hide_addresses = 'Hide addresses';
 $html_outlook_quoting = 'Outlook-style quoting';
+$html_use_javascript = 'JavaScript';
 $html_reply_to = 'Reply to';
 $html_reply_to_label = 'Reply to:';
 $html_use_signature = 'Use signature';

@@ -438,6 +438,7 @@ switch ($service) {
             $user_prefs->setHideAddresses(isset($_REQUEST['hide_addresses']));
             $user_prefs->setShowAlert(isset($_REQUEST['show_alert']));
             $user_prefs->setOutlookQuoting(isset($_REQUEST['outlook_quoting']));
+            $user_prefs->setUseJavaScript(isset($_REQUEST['use_javascript']));
             $user_prefs->setColoredQuotes(isset($_REQUEST['colored_quotes']));
             $user_prefs->setDisplayStructuredText(isset($_REQUEST['display_struct']));
             $user_prefs->seperate_msg_win = isset($_REQUEST['seperate_msg_win']);
