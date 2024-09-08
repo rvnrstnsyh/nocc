@@ -25,8 +25,8 @@ $mail_subject = NVLL_Request::getStringValue('mail_subject');
 $mail_body = NVLL_Request::getStringValue('mail_body');
 
 if (strlen(NVLL_Request::getStringValue('nvll_attach_array')) > 0) {
-    $mail_att = unserialize(base64_decode(NVLL_Request::getStringValue('nvll_attach_array')));
-    if (!is_array($mail_att)) unset($mail_att);
+    $mail_attachment = unserialize(base64_decode(NVLL_Request::getStringValue('nvll_attach_array')));
+    if (!is_array($mail_attachment)) unset($mail_attachment);
 }
 
 $mail_receipt = isset($_REQUEST['receipt']);
@@ -41,7 +41,7 @@ $send_backup['mail_bcc'] = $mail_bcc;
 $send_backup['mail_subject'] = $mail_subject;
 $send_backup['mail_body'] = $mail_body;
 
-if (isset($mail_att)) $send_backup['mail_att'] = $mail_att;
+if (isset($mail_attachment)) $send_backup['mail_attachment'] = $mail_attachment;
 
 $send_backup['mail_receipt'] = $mail_receipt;
 $send_backup['mail_priority'] = $mail_priority;
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 require_once './classes/NVLL_MIME.php';
 require_once './classes/NVLL_SMTP.php';
 
-if (ini_get("file_uploads") && isset($_FILES['mail_att'])) $_FILES['mail_att'];
+if (ini_get("file_uploads") && isset($_FILES['mail_attachment'])) $mail_attachment = $_FILES['mail_attachment'];
 if (NVLL_Session::getSendHtmlMail()) $mail_body = '<html><head></head><body>' . $mail_body . '</body></html>';
 
 switch ($_REQUEST['sendaction']) {
@@ -72,12 +72,27 @@ switch ($_REQUEST['sendaction']) {
         if (!isset($_SESSION['nvll_attach_array'])) $_SESSION['nvll_attach_array'] = array();
 
         $attach_array = $_SESSION['nvll_attach_array'];
-        //TODO: Check if "$conf->tmpdir" exists?
-        $tmpFile = $conf->tmpdir . '/' . basename($mail_att['tmp_name'] . md5(uniqid(rand(), true)) . '.att');
+        // Check if "$conf->tmpdir" exists
+        if (!is_dir($conf->tmpdir)) {
+            $ev = new NVLL_Exception('Temporary directory does not exist');
+            require './html/header.php';
+            require './html/error.php';
+            require './html/footer.php';
+            break;
+        }
 
+        if (!isset($_FILES['mail_attachment']) || empty($_FILES['mail_attachment']['tmp_name']) || !file_exists($_FILES['mail_attachment']['tmp_name'])) {
+            $ev = new NVLL_Exception('Temporary file does not exist');
+            require './html/header.php';
+            require './html/error.php';
+            require './html/footer.php';
+            break;
+        }
+
+        $tmpFile = $conf->tmpdir . '/' . basename($mail_attachment['tmp_name'] . md5(uniqid(rand(), true)) . '.att');
         // Adding the new file to the array
-        if (@move_uploaded_file($mail_att['tmp_name'], $tmpFile)) {
-            $attachedFile = new NVLL_AttachedFile($tmpFile, basename($mail_att['name']), $mail_att['size'], $mail_att['type']);
+        if (@move_uploaded_file($mail_attachment['tmp_name'], $tmpFile)) {
+            $attachedFile = new NVLL_AttachedFile($tmpFile, basename($mail_attachment['name']), $mail_attachment['size'], $mail_attachment['type']);
             $attach_array[] = $attachedFile;
         } else {
             $ev = new NVLL_Exception($html_file_upload_attack);
@@ -89,7 +104,7 @@ switch ($_REQUEST['sendaction']) {
 
         // Registering the attachments array into the session
         $_SESSION['nvll_attach_array'] = $attach_array;
-        $_SESSION['send_backup']['mail_att'] = $attach_array;
+        $_SESSION['send_backup']['mail_attachment'] = $attach_array;
         // Displaying the sending form with the new attachments array
         //header("Content-type: text/html; Charset=UTF-8");
         require './html/header.php';
@@ -283,7 +298,7 @@ switch ($_REQUEST['sendaction']) {
 
         // Registering the new attachments array into the session
         $_SESSION['nvll_attach_array'] = $tmp_array;
-        $_SESSION['send_backup']['mail_att'] = $attach_array;
+        $_SESSION['send_backup']['mail_attachment'] = $attach_array;
 
         // Displaying the sending form with the new attachment array 
         header("Content-type: text/html; Charset=UTF-8");

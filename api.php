@@ -146,7 +146,7 @@ switch ($service) {
             if (isset($_SESSION['send_backup']['mail_bcc'])) $mail_bcc = $_SESSION['send_backup']['mail_bcc'];
             if (isset($_SESSION['send_backup']['mail_subject'])) $mail_subject = $_SESSION['send_backup']['mail_subject'];
             if (isset($_SESSION['send_backup']['mail_body'])) $mail_body = $_SESSION['send_backup']['mail_body'];
-            if (isset($_SESSION['send_backup']['mail_att'])) $_SESSION['nvll_attach_array'] = $_SESSION['send_backup']['mail_att'];
+            if (isset($_SESSION['send_backup']['mail_attachment'])) $_SESSION['nvll_attach_array'] = $_SESSION['send_backup']['mail_attachment'];
             if (isset($_SESSION['send_backup']['mail_receipt'])) $mail_receipt = $_SESSION['send_backup']['mail_receipt'];
             if (isset($_SESSION['send_backup']['mail_priority'])) $mail_priority = $_SESSION['send_backup']['mail_priority'];
 
@@ -889,8 +889,8 @@ function display_attachments($content, $pop, $attachmentParts)
             if (NVLL_Security::isSupportedImageType($imageType)) {
                 echo $name . '<hr class="mailAttachSep" />';
                 echo '<div class="mailImgAttach">';
-                echo '<img src="get_img.php?' . NVLL_Session::getUrlGetSession() . '&amp;mail=' . $_REQUEST['mail'] . '&amp;num=' . $attachmentPart->getPartNumber() . '&amp;mime='
-                    . $imageType . '&amp;transfer=' . $attachmentPart->getEncoding()->__toString() . '" alt="" title="' . $partStructure->getName() . '" />';
+                echo '<img src="get_img.php?' . NVLL_Session::getUrlGetSession() . '&mail=' . $_REQUEST['mail'] . '&num=' . $attachmentPart->getPartNumber() . '&mime='
+                    . $imageType . '&transfer=' . $attachmentPart->getEncoding()->__toString() . '" alt="" title="' . $partStructure->getName() . '" />';
                 echo '</div> <!-- .mailImgAttach -->';
             }
         }
@@ -913,7 +913,7 @@ function display_embedded_html_images(&$content, $attachmentParts)
         if ($partStructure->getInternetMediaType()->isImage() && ! $partStructure->isAttachment() && $conf->display_img_attach) { //if embedded image...
             $imageType = $attachmentPart->getInternetMediaType()->__toString();
             if (NVLL_Security::isSupportedImageType($imageType)) {
-                $new_img_src = 'get_img.php?' . NVLL_Session::getUrlGetSession() . '&amp;mail=' . $_REQUEST['mail'] . '&amp;num=' . $attachmentPart->getPartNumber() . '&amp;mime=' . $imageType . '&amp;transfer=' . $attachmentPart->getEncoding()->__toString();
+                $new_img_src = 'get_img.php?' . NVLL_Session::getUrlGetSession() . '&mail=' . $_REQUEST['mail'] . '&num=' . $attachmentPart->getPartNumber() . '&mime=' . $imageType . '&transfer=' . $attachmentPart->getEncoding()->__toString();
                 $img_id = 'cid:' . trim($partStructure->getId(true), '<>');
                 $content['body'] = str_replace('[' . $img_id . ']', '<img src="' . $new_img_src . '" alt="" title="' . $partStructure->getName() . '" />', $content['body']);
                 $content['body'] = str_replace($img_id, $new_img_src, $content['body']);
@@ -1018,7 +1018,7 @@ function set_list_of_folders($pop, $subscribed)
         if (isset($status['unseen']) && $status['unseen'] > 0) $unseen = $status['unseen'];
         if ($unseen > 0) {
             if (!in_array($folder_name, $new_folders)) {
-                $list_of_folders .= ' <a href="api.php?' . NVLL_Session::getUrlGetSession() . '&amp;folder=' . $folder_name . '">' . $folder_name . " ($unseen)" . '</a>';
+                $list_of_folders .= ' <a href="api.php?' . NVLL_Session::getUrlGetSession() . '&folder=' . $folder_name . '">' . $folder_name . " ($unseen)" . '</a>';
                 $_SESSION['list_of_folders'] = $list_of_folders;
                 array_push($new_folders, $folder_name);
             }

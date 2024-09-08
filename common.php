@@ -208,8 +208,8 @@ if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
     }
 
     $domain = new NVLL_Domain($conf->domains[$domain_index]);
-    $_SESSION['nvll_domain_index'] = $domain_index;
     $_SESSION['nvll_domain'] = $conf->domains[$domain_index]->domain;
+    $_SESSION['nvll_domain_index'] = $domain_index;
     $_SESSION['nvll_servr'] = $conf->domains[$domain_index]->in;
     $_SESSION['nvll_smtp_server'] = $conf->domains[$domain_index]->smtp;
     $_SESSION['nvll_smtp_port'] = $conf->domains[$domain_index]->smtp_port;

@@ -84,9 +84,8 @@ class NVLL_AttachedFile
      */
     public function getSize()
     {
-        if ($this->bytes > 1024) { //if more then 1024 bytes...
-            return ceil($this->bytes / 1024);
-        }
+        //if more then 1024 bytes...
+        if ($this->bytes > 1024) return ceil($this->bytes / 1024);
         return 1;
     }
 
@@ -115,8 +114,10 @@ class NVLL_AttachedFile
     public function getContent()
     {
         if ($this->exists()) {
+            // Check if the file size is 0!
+            if (filesize($this->tmpFile) === 0) return '';
+
             $fp = fopen($this->tmpFile, 'rb');
-            //TODO: Check if the file size is 0!
             $content = fread($fp, $this->bytes);
             fclose($fp);
 

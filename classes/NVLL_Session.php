@@ -222,9 +222,7 @@ class NVLL_Session
 					foreach ($old_session_files as $filename) {
 						$last_mod = filemtime($filename);
 						$age = time() - $last_mod;
-						if ($age > $max_age) {
-							unlink($filename);
-						}
+						if ($age > $max_age) unlink($filename);
 					}
 				}
 			}
@@ -259,7 +257,7 @@ class NVLL_Session
 				foreach ($old_session_files as $filename) {
 					$last_mod = filemtime($filename);
 					$age = time() - $last_mod;
-					$max_age = 60 * 60 * 1;  //1 hour
+					$max_age = 60 * 60 * 1;  // 1 hour.
 					if ($age > $max_age) {
 						unlink($filename);
 					}
@@ -271,7 +269,7 @@ class NVLL_Session
 				foreach ($old_session_files as $filename) {
 					$last_mod = filemtime($filename);
 					$age = time() - $last_mod;
-					$max_age = 60 * 60 * 24 * 1;  //1 day
+					$max_age = 60 * 60 * 24 * 1;  // 1 day.
 					if ($age > $max_age) {
 						unlink($filename);
 					}
@@ -341,7 +339,7 @@ class NVLL_Session
 
 		$cookie_lifetime = 0;
 		if ($persistent == 1) {
-			$cookie_lifetime = 60 * 60 * 24 * 7 * 4; //4weeks
+			$cookie_lifetime = 60 * 60 * 24 * 7 * 4; // 4 weeks.
 			if (isset($conf->max_session_lifetime)) $cookie_lifetime = $conf->max_session_lifetime;
 		}
 
@@ -523,7 +521,7 @@ class NVLL_Session
 
 		$cookie_lifetime = 0;
 		if ($persistent == 1) {
-			$cookie_lifetime = time() + 60 * 60 * 24 * 7 * 4; //4weeks
+			$cookie_lifetime = time() + 60 * 60 * 24 * 7 * 4; // 4 weeks.
 			if (isset($conf->max_session_lifetime)) {
 				$cookie_lifetime = time() + $conf->max_session_lifetime;
 			}
@@ -650,10 +648,8 @@ class NVLL_Session
 	 */
 	public static function existsUserPrefs()
 	{
-		if (isset($_SESSION['nvll_userprefs'])) {
-			if ($_SESSION['nvll_userprefs'] instanceof NVLL_UserPrefs) {
-				return true;
-			}
+		if (isset($_SESSION['nvll_user_prefs'])) {
+			if ($_SESSION['nvll_user_prefs'] instanceof NVLL_UserPrefs) return true;
 		}
 		return false;
 	}
@@ -665,7 +661,7 @@ class NVLL_Session
 	 */
 	public static function getUserPrefs()
 	{
-		if (NVLL_Session::existsUserPrefs()) return $_SESSION['nvll_userprefs'];
+		if (NVLL_Session::existsUserPrefs()) return $_SESSION['nvll_user_prefs'];
 		return new NVLL_UserPrefs('');
 	}
 
@@ -677,7 +673,7 @@ class NVLL_Session
 	 */
 	public static function setUserPrefs($value)
 	{
-		$_SESSION['nvll_userprefs'] = $value;
+		$_SESSION['nvll_user_prefs'] = $value;
 	}
 
 	/**

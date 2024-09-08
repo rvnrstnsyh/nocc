@@ -25,7 +25,6 @@ class result
 	public $charset = '';
 }
 
-//TODO: Use mail or message as name?
 class NVLL_IMAP
 {
 	private $server;
@@ -101,9 +100,7 @@ class NVLL_IMAP
 			if (isset($_REQUEST['enter'])) {
 				$log_string = 'NVLL: failed login from rhost=' . $_SERVER['REMOTE_ADDR'] . ' to server=' . $this->server . ' as user=' . $_SESSION['nvll_login'] . '';
 				error_log($log_string);
-				if (isset($conf->syslog) && $conf->syslog) {
-					syslog(LOG_INFO, $log_string);
-				}
+				if (isset($conf->syslog) && $conf->syslog) syslog(LOG_INFO, $log_string);
 			}
 
 			$error = "";
@@ -298,7 +295,7 @@ class NVLL_IMAP
 	 * @param string $defaultcharset Default charset
 	 * @return NVLL_HeaderInfo Header info
 	 */
-	public function headerinfo($msgnum, $defaultcharset = 'ISO-8859-1')
+	public function headerinfo($msgnum, $defaultcharset = 'UTF-8')
 	{
 		$headerinfo = @imap_headerinfo($this->conn, $msgnum);
 
@@ -596,7 +593,7 @@ class NVLL_IMAP
 		if (preg_match("/:/", $mailbox)) {
 			$remote = explode(":", $mailbox);
 			foreach ($_COOKIE as $cookie_key => $cookie_value) {
-				if (preg_match("/^NEXT_/", $cookie_key)) {
+				if (preg_match("/^IM_/", $cookie_key)) {
 					$_vmbox = $cookie_key;
 					if ($line = NVLL_Session::load_session_file($_vmbox)) {
 						list(
@@ -619,7 +616,7 @@ class NVLL_IMAP
 							$TMP_SESSION['quota_type'],
 							$TMP_SESSION['creation_time'],
 							$TMP_SESSION['persistent'],
-							$TMP_SESSION['remote_addr'],
+							$TMP_SESSION['remote_addr']
 						) = explode(" ", base64_decode($line));
 						if ($session_id == $cookie_value) {
 							foreach ($conf->domains as $index => $domain) {
@@ -1026,14 +1023,13 @@ class NVLL_IMAP
 	public static function mime_header_decode($header, $decode = true)
 	{
 		global $conf;
+
 		$decodedheader = "";
 		//special utf-16 handling:
 		$do_pre_decoding = false;
 		$source = imap_mime_header_decode($header);
 
-		for ($j = 0; $j < count($source); $j++) {
-			if ($source[$j]->charset == 'utf-16') $do_pre_decoding = true;
-		}
+		for ($j = 0; $j < count($source); $j++) if ($source[$j]->charset == 'utf-16') $do_pre_decoding = true;
 
 		if ($do_pre_decoding) {
 			if (isset($conf->default_charset) && $conf->default_charset != '') {
@@ -1111,7 +1107,7 @@ class NVLL_IMAP
 
 		foreach ($folders as $folder) $html_select .= "\t<option " . ($folder == $selected ? "selected=\"selected\"" : "") . " value=\"$folder\">" . $folder . "</option>\n";
 		foreach ($_COOKIE as $cookie_key => $cookie_value) {
-			if (preg_match("/^NEXT_/", $cookie_key)) {
+			if (preg_match("/^IM_/", $cookie_key)) {
 				$_vmbox = $cookie_key;
 				if ($line = NVLL_Session::load_session_file($_vmbox)) {
 					list(
@@ -1134,7 +1130,7 @@ class NVLL_IMAP
 						$TMP_SESSION['quota_type'],
 						$TMP_SESSION['creation_time'],
 						$TMP_SESSION['persistent'],
-						$TMP_SESSION['remote_addr'],
+						$TMP_SESSION['remote_addr']
 					) = explode(" ", base64_decode($line));
 
 					//unclear if INBOX is always the best default, but we don't have available folders of another server session

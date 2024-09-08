@@ -138,7 +138,7 @@ class NVLL_RSSFeed
         echo "    <dc:creator></dc:creator>\n";
         echo "    <dc:rights></dc:rights>\n";
         echo "    <dc:date>" . $date . "</dc:date>\n";
-        echo "    <admin:generatorAgent rdf:resource=\"http://nvll.sourceforge.net/\" />\n";
+        echo "    <admin:generatorAgent rdf:resource=\"http://nvll.me/\" />\n";
         echo "    <sy:updatePeriod>hourly</sy:updatePeriod>\n";
         echo "    <sy:updateFrequency>1</sy:updateFrequency>\n";
         echo "    <sy:updateBase>" . $date . "</sy:updateBase>\n";

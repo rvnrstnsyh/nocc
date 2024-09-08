@@ -109,9 +109,9 @@ $mail_from = get_default_from_address();
       <?php if (ini_get("file_uploads")) { ?>
         <?php if (isset($_GET['service']) && $_GET['service'] != 'forward') { ?>
           <tr>
-            <td class="sendLabel"><label for="mail_att"><?php echo $html_att_label ?></label></td>
+            <td class="sendLabel"><label for="mail_attachment"><?php echo $html_att_label ?></label></td>
             <td class="sendData">
-              <input class="button" type="file" name="mail_att" id="mail_att" size="40" value="" style="max-width:180px" />
+              <input class="button" type="file" name="mail_attachment" id="mail_attachment" size="40" value="" style="max-width:180px" />
               <input type="submit" class="button" onclick="btnClicked=this" name="sendaction" value="<?php echo $html_attach ?>" />
             </td>
           </tr>
@@ -231,7 +231,7 @@ $mail_from = get_default_from_address();
     }
 
     if (btnClicked.value == "<?php echo unhtmlentities($html_attach) ?>") {
-      if (f.elements['mail_att'].value == "") {
+      if (f.elements['mail_attachment'].value == "") {
         alert('<?php echo unhtmlentities($html_attach_none) ?>');
         return (false);
       } else {
@@ -249,7 +249,7 @@ $mail_from = get_default_from_address();
       }
     }
 
-    if (f.elements['mail_att'].value != "") {
+    if (f.elements['mail_attachment'].value != "") {
       alert("<?php echo unhtmlentities($html_attach_forget) ?>")
       return (false);
     }
