@@ -33,15 +33,13 @@ foreach ($conf->column_order as $column) { //For all columns...
   echo '">';
   switch ($column) {
     case '1': //From...
-      echo '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&service=compose&amp;mail_to=' . convertMailData2Html($tmp['from']) . '" title="' . convertMailData2Html($tmp['from']) . '">' . convertMailData2Html(display_address($tmp['from']), 64) . '</a>&nbsp;';
+      echo '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&service=compose&mail_to=' . convertMailData2Html($tmp['from']) . '" title="' . convertMailData2Html($tmp['from']) . '">' . convertMailData2Html(display_address($tmp['from']), 64) . '</a>&nbsp;';
       break;
     case '2': //To...
       echo convertMailData2Html(display_address($tmp['to']), 64);
       break;
     case '3': //Subject...
-      echo '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&service=aff_mail&amp;mail=' . $tmp['number'] . '&amp;verbose=' . $conf->use_verbose_by_default . '&amp;title=';
-      echo $tmp['subject'] ? convertMailData2Html($tmp['subject']) : $html_nosubject;
-      echo '"' . $target_blank . '>';
+      echo '<a href="api.php?' . NVLL_Session::getUrlGetSession() . '&service=aff_mail&mail=' . $tmp['number'] . '&verbose=' . $conf->use_verbose_by_default . '"' . $target_blank . '>';
       echo $tmp['subject'] ? convertMailData2Html($tmp['subject'], 64) : $html_nosubject;
       echo '</a>';
       break;

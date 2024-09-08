@@ -225,7 +225,8 @@ function aff_mail(&$pop, $mail, $verbose, &$attachmentParts = null)
         'prev' => $prev_msg,
         'next' => $next_msg,
         'msgnum' => $mail,
-        'charset' => $body_charset
+        'charset' => $body_charset,
+        'original' => $pop->fetchmessage($mail) // Add original raw email data
     );
     return ($content);
 }

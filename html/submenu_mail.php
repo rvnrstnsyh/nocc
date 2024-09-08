@@ -2,32 +2,52 @@
 if (!isset($conf->loaded)) die('Hacking attempt');
 
 $url_session = NVLL_Session::getUrlGetSession();
-$display_images = (!empty($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
+$display_images = (isset($_REQUEST['display_images']) && $_REQUEST['display_images'] == 1) ? '1' : '0';
 $msgnum = $content['msgnum'];
+$original = (isset($_REQUEST['original']) && $_REQUEST['original'] == 1) ? '1' : '0';
+$verbose = (isset($_REQUEST['verbose']) && $_REQUEST['verbose'] == 1) ? '1' : '0';
+$as_html = (isset($_REQUEST['as_html']) && $_REQUEST['as_html'] == 1) ? '1' : '0';
+
+$apiBaseUrl = 'api.php?' . $url_session . '&';
+$deleteBaseUrl = 'delete.php?' . $url_session . '&';
 ?>
 
 <div class="submenu">
   <ul>
     <li>
-      <a href="api.php?<?php echo $url_session ?>&service=compose"><?php echo convertLang2Html($html_new_msg) ?></a>
+      <a href="<?php echo $apiBaseUrl . NVLL_Request::Params(['service' => 'compose']) ?>">
+        <?php echo convertLang2Html($html_new_msg) ?>
+      </a>
     </li>
     <li>
-      <a href="api.php?<?php echo $url_session ?>&service=reply&amp;mail=<?php echo $msgnum ?>&amp;display_images=<?php echo $display_images ?>"><?php echo convertLang2Html($html_reply) ?></a>
+      <a href="<?php echo $apiBaseUrl . NVLL_Request::Params(['service' => 'reply', 'mail' => $msgnum, 'display_images' => $display_images]) ?>">
+        <?php echo convertLang2Html($html_reply) ?>
+      </a>
     </li>
     <li>
-      <a href="api.php?<?php echo $url_session ?>&service=reply_all&amp;mail=<?php echo $msgnum ?>&amp;display_images=<?php echo $display_images ?>"><?php echo convertLang2Html($html_reply_all) ?></a>
+      <a href="<?php echo $apiBaseUrl . NVLL_Request::Params(['service' => 'reply_all', 'mail' => $msgnum, 'display_images' => $display_images]) ?>">
+        <?php echo convertLang2Html($html_reply_all) ?>
+      </a>
     </li>
     <li>
-      <a href="delete.php?<?php echo $url_session ?>&mark_mode=unseen&amp;mail=<?php echo $msgnum ?>&amp;only_one=1"><?php echo convertLang2Html($html_unseen) ?></a>
+      <a href="<?php echo $deleteBaseUrl . NVLL_Request::Params(['mark_mode' => 'unseen', 'mail' => $msgnum, 'only_one' => '1']) ?>">
+        <?php echo convertLang2Html($html_unseen) ?>
+      </a>
     </li>
     <li>
-      <a href="delete.php?<?php echo $url_session ?>&mark_mode=flag&amp;mail=<?php echo $msgnum ?>&amp;only_one=1"><?php echo convertLang2Html($html_flag) ?></a>
+      <a href="<?php echo $deleteBaseUrl . NVLL_Request::Params(['mark_mode' => 'flag', 'mail' => $msgnum, 'only_one' => '1']) ?>">
+        <?php echo convertLang2Html($html_flag) ?>
+      </a>
     </li>
     <li>
-      <a href="delete.php?<?php echo $url_session ?>&mark_mode=unflag&amp;mail=<?php echo $msgnum ?>&amp;only_one=1"><?php echo convertLang2Html($html_unflag) ?></a>
+      <a href="<?php echo $deleteBaseUrl . NVLL_Request::Params(['mark_mode' => 'unflag', 'mail' => $msgnum, 'only_one' => '1']) ?>">
+        <?php echo convertLang2Html($html_unflag) ?>
+      </a>
     </li>
     <li>
-      <a href="api.php?<?php echo $url_session ?>&service=forward&amp;mail=<?php echo $msgnum ?>"><?php echo convertLang2Html($html_forward) ?></a>
+      <a href="<?php echo $apiBaseUrl . NVLL_Request::Params(['service' => 'forward', 'mail' => $msgnum]) ?>">
+        <?php echo convertLang2Html($html_forward) ?>
+      </a>
     </li>
     <li>
       <?php if ($pop->is_imap() && $pop->get_folder_count() > 1) {
@@ -42,11 +62,36 @@ $msgnum = $content['msgnum'];
         </form>
       <?php } ?>
     </li>
+    <?php
+    $current_url = "api.php?$url_session&" . NVLL_Request::Params([
+      'service' => 'aff_mail',
+      'mail' => $msgnum,
+      'verbose' => $verbose,
+      'as_html' => $as_html,
+      'display_images' => $display_images
+    ]);
+    if ($original === '0') { ?>
+      <li>
+        <a href="<?php echo $current_url ?>&<?php echo NVLL_Request::Params(['original' => '1']) ?>">
+          <?php echo convertLang2Html($html_show_original) ?>
+        </a>
+      </li>
+    <?php } else { ?>
+      <li>
+        <a href="<?php echo $current_url ?>">
+          <?php echo convertLang2Html($html_show_formatted) ?>
+        </a>
+      </li>
+    <?php } ?>
     <li>
-      <a href="down_mail.php?<?php echo $url_session ?>&mail=<?php echo $msgnum ?>"><?php echo convertLang2Html($html_down_mail) ?></a>
+      <a href="down_mail.php?<?php echo $url_session ?>&<?php echo NVLL_Request::Params(['mail' => $msgnum]) ?>">
+        <?php echo convertLang2Html($html_down_mail) ?>
+      </a>
     </li>
     <li>
-      <a href="delete.php?<?php echo $url_session ?>&delete_mode=1&amp;mail=<?php echo $msgnum ?>&amp;only_one=1" onclick="return confirm('<?php echo $html_del_msg ?>');"><?php echo convertLang2Html($html_delete) ?></a>
+      <a href="<?php echo $deleteBaseUrl . NVLL_Request::Params(['delete_mode' => '1', 'mail' => $msgnum, 'only_one' => '1']) ?>" onclick="return confirm('<?php echo $html_del_msg ?>');">
+        <?php echo convertLang2Html($html_delete) ?>
+      </a>
     </li>
   </ul>
 </div>
