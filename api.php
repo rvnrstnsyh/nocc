@@ -87,25 +87,28 @@ switch ($service) {
                 $contacts = $contacts_object->add_contact($path, $all_to);
 
                 if (count($contacts) <= $conf->contact_number_max) $contacts_object->saveList($path, $contacts, $conf, $ev);
-                //ignore exception as emails should be send anyways
+                //ignore exception as emails should be send anyways.
             }
 
-            // Display or hide distant HTML images
+            // Display or hide distant HTML images.
             if (!NVLL_Request::getBoolValue('display_images')) $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
 
             display_embedded_html_images($content, $attachmentParts);
 
-            // Display as plain text
-            if ($conf->use_plaintext_by_default && isset($content['body']) && strlen(trim(preg_replace('/[\x00-\x1F\x7F]/', '', $content['body']))) > 0 && !NVLL_Request::getBoolValue('as_html') && !isset($_REQUEST['user_charset'])) {
-                add_quoting($content['body'], $content);
+            $hasBody = isset($content['body']) && strlen(trim(preg_replace('/[\x00-\x1F\x7F]/', '', $content['body']))) > 0;
+            $bodyIsHTML = $content['body_mime'] === 'text/html';
 
+            // Display as plain text.
+            if ($hasBody && $bodyIsHTML && $conf->use_plaintext_by_default && !NVLL_Request::getBoolValue('as_html') && !isset($_REQUEST['user_charset'])) {
+                $content['body'] = NVLL_Security::convertHtmlToPlainText($content['body'], $content['body_mime']);
                 $content['body'] = htmlspecialchars($content['body'], ENT_COMPAT | ENT_SUBSTITUTE, $charset);
                 $content['body'] = NVLL_Body::prepareTextLinks($content['body']);
-
-                if ($user_prefs->getColoredQuotes()) $content['body'] = NVLL_Body::addColoredQuotes($content['body']);
-                if ($user_prefs->getDisplayStructuredText()) $content['body'] = NVLL_Body::addStructuredText($content['body']);
-
-                $content['body'] = trim($content['body']);
+                $content['body'] = NVLL_Body::addColoredQuotes($content['body']);
+                // Replace multiple newlines with a single newline.
+                $content['body'] = preg_replace('/(\r?\n){2,}/', "\n\n", $content['body']); // Keep a single blank line between paragraphs.
+                // Remove extra whitespace from each line.
+                $content['body'] = preg_replace('/^[ \t]+|[ \t]+$/m', '', $content['body']); // Remove leading/trailing spaces per line.
+                $content['body'] = trim($content['body']); // Trim leading and trailing whitespace.
                 $content['body'] = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $content['body'] . '</span>';
             }
         } catch (Exception $ex) {
@@ -119,7 +122,7 @@ switch ($service) {
 
         $rfc822_hasImages = create_rfc822_content($content, $pop, $attachmentParts);
 
-        // Here we display the message
+        // Here we display the message.
         require './html/header.php';
         require './html/menu_mail.php';
         require './html/submenu_mail.php';

@@ -16,7 +16,7 @@
   --black-500: #555555;
   --gray-100: #888888;
   --success-color: #adff2f;
-  --error-color: #b91c1c;
+  --error-color: #b40217;
 }
 
 html {
@@ -556,7 +556,7 @@ img.sort {
 }
 
 #inboxTable .flagged {
-  color: #b91c1c;
+  color: var(--error-color);
   font-weight: bold;
   text-decoration: line-through;
 }

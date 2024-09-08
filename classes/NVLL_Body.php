@@ -24,11 +24,7 @@ class NVLL_Body
         $placeholder = md5($body);
         $matches = array();
 
-        if ($count = preg_match_all("/\[cid:.*?\]/", $body, $matches)) {
-            for ($i = 0; $i < $count; $i++) {
-                $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
-            }
-        }
+        if ($count = preg_match_all("/\[cid:.*?\]/", $body, $matches)) for ($i = 0; $i < $count; $i++) $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
 
         $body = preg_replace("|href=\"mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)\"|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
         $body = preg_replace("|href=mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
@@ -56,11 +52,7 @@ class NVLL_Body
         $placeholder = md5($body);
         $matches = array();
 
-        if ($count = preg_match_all("/\[cid:.*?\]/", $body, $matches)) {
-            for ($i = 0; $i < $count; $i++) {
-                $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
-            }
-        }
+        if ($count = preg_match_all("/\[cid:.*?\]/", $body, $matches)) for ($i = 0; $i < $count; $i++) $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
 
         $body = preg_replace("/([0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,})/", "<a href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=\\1\">\\1</a>", $body);
         for ($i = 0; $i < $count; $i++) $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);

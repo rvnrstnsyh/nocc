@@ -129,10 +129,14 @@ class NVLL_Security
         $string = str_replace("\r\n", "\n", $string);
         $string = str_replace("\r", "\n", $string);
         $string = str_replace("\n", $crlf, $string);
+        // Replace image tags with their alt text, adding a line break before.
+        $string = preg_replace_callback('/<img[^>]+alt=([\'"])(.*?)\1[^>]*>/i', function ($matches) use ($crlf) {
+            return $matches[2] ? $crlf . '[' . $matches[2] . ']' : '';
+        }, $string);
+        // Cleanup <pre> tags and other unnecessary tags.
         $string = preg_replace("/^<pre>/Ui", "", $string);
         $string = preg_replace("/<\/pre>$/Ui", "", $string);
-        //$string=preg_replace('/^<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">/Ui',"",$string);
-        //$string=preg_replace('/<\/span>$/Ui',"",$string);
+        // Handle paragraphs and line breaks.
         $string = preg_replace("/" . $crlf . "\s*<p/Ui", "<p", $string);
         $string = preg_replace("/(<p.*>)/Ui", $crlf . "$1", $string);
         $string = preg_replace("/<br\s*>/Ui", "<br />", $string);
@@ -141,7 +145,7 @@ class NVLL_Security
         $string = preg_replace("/<br \/>\s*" . $crlf . "/Ui", "<br />", $string);
         $string = preg_replace("/<br \/>/Ui", "<br />" . $crlf, $string);
         $string = preg_replace("/<p[^>]*>\s*?(.*)\s*?<\/p>/Uis", "<p>$1</p>", $string);
-
+        // Process blockquote tags.
         $new_string = $string;
         do {
             $string = $new_string;
@@ -154,22 +158,30 @@ class NVLL_Security
                 $new_inner = "";
                 $lines = explode($crlf, $inner);
                 foreach ($lines as $line) {
-                    $new_inner = $new_inner . "> " . $line . "<br />" . $crlf;
+                    // Only add "> " to non-empty lines inside blockquote.
+                    if (trim($line) !== "") {
+                        $new_inner .= "> " . $line . "<br />" . $crlf;
+                    } else {
+                        $new_inner .= "<br />" . $crlf;
+                    }
                 }
-                $new_outer = $new_inner;
+                $new_outer = rtrim($new_inner, "<br />" . $crlf); // Remove unnecessary last <br /> at the end.
                 $new_string = $left . $new_outer . $right;
             }
         } while ($new_string != $string);
 
+        // Strip remaining HTML tags.
         $tmp_string = strip_tags($string);
         if ($mime == "text/html") {
             $lines = preg_split("/" . $crlf . "/", $tmp_string);
             $tmp_string = "";
             foreach ($lines as $line) {
                 $new_line = preg_replace("/^\s*/", "", $line);
-                $tmp_string = $tmp_string . $new_line . $crlf;
+                $tmp_string .= $new_line . $crlf;
             }
         }
+
+        // Final decoding of HTML entities.
         $string = $tmp_string;
         return html_entity_decode($string, ENT_COMPAT, 'UTF-8');
     }
