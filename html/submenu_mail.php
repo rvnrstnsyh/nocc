@@ -89,8 +89,8 @@ $deleteBaseUrl = 'delete.php?' . $url_session . '&';
       </a>
     </li>
     <li>
-      <a href="<?php echo $deleteBaseUrl . NVLL_Request::Params(['delete_mode' => '1', 'mail' => $msgnum, 'only_one' => '1']) ?>" onclick="return confirm('<?php echo $html_del_msg ?>');">
-        <?php echo convertLang2Html($html_delete) ?>
+      <a href="<?php echo $deleteBaseUrl . NVLL_Request::Params(['delete_mode' => '1', 'mail' => $msgnum, 'only_one' => '1']) ?>" onclick="return confirm('<?php echo $html_soft_del_msg ?>');">
+        <?php echo convertLang2Html($html_soft_delete) ?>
       </a>
     </li>
   </ul>

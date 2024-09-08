@@ -27,8 +27,20 @@
         </select>
       <?php } ?>
       <input type="submit" name="bottom_forward_mode" class="button" value="<?php echo $html_forward; ?>" />
-      <input type="submit" name="bottom_delete_mode" class="button" value="<?php echo $html_delete; ?>" onclick="if (confirm('<?php echo $html_del_msg; ?>')) return true; else return false;" />
+      <input type="submit" name="delete_mode" class="button" value="<?php echo $html_delete; ?>" onclick="return confirmDelete();" />
+      <input type="checkbox" name="bottom_bypass_trash" id="bottom_bypass_trash" value="true" />
+      <label for="bottom_bypass_trash"><?php echo convertLang2Html($html_bypass_trash); ?></label>
     </td>
   </tr>
 </table>
 </form>
+
+<script type="text/javascript">
+  function confirmDelete() {
+    const bypassTrash = document.getElementById('bypass_trash').checked;
+    const bottomBypassTrash = document.getElementById('bottom_bypass_trash').checked;
+    const message = bypassTrash || bottomBypassTrash ? '<?php echo $html_del_msg_bypass_trash; ?>' : '<?php echo $html_del_msg; ?>';
+
+    return confirm(message);
+  }
+</script>

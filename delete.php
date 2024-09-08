@@ -94,8 +94,9 @@ if (isset($_REQUEST['only_one'])) {
             if (isset($_REQUEST['delete_mode']) || isset($_REQUEST['bottom_delete_mode'])) {
                 $_SESSION['message_deleted'] = "true";
                 $target_folder = $_SESSION['imap_namespace'] . $user_prefs->getTrashFolderName();
+                $bypass_trash = isset($_REQUEST['bypass_trash']) || isset($_REQUEST['bottom_bypass_trash']);
 
-                if ($pop->is_imap() && $user_prefs->getUseTrashFolder() && $_SESSION['nvll_folder'] != $target_folder) {
+                if ($pop->is_imap() && $user_prefs->getUseTrashFolder() && $_SESSION['nvll_folder'] != $target_folder && !$bypass_trash) {
                     $pop->mail_move($i, $target_folder);
                 } else {
                     $pop->delete($i);

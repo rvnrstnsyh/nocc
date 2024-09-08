@@ -27,7 +27,9 @@
         </select>
       <?php } ?>
       <input type="submit" name="forward_mode" class="button" value="<?php echo $html_forward; ?>" />
-      <input type="submit" name="delete_mode" class="button" value="<?php echo $html_delete; ?>" onclick="if (confirm('<?php echo $html_del_msg; ?>')) return true; else return false;" />
+      <input type="submit" name="delete_mode" class="button" value="<?php echo $html_delete; ?>" onclick="return confirmDelete();" />
+      <input type="checkbox" name="bypass_trash" id="bypass_trash" value="true" />
+      <label for="bypass_trash"><?php echo convertLang2Html($html_bypass_trash); ?></label>
     </td>
   </tr>
 </table>
