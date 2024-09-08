@@ -74,7 +74,7 @@ switch ($_REQUEST['sendaction']) {
         $attach_array = $_SESSION['nvll_attach_array'];
         // Check if "$conf->tmpdir" exists
         if (!is_dir($conf->tmpdir)) {
-            $ev = new NVLL_Exception('Temporary directory does not exist');
+            $ev = new NVLL_Exception($html_tmp_directory_doesnt_exist);
             require './html/header.php';
             require './html/error.php';
             require './html/footer.php';
@@ -82,7 +82,7 @@ switch ($_REQUEST['sendaction']) {
         }
 
         if (!isset($_FILES['mail_attachment']) || empty($_FILES['mail_attachment']['tmp_name']) || !file_exists($_FILES['mail_attachment']['tmp_name'])) {
-            $ev = new NVLL_Exception('Temporary file does not exist');
+            $ev = new NVLL_Exception($html_tmp_file_doesnt_exist);
             require './html/header.php';
             require './html/error.php';
             require './html/footer.php';

@@ -153,7 +153,13 @@ require './html/header.php';
           <th></th>
           <td class="remember">
             <input type="checkbox" name="remember" id="remember" value="true" />
-            <label for="remember"><?php echo $html_remember ?><br><span>Recommended on trusted devices. <a href="">Why?</a></span></label>
+            <label for="remember">
+              <?php echo convertLang2Html($html_remember) ?>
+              <br>
+              <span><?php echo convertLang2Html($html_remember_desc); ?>
+                <a href=""><?php echo convertLang2Html($html_why); ?>?
+                </a></span>
+            </label>
           </td>
         </tr>
 
