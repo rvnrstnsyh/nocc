@@ -161,7 +161,7 @@ switch ($service) {
 
         require './html/header.php';
         require './html/menu_inbox.php';
-        require './html/send.php';
+        require './html/compose.php';
         require './html/menu_inbox.php';
         require './html/script.php';
         require './html/footer.php';
@@ -214,7 +214,7 @@ switch ($service) {
 
         require './html/header.php';
         require './html/menu_inbox.php';
-        require './html/send.php';
+        require './html/compose.php';
         require './html/menu_inbox.php';
         require './html/script.php';
         require './html/footer.php';
@@ -286,7 +286,7 @@ switch ($service) {
             }
         }
 
-        // Let send.php know to attach the original message
+        // Let compose.php know to attach the original message
         $forward_msgnum = $_REQUEST['mail'];
 
         // Add signature
@@ -294,7 +294,7 @@ switch ($service) {
 
         require './html/header.php';
         require './html/menu_inbox.php';
-        require './html/send.php';
+        require './html/compose.php';
         require './html/menu_inbox.php';
         require './html/script.php';
         require './html/footer.php';

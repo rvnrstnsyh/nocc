@@ -934,7 +934,7 @@ function safestrip(&$string)
  * @param int $length
  * @param string $newline
  * @param string $initial_quote
- * @todo Move to class_send.php?
+ * @todo Move to NVLL_MIME.php?
  * @return string
  */
 function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = "")
@@ -992,7 +992,7 @@ function wrap_outgoing_msg($txt, $length, $newline = "\r\n", $initial_quote = ""
  * ...
  * @param string $txt
  * @return string
- * @todo Move to class_send.php?
+ * @todo Move to NVLL_MIME.php?
  */
 function escape_dots($txt)
 {

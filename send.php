@@ -109,7 +109,7 @@ switch ($_REQUEST['sendaction']) {
         //header("Content-type: text/html; Charset=UTF-8");
         require './html/header.php';
         require './html/menu_inbox.php';
-        require './html/send.php';
+        require './html/compose.php';
         require './html/menu_inbox.php';
         require './html/footer.php';
         break;
@@ -130,7 +130,7 @@ switch ($_REQUEST['sendaction']) {
         header('Location: ' . $conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession());
         //require './html/header.php';
         //require './html/menu_inbox.php';
-        //require './html/send.php';
+        //require './html/compose.php';
         //require './html/menu_inbox.php';
         //require './html/footer.php';
 
@@ -304,7 +304,7 @@ switch ($_REQUEST['sendaction']) {
         header("Content-type: text/html; Charset=UTF-8");
         require './html/header.php';
         require './html/menu_inbox.php';
-        require './html/send.php';
+        require './html/compose.php';
         require './html/menu_inbox.php';
         require './html/footer.php';
         break;
