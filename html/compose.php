@@ -28,7 +28,7 @@ $mail_from = get_default_from_address();
     <legend><?php echo strtoupper(convertLang2Html($html_new_msg)); ?></legend>
   </fieldset>
   <!-- If 'file_uploads=Off', we must set formtype to "normal" otherwise it won't work -->
-  <form method="POST" action="send.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&service=<?php echo $service_request; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>" id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" onsubmit="return(validate(this));">
+  <form method="POST" action="delivery.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&service=<?php echo $service_request; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>" id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" onsubmit="return(validate(this));">
     <?php
     if (isset($broken_forwarding) && !$broken_forwarding) {
       if (isset($forward_msgnum)) { ?>

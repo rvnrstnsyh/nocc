@@ -11,12 +11,12 @@
 require_once './common.php';
 
 $mail_from = get_default_from_address();
-if (
-    (isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) ||
-    (!isset($conf->domains[$_SESSION['nvll_domain_index']]->allow_address_change) && $conf->allow_address_change)
-) {
-    $mail_from = NVLL_Request::getStringValue('mail_from');
-}
+$domain_index = $_SESSION['nvll_domain_index'];
+$domain_allow_change = isset($conf->domains[$domain_index]->allow_address_change) ? $conf->domains[$domain_index]->allow_address_change : null;
+$global_allow_change = $conf->allow_address_change;
+$can_change_address = ($domain_allow_change !== null) ? $domain_allow_change : $global_allow_change;
+
+if ($can_change_address) $mail_from = NVLL_Request::getStringValue('mail_from');
 
 $mail_to = NVLL_Request::getStringValue('mail_to');
 $mail_cc = NVLL_Request::getStringValue('mail_cc');
@@ -275,7 +275,6 @@ switch ($_REQUEST['sendaction']) {
                 }
             }
             if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) unset($_SESSION['send_backup']);
-
             clear_attachments();
             // Redirect user to inbox
             require_once './utils/proxy.php';
