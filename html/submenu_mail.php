@@ -84,7 +84,7 @@ $deleteBaseUrl = 'delete.php?' . $url_session . '&';
       </li>
     <?php } ?>
     <li>
-      <a href="down_mail.php?<?php echo $url_session ?>&<?php echo NVLL_Request::Params(['mail' => $msgnum]) ?>">
+      <a href="download_mail.php?<?php echo $url_session ?>&<?php echo NVLL_Request::Params(['mail' => $msgnum]) ?>">
         <?php echo convertLang2Html($html_down_mail) ?>
       </a>
     </li>

@@ -499,7 +499,7 @@ class NVLL_IMAP
 				// message should go here (JavaScripted "<foldername> folder contains
 				// no messages")?
 				//if ($file != "") {
-				// This is a repeat of a large chunk of code fromm down_mail.php -
+				// This is a repeat of a large chunk of code fromm download_mail.php -
 				// perhaps that should be put in a function somewhere and shared here
 				// too? Would need to take $filename and $file as parameters.
 				$isIE = $isIE6 = 0;
