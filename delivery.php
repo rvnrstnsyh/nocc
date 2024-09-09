@@ -278,7 +278,7 @@ switch ($_REQUEST['sendaction']) {
             clear_attachments();
             // Redirect user to inbox
             require_once './utils/proxy.php';
-            header("Location: " . $conf->base_url . "api.php?successfulsend=true&" . NVLL_Session::getUrlGetSession());
+            header("Location: " . $conf->base_url . "api.php?" . NVLL_Session::getUrlGetSession() . '&accepted_for_delivery=true');
         }
         break;
     case unhtmlentities($html_attach_delete):

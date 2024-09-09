@@ -64,7 +64,7 @@ switch ($service) {
         <a href="javascript:void(0);" onclick="window.open('contacts_manager.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&<?php echo NVLL_Session::getUrlQuery(); ?>','','scrollbars=yes, resizable=yes, width=700, height=350')"><?php echo i18n_message($html_contacts, ''); ?></a>
       </li>
     <?php } ?>
-    <?php if (isset($_GET['successfulsend']) && $_GET['successfulsend']) { ?>
+    <?php if (isset($_GET['accepted_for_delivery']) && $_GET['accepted_for_delivery']) { ?>
       <li class="success-message">
         <?php echo convertLang2Html($html_send_confirmed); ?>
       </li>
