@@ -253,16 +253,33 @@ switch ($service) {
 
             if (isset($conf->broken_forwarding) && $conf->broken_forwarding) {
                 // Set body
-                //TODO: Put to own function and merge with code from add_quoting()!
-                if ($user_pref->getOutlookQuoting())
-                    $mail_body .= $original_msg . $conf->crlf . $html_from_label . ' ' . $content['from'] . $conf->crlf
-                        . $html_to_label . ' ' . $content['to'] . $conf->crlf . $html_sent_label . ' ' . $content['complete_date']
-                        . $conf->crlf . $html_subject_label . ' ' . $content['subject'] . $conf->crlf . $conf->crlf
-                        . strip_tags2($content['body'], '') . $conf->crlf . $conf->crlf;
-                else {
-                    $stripped_content = strip_tags2($content['body'], '');
-                    $mail_body .= mailquote($stripped_content, $content['from'], $html_wrote, $content['body_mime']) . $conf->crlf . $conf->crlf;
-                }
+                // DEPRECATED // TODO: Put to own function and merge with code from add_quoting()!
+                // if ($user_pref->getOutlookQuoting()) {
+                //     $mail_body .= $original_msg . $conf->crlf . $html_from_label . ' ' . $content['from'] . $conf->crlf
+                //         . $html_to_label . ' ' . $content['to'] . $conf->crlf . $html_sent_label . ' ' . $content['complete_date']
+                //         . $conf->crlf . $html_subject_label . ' ' . $content['subject'] . $conf->crlf . $conf->crlf
+                //         . strip_tags2($content['body'], '') . $conf->crlf . $conf->crlf;
+                // } else {
+                //     $stripped_content = strip_tags2($content['body'], '');
+                //     $mail_body .= mailquote($stripped_content, $content['from'], $html_wrote, $content['body_mime']) . $conf->crlf . $conf->crlf;
+                // }
+
+                $content['body'] = NVLL_Security::convertHtmlToPlainText($content['body'], $content['body_mime']);
+                $content['body'] = NVLL_Body::prepareTextLinks($content['body']);
+                $content['body'] = preg_replace('/(\r?\n){2,}/', "\n\n", $content['body']); // Keep a single blank line between paragraphs.
+                $content['body'] = preg_replace('/^[ \t]+|[ \t]+$/m', '', $content['body']); // Remove leading/trailing spaces per line.
+                $content['body'] = trim($content['body']);
+
+                // TODO: Include attachments if the message to be forwarded has them!
+                $mail_body .= "-------------------- Original Message --------------------" . $conf->crlf
+                    . $html_from_label . ' ' . $content['from'] . $conf->crlf
+                    . $html_to_label . ' ' . $content['to'] . $conf->crlf
+                    . $html_date_label . ' ' . $content['complete_date'] . $conf->crlf
+                    . $html_subject_label . ' ' . $content['subject'] . $conf->crlf
+                    . "----------------------------------------------------------" . $conf->crlf
+                    . $conf->crlf
+                    . $content['body'] . $conf->crlf;
+
                 $broken_forwarding = true;
             } else {
                 $broken_forwarding = false;
@@ -938,8 +955,7 @@ function add_signature(&$body)
 function add_quoting(&$mail_body, $content)
 {
     global $user_prefs, $conf;
-    global $original_msg, $html_from_label, $html_to_label, $html_sent_label, $html_subject_label;
-    global $html_wrote;
+    global $html_from_label, $html_to_label, $html_date_label, $html_subject_label;
     global $html_quote_wrote;
 
     $from = $content['from'];
@@ -966,12 +982,21 @@ function add_quoting(&$mail_body, $content)
         $crlf = "\r\n";
         $body = $content['body'];
         $stripped_content = NVLL_Security::convertHtmlToPlainText($body, $content['body_mime']);
+        $stripped_content = NVLL_Body::prepareTextLinks($stripped_content);
+        $stripped_content = preg_replace('/(\r?\n){2,}/', "\n\n", $stripped_content); // Keep a single blank line between paragraphs.
+        $stripped_content = preg_replace('/^[ \t]+|[ \t]+$/m', '', $stripped_content); // Remove leading/trailing spaces per line.
+        $stripped_content = trim($stripped_content);
     }
 
     if ($user_prefs->getOutlookQuoting()) {
-        $mail_body = $original_msg . $crlf . $html_from_label . ' ' . $from . $crlf . $html_to_label . ' '
-            . $to . $crlf . $html_sent_label . ' ' . $content['complete_date'] . $crlf . $html_subject_label
-            . ' ' . $content['subject'] . $crlf . $crlf . $stripped_content;
+        $mail_body = "-------------------- Original Message --------------------" . $crlf
+            . $html_from_label . ' ' . $from . $crlf
+            . $html_to_label . ' ' . $to . $crlf
+            . $html_date_label . ' ' . $content['complete_date'] . $crlf
+            . $html_subject_label . ' ' . $content['subject'] . $crlf
+            . "----------------------------------------------------------" . $crlf
+            . $crlf
+            . $stripped_content;
     } else {
         if (
             isset($conf->enable_reply_leadin)

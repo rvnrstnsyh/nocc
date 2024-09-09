@@ -30,7 +30,7 @@ $mail_from = get_default_from_address();
   <!-- If 'file_uploads=Off', we must set formtype to "normal" otherwise it won't work -->
   <form method="POST" action="send.php?<?php echo NVLL_Session::getUrlGetSession(); ?>&service=<?php echo $service_request; ?>&mail=<?php echo $req_mail; ?>&display_images=<?php echo $req_display_images; ?>" id="sendform" enctype="<?php echo (ini_get("file_uploads")) ? "multipart/form-data" : "normal" ?>" onsubmit="return(validate(this));">
     <?php
-    if (isset($broken_forwarding) && !($broken_forwarding)) {
+    if (isset($broken_forwarding) && !$broken_forwarding) {
       if (isset($forward_msgnum)) { ?>
         <div><input type="hidden" name="forward_msgnum" value="<?php echo $forward_msgnum ?>" /></div>
     <?php }
@@ -107,7 +107,7 @@ $mail_from = get_default_from_address();
       </tr>
       <!-- If 'file_uploads=Off', we mustn't present the ability to do attachments -->
       <?php if (ini_get("file_uploads")) { ?>
-        <?php if (isset($_GET['service']) && $_GET['service'] != 'forward') { ?>
+        <?php if (isset($_GET['service']) && $_GET['service'] != 'forward' || (isset($broken_forwarding) && $broken_forwarding)) { ?>
           <tr>
             <td class="sendLabel"><label for="mail_attachment"><?php echo $html_att_label ?></label></td>
             <td class="sendData">
@@ -177,7 +177,7 @@ $mail_from = get_default_from_address();
         echo '</td>';
         echo '</tr>';
       } else {
-        if (isset($broken_forwarding) && !($broken_forwarding)) {
+        if (isset($broken_forwarding) && !$broken_forwarding) {
           if ($isForward) {
             echo '<tr>';
             echo '<td>&nbsp;</td>';
