@@ -19,8 +19,11 @@ $theme = new NVLL_Theme($_SESSION['nvll_theme']);
 
 <head>
   <title>Non-Violable Liberty Layers | Webmail | <?php echo $html_help ?></title>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link href="<?php echo $theme->getStylesheet(); ?>" rel="stylesheet" type="text/css" />
+  <link href="<?php echo $theme->getPrintStylesheet(); ?>" rel="stylesheet" media="print" type="text/css" />
+  <link href="<?php echo $theme->getFavicon(); ?>" rel="shortcut icon" type="image/x-icon" />
+  <script src="scripts/index.js" type="text/javascript"></script>
 </head>
 
 <body dir="<?php echo $lang_dir; ?>">
