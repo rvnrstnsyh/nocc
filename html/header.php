@@ -42,7 +42,7 @@ if (file_exists($custom_header)) {
 		//TODO: Why check for $_SESSION['quota_type'])?
 		if (isRssAllowed()) {
 			if (isset($_SESSION['quota_type'])) {
-				//$_vmbox='IM_'.md5(uniqid(rand(),true));
+				// $_vmbox='IM_' . NVLL_Encoding::base64url_encode(random_bytes(32));
 				$rss_url = "rss.php";
 				//$rss_url .= '?_vmbox='.$_vmbox.'&';
 				$rss_url .= '?_vmbox=RSS&';

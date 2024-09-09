@@ -89,7 +89,7 @@ switch ($_REQUEST['sendaction']) {
             break;
         }
 
-        $tmpFile = $conf->tmpdir . '/' . basename($mail_attachment['tmp_name'] . md5(uniqid(rand(), true)) . '.att');
+        $tmpFile = $conf->tmpdir . '/' . basename($mail_attachment['tmp_name'] . NVLL_Encoding::base64url_encode(random_bytes(32)) . '.att');
         // Adding the new file to the array
         if (@move_uploaded_file($mail_attachment['tmp_name'], $tmpFile)) {
             $attachedFile = new NVLL_AttachedFile($tmpFile, basename($mail_attachment['name']), $mail_attachment['size'], $mail_attachment['type']);

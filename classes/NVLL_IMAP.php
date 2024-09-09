@@ -405,7 +405,7 @@ class NVLL_IMAP
 			return;
 		}
 
-		$tmpFile = $_SESSION['_vmbox'] . "_" . md5(uniqid(rand(), true)) . '.tmp';
+		$tmpFile = $_SESSION['_vmbox'] . "_" . NVLL_Encoding::base64url_encode(random_bytes(32)) . '.tmp';
 		$_SESSION['fd_message'][] = $tmpFile;
 		$tmpFile = $conf->tmpdir . '/' . $tmpFile;
 		$_SESSION[$tmpFile] = 1;

@@ -168,7 +168,7 @@ class NVLL_MIME
      */
     private function _buildMultipart()
     {
-        $boundary = 'NextPart' . md5(uniqid(rand(), true));
+        $boundary = 'NextPart' . NVLL_Encoding::base64url_encode(random_bytes(32));
         $multipart = 'Content-Type: multipart/mixed;' . $this->crlf . "\tboundary=\"$boundary\"" . $this->crlf . $this->crlf . 'This is a MIME encoded message.' . $this->crlf . $this->crlf . '--' . $boundary;
 
         for ($i = sizeof($this->parts) - 1; $i >= 0; $i--) $multipart .= $this->crlf . $this->_buildMessage($this->parts[$i]) . '--' . $boundary;
