@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './classes/NVLL_Session.php';
-require_once './classes/NVLL_UserPrefs.php';
+require_once dirname(__FILE__) . '/classes/NVLL_Session.php';
+require_once dirname(__FILE__) . '/classes/NVLL_UserPrefs.php';
 
 $from_rss = true;
 $_REQUEST['_vmbox'] = "RSS";
@@ -48,9 +48,10 @@ if (!NVLL_Session::existsUserPrefs()) {
   }
 }
 
-require_once './common.php';
-require_once './classes/NVLL_IMAP.php';
-require_once './classes/NVLL_RSSFeed.php';
+require_once dirname(__FILE__) . '/classes/NVLL_IMAP.php';
+require_once dirname(__FILE__) . '/classes/NVLL_RSSFeed.php';
+
+require_once dirname(__FILE__) . '/common.php';
 
 if (!isRssAllowed()) exit;
 
@@ -59,7 +60,7 @@ try {
 } catch (Exception $ex) {
   //TODO: Show error without NVLL_Exception!
   $ev = new NVLL_Exception($ex->getMessage());
-  require './html/error.php';
+  require dirname(__FILE__) . '/html/error.php';
   exit;
 }
 
@@ -75,7 +76,7 @@ if ($pop->num_msg() > 0) {
 
 $tab_mail_bak = $tab_mail;
 if (NVLL_Exception::isException($ev)) {
-  require './html/error.php';
+  require dirname(__FILE__) . '/html/error.php';
   exit;
 }
 

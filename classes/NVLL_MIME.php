@@ -8,7 +8,7 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_Exception.php';
+require_once dirname(__FILE__) . '/NVLL_Exception.php';
 
 /**
  * Building and sending a mail

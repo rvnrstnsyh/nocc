@@ -10,8 +10,8 @@
 
 //If a previous authentification cookie was set, we use it to bypass login window.
 
-require_once './common.php';
-require_once './utils/captcha.php';
+require_once dirname(__FILE__) .  '/common.php';
+require_once dirname(__FILE__) .  '/functions/captcha.php';
 
 if (isset($_REQUEST['_vmbox']) && $_REQUEST['_vmbox'] == "RSS") {
   header("Location: " . $conf->base_url);
@@ -23,8 +23,8 @@ if (isset($_SESSION['restart_session']) && $_SESSION['restart_session'] == true)
   exit();
 }
 
-require_once './utils/check.php';
-require './html/header.php';
+require_once dirname(__FILE__) .  '/functions/check.php';
+require dirname(__FILE__) . '/html/header.php';
 ?>
 
 <form method="POST" action="api.php?<?php echo NVLL_Session::getUrlGetSession(); ?>" id="nvll_webmail_login" accept-charset="UTF-8">
@@ -39,13 +39,12 @@ require './html/header.php';
           <input class="button" type="text" name="user" id="user" size="25" placeholder="e.g. chernobyl, chernobyl@nvll.me" value="<?php if (isset($REMOTE_USER)) echo $REMOTE_USER; ?>" />
           <?php if (count($conf->domains) > 1) {
             //Add fill-in domain
-            if (isset($conf->typed_domain_login))
+            if (isset($conf->typed_domain_login)) {
               echo '<label for="fillindomain">@</label> <input class="button" type="text" name="fillindomain" id="fillindomain">';
-            else if (isset($conf->vhost_domain_login) && $conf->vhost_domain_login == true) {
+            } elseif (isset($conf->vhost_domain_login) && $conf->vhost_domain_login == true) {
               $i = 0;
               while (!empty($conf->domains[$i]->in)) {
-                if (strpos($_SERVER['HTTP_HOST'], $conf->domains[$i]->domain))
-                  echo '<input type="hidden" name="domain_index" id="domain_index" value="' . $i . '" />' . "\n";
+                if (strpos($_SERVER['HTTP_HOST'], $conf->domains[$i]->domain)) echo '<input type="hidden" name="domain_index" id="domain_index" value="' . $i . '" />' . "\n";
                 $i++;
               }
             } else {
@@ -53,13 +52,9 @@ require './html/header.php';
               $i = 0;
               while (!empty($conf->domains[$i]->in)) {
                 if (isset($conf->domains[$i]->show_as) && strlen($conf->domains[$i]->show_as) > 0) {
-                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domain_index'] == $i) {
-                    echo "<option value=\"$i\">" . $conf->domains[$i]->show_as . '</option>';
-                  }
+                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domain_index'] == $i) echo "<option value=\"$i\">" . $conf->domains[$i]->show_as . '</option>';
                 } else {
-                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domain_index'] == $i) {
-                    echo "<option value=\"$i\">" . $conf->domains[$i]->domain . '</option>';
-                  }
+                  if (!isset($_SESSION['send_backup']) || $_SESSION['send_backup']['nvll_domain_index'] == $i) echo "<option value=\"$i\">" . $conf->domains[$i]->domain . '</option>';
                 }
                 $i++;
               }
@@ -195,4 +190,4 @@ require './html/header.php';
 </script>
 <?php
 
-require './html/footer.php';
+require dirname(__FILE__) . '/html/footer.php';

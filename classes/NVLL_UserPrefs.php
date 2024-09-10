@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_Exception.php';
-require_once 'NVLL_MailAddress.php';
+require_once dirname(__FILE__) . '/NVLL_Exception.php';
+require_once dirname(__FILE__) . '/NVLL_MailAddress.php';
 
 /**
  * Handling user preferences

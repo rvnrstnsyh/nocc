@@ -8,7 +8,7 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_Exception.php';
+require_once dirname(__FILE__) . '/NVLL_Exception.php';
 
 /**
  * Sending a mail with SMTP
@@ -133,7 +133,7 @@ class NVLL_SMTP
 		global $conf;
 		global $html_smtp_error_unexpected;
 
-		require_once './utils/crypt.php';
+		require_once dirname(__FILE__) . '/../functions/crypt.php';
 
 		if (
 			isset($_SESSION['nvll_domain_index'])

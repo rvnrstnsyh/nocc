@@ -10,8 +10,9 @@
 
 if (!isset($HTTP_USER_AGENT)) $HTTP_USER_AGENT = $_SERVER['HTTP_USER_AGENT'];
 
-require_once './common.php';
-require_once './classes/NVLL_IMAP.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_IMAP.php';
+
+require_once dirname(__FILE__) .  '/common.php';
 
 try {
 	$pop = new NVLL_IMAP();
@@ -94,8 +95,8 @@ try {
 } catch (Exception $ex) {
 	//TODO: Show error without NVLL_Exception!
 	$ev = new NVLL_Exception($ex->getMessage());
-	require './html/header.php';
-	require './html/error.php';
-	require './html/footer.php';
+	require dirname(__FILE__) . '/html/header.php';
+	require dirname(__FILE__) . '/html/error.php';
+	require dirname(__FILE__) . '/html/footer.php';
 	return;
 }

@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './common.php';
-require_once './utils/captcha.php';
+require_once dirname(__FILE__) . '/common.php';
+require_once dirname(__FILE__) . '/functions/captcha.php';
 
 // Remove any attachments from disk and from our session
 clear_attachments();
@@ -26,9 +26,9 @@ if (!isset($_REQUEST['sort'])) {
         } catch (Exception $ex) {
             //TODO: Show error without NVLL_Exception!
             $ev = new NVLL_Exception($ex->getMessage());
-            require './html/header.php';
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             exit;
         }
 
@@ -41,7 +41,7 @@ if (!isset($_REQUEST['sort'])) {
 $service = NVLL_Request::getStringValue('service');
 
 if ($service == 'logout') {
-    require_once './utils/proxy.php';
+    require_once dirname(__FILE__) . '/functions/proxy.php';
     header('Location: ' . $conf->base_url . 'logout.php?' . NVLL_Session::getUrlGetSession());
     exit;
 }
@@ -61,9 +61,9 @@ try {
     }
     //TODO: Show error without NVLL_Exception!
     $ev = new NVLL_Exception($ex->getMessage());
-    require './html/header.php';
-    require './html/error.php';
-    require './html/footer.php';
+    require dirname(__FILE__) . '/html/header.php';
+    require dirname(__FILE__) . '/html/error.php';
+    require dirname(__FILE__) . '/html/footer.php';
     exit;
 }
 
@@ -79,7 +79,7 @@ switch ($service) {
             $content = aff_mail($pop, $_REQUEST['mail'], NVLL_Request::getBoolValue('verbose'), $attachmentParts);
 
             if ($user_prefs->getCollect() == 2 || $user_prefs->getCollect() == 3) {
-                require_once './classes/nvll_contacts.php';
+                require_once dirname(__FILE__) . '/classes/nvll_contacts.php';
 
                 $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
                 $contacts_object = new NVLL_Contacts();
@@ -92,7 +92,6 @@ switch ($service) {
 
             // Display or hide distant HTML images.
             if (!NVLL_Request::getBoolValue('display_images')) $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
-
             display_embedded_html_images($content, $attachmentParts);
 
             $hasBody = isset($content['body']) && strlen(trim(preg_replace('/[\x00-\x1F\x7F]/', '', $content['body']))) > 0;
@@ -110,28 +109,30 @@ switch ($service) {
                 $content['body'] = preg_replace('/^[ \t]+|[ \t]+$/m', '', $content['body']); // Remove leading/trailing spaces per line.
                 $content['body'] = trim($content['body']); // Trim leading and trailing whitespace.
                 $content['body'] = '<span style="white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;">' . $content['body'] . '</span>';
+            } else { // Display as HTML.
+                $content['body'] = NVLL_Body::prepareHtmlLinks($content['body']);
             }
         } catch (Exception $ex) {
             //TODO: Show error without NVLL_Exception!
             $ev = new NVLL_Exception($ex->getMessage());
-            require './html/header.php';
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             break;
         }
 
         $rfc822_hasImages = create_rfc822_content($content, $pop, $attachmentParts);
 
         // Here we display the message.
-        require './html/header.php';
-        require './html/menu_mail.php';
-        require './html/submenu_mail.php';
-        require './html/html_mail.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_mail.php';
+        require dirname(__FILE__) . '/html/submenu_mail.php';
+        require dirname(__FILE__) . '/html/html_mail.php';
         display_attachments($content, $pop, $attachmentParts);
-        require './html/submenu_mail.php';
-        require './html/menu_mail.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/submenu_mail.php';
+        require dirname(__FILE__) . '/html/menu_mail.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
 
         $pop->close();
         break;
@@ -159,12 +160,12 @@ switch ($service) {
         // Add signature
         add_signature($mail_body);
 
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        require './html/compose.php';
-        require './html/menu_inbox.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/compose.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
         break;
 
         //--------------------------------------------------------------------------------
@@ -179,16 +180,14 @@ switch ($service) {
         $attachmentParts = array();
         try {
             $content = aff_mail($pop, $_REQUEST['mail'], NVLL_Request::getBoolValue('verbose'), $attachmentParts);
-            if (!NVLL_Request::getBoolValue('display_images')) {
-                $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
-            }
+            if (!NVLL_Request::getBoolValue('display_images')) $content['body'] = NVLL_Security::disableHtmlImages($content['body']);
             display_embedded_html_images($content, $attachmentParts);
         } catch (Exception $ex) {
             //TODO: Show error without NVLL_Exception!
             $ev = new NVLL_Exception($ex->getMessage());
-            require './html/header.php';
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             break;
         }
 
@@ -212,12 +211,12 @@ switch ($service) {
         // Add signature
         add_signature($mail_body);
 
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        require './html/compose.php';
-        require './html/menu_inbox.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/compose.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
 
         $pop->close();
         break;
@@ -239,9 +238,9 @@ switch ($service) {
             } catch (Exception $ex) {
                 //TODO: Show error without NVLL_Exception!
                 $ev = new NVLL_Exception($ex->getMessage());
-                require './html/header.php';
-                require './html/error.php';
-                require './html/footer.php';
+                require dirname(__FILE__) . '/html/header.php';
+                require dirname(__FILE__) . '/html/error.php';
+                require dirname(__FILE__) . '/html/footer.php';
                 break;
             }
 
@@ -265,13 +264,12 @@ switch ($service) {
                 // }
 
                 $content['body'] = NVLL_Security::convertHtmlToPlainText($content['body'], $content['body_mime']);
-                $content['body'] = NVLL_Body::prepareTextLinks($content['body']);
                 $content['body'] = preg_replace('/(\r?\n){2,}/', "\n\n", $content['body']); // Keep a single blank line between paragraphs.
                 $content['body'] = preg_replace('/^[ \t]+|[ \t]+$/m', '', $content['body']); // Remove leading/trailing spaces per line.
                 $content['body'] = trim($content['body']);
 
                 // TODO: Include attachments if the message to be forwarded has them!
-                $mail_body .= "-------------------- Original Message --------------------" . $conf->crlf
+                $mail_body .= '-------------------- ' . $html_original_msg . ' --------------------' . $conf->crlf
                     . $html_from_label . ' ' . $content['from'] . $conf->crlf
                     . $html_to_label . ' ' . $content['to'] . $conf->crlf
                     . $html_date_label . ' ' . $content['complete_date'] . $conf->crlf
@@ -292,12 +290,12 @@ switch ($service) {
         // Add signature
         add_signature($mail_body);
 
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        require './html/compose.php';
-        require './html/menu_inbox.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/compose.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
 
         $pop->close();
         break;
@@ -310,11 +308,7 @@ switch ($service) {
         $dl = convertLang2Html($html_down_mail);
         switch ($do) {
             case 'create_folder':
-                if ($_REQUEST['createnewbox']) {
-                    if ($pop->createmailbox($_REQUEST['createnewbox'])) {
-                        $pop->subscribe($_REQUEST['createnewbox'], true);
-                    }
-                }
+                if ($_REQUEST['createnewbox'] && $pop->createmailbox($_REQUEST['createnewbox'])) $pop->subscribe($_REQUEST['createnewbox'], true);
                 break;
             case 'subscribe_folder':
                 if ($_REQUEST['subscribenewbox']) $pop->subscribe($_REQUEST['subscribenewbox'], false);
@@ -353,12 +347,12 @@ switch ($service) {
                 break;
         }
 
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        if ($pop->is_imap()) require './html/folders.php';
-        require './html/menu_inbox.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        if ($pop->is_imap()) require dirname(__FILE__) . '/html/folders.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
 
         $pop->close();
 
@@ -372,9 +366,9 @@ switch ($service) {
         $filterset = NVLL_UserFilters::read($user_key, $ev);
 
         if (NVLL_Exception::isException($ev)) {
-            require './html/header.php';
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             break;
         }
 
@@ -386,9 +380,9 @@ switch ($service) {
                         $filterset->dirty_flag = 1;
                         $filterset->commit($ev);
                         if (NVLL_Exception::isException($ev)) {
-                            require './html/header.php';
-                            require './html/error.php';
-                            require './html/footer.php';
+                            require dirname(__FILE__) . '/html/header.php';
+                            require dirname(__FILE__) . '/html/error.php';
+                            require dirname(__FILE__) . '/html/footer.php';
                             break;
                         }
                     }
@@ -396,17 +390,13 @@ switch ($service) {
 
                 case 'create':
                     if (!$_REQUEST['filtername']) break;
-
                     if ($_REQUEST['thing1'] == '-') {
                         break;
                     } else {
-                        $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] =
-                            $_REQUEST['thing1'] . ' "' . $_REQUEST['contains1'] . '"';
+                        $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] = $_REQUEST['thing1'] . ' "' . $_REQUEST['contains1'] . '"';
                     }
-
                     if ($_REQUEST['thing2'] != '-') $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] .= ' ' . $_REQUEST['thing2'] . ' "' . $_REQUEST['contains2'] . '"';
                     if ($_REQUEST['thing3'] != '-') $filterset->filterset[$_REQUEST['filtername']]['SEARCH'] .= ' ' . $_REQUEST['thing3'] . ' "' . $_REQUEST['contains3'] . '"';
-
                     if ($_REQUEST['filter_action'] == 'DELETE') {
                         $filterset->filterset[$_REQUEST['filtername']]['ACTION'] = 'DELETE';
                     } elseif ($_REQUEST['filter_action'] == 'MOVE') {
@@ -419,9 +409,9 @@ switch ($service) {
                     $filterset->commit($ev);
 
                     if (NVLL_Exception::isException($ev)) {
-                        require './html/header.php';
-                        require './html/error.php';
-                        require './html/footer.php';
+                        require dirname(__FILE__) . '/html/header.php';
+                        require dirname(__FILE__) . '/html/error.php';
+                        require dirname(__FILE__) . '/html/footer.php';
                         break;
                     }
                     break;
@@ -431,14 +421,14 @@ switch ($service) {
         $html_filter_select = $filterset->html_filter_select();
         $filter_move_to = $pop->html_folder_select('filter_move_box', '');
 
-        require './html/header.php';
-        require './html/menu_prefs.php';
-        require './html/submenu_prefs.php';
-        require './html/filter_prefs.php';
-        require './html/submenu_prefs.php';
-        require './html/menu_prefs.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_prefs.php';
+        require dirname(__FILE__) . '/html/submenu_prefs.php';
+        require dirname(__FILE__) . '/html/filter_prefs.php';
+        require dirname(__FILE__) . '/html/submenu_prefs.php';
+        require dirname(__FILE__) . '/html/menu_prefs.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
 
         $pop->close();
 
@@ -517,23 +507,23 @@ switch ($service) {
             }
 
             if (NVLL_Exception::isException($ev)) {
-                require './html/header.php';
-                require './html/error.php';
-                require './html/footer.php';
+                require dirname(__FILE__) . '/html/header.php';
+                require dirname(__FILE__) . '/html/error.php';
+                require dirname(__FILE__) . '/html/footer.php';
                 break;
             }
 
             NVLL_Session::setUserPrefs($user_prefs);
         }
 
-        require './html/header.php';
-        require './html/menu_prefs.php';
-        require './html/submenu_prefs.php';
-        require './html/prefs.php';
-        require './html/submenu_prefs.php';
-        require './html/menu_prefs.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_prefs.php';
+        require dirname(__FILE__) . '/html/submenu_prefs.php';
+        require dirname(__FILE__) . '/html/prefs.php';
+        require dirname(__FILE__) . '/html/submenu_prefs.php';
+        require dirname(__FILE__) . '/html/menu_prefs.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
 
         $pop->close();
 
@@ -546,9 +536,9 @@ switch ($service) {
         if ($service == 'login') {
             if ($conf->use_captcha && !verify_captcha($_REQUEST['challenge'], $_REQUEST['captcha'])) {
                 $ev = new NVLL_Exception('Invalid Captcha');
-                require './html/header.php';
-                require './html/error.php';
-                require './html/footer.php';
+                require dirname(__FILE__) . '/html/header.php';
+                require dirname(__FILE__) . '/html/error.php';
+                require dirname(__FILE__) . '/html/footer.php';
                 break;
             }
 
@@ -561,7 +551,7 @@ switch ($service) {
                     if (!in_array($folder, $existing_folders)) {
                         if ($pop->createmailbox($folder)) {
                             $pop->subscribe($folder, true);
-                        } else if ($_SESSION['nvll_folder'] == $folder) {
+                        } elseif ($_SESSION['nvll_folder'] == $folder) {
                             // Subscribe to INBOX.
                             $pop->subscribe($_SESSION['nvll_folder'], false);
                         } else {
@@ -602,9 +592,7 @@ switch ($service) {
                             }
                         }
                     }
-                    if (!$pop->expunge()) {
-                        error_log("NVLL: Error expunging mail for user '$user_key': " . $pop->last_error());
-                    }
+                    if (!$pop->expunge()) error_log("NVLL: Error expunging mail for user '$user_key': " . $pop->last_error());
                 }
             }
         }
@@ -616,11 +604,12 @@ switch ($service) {
         if (strlen($new_session_name) > 0) {
             NVLL_Session::save_session();
             if (NVLL_Exception::isException($ev)) {
-                require './html/header.php';
-                require './html/error.php';
-                require './html/footer.php';
+                require dirname(__FILE__) . '/html/header.php';
+                require dirname(__FILE__) . '/html/error.php';
+                require dirname(__FILE__) . '/html/footer.php';
                 break;
             }
+
             NVLL_Session::createCookie($remember);
             if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) {
                 //header("Location: ".$conf->base_url."api.php?".NVLL_Session::getUrlGetSession().'&service=compose');
@@ -639,12 +628,10 @@ switch ($service) {
 
         if ($service == 'inbox_changed') {
             $req_num_msg = 0;
-            if (isset($_REQUEST['num_msg'])) {
-                $req_num_msg = intval($_REQUEST['num_msg']);
-            }
-            if ($num_msg != $req_num_msg) {
-                $_SESSION['inbox_alert'] = false;
-            }
+
+            if (isset($_REQUEST['num_msg'])) $req_num_msg = intval($_REQUEST['num_msg']);
+            if ($num_msg != $req_num_msg) $_SESSION['inbox_alert'] = false;
+
             echo $num_msg;
             unset($_SESSION['ajxfolder']);
             $pop->close();
@@ -662,23 +649,23 @@ switch ($service) {
                 $tab_mail = inbox($pop, $skip);
             } catch (Exception $ex) {
                 $ev = new NVLL_Exception($ex->getMessage());
-                require './html/header.php';
-                require './html/error.php';
-                require './html/footer.php';
+                require dirname(__FILE__) . '/html/header.php';
+                require dirname(__FILE__) . '/html/error.php';
+                require dirname(__FILE__) . '/html/footer.php';
                 break;
             }
         }
 
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        require './html/html_top_table.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/html_top_table.php';
         if (count($tab_mail) < 1) {
             // the mailbox is empty
             include './html/no_mail.php';
         } else {
             // there are messages, we display
             while ($tmp = array_shift($tab_mail)) {
-                require './html/html_inbox.php';
+                require dirname(__FILE__) . '/html/html_inbox.php';
             }
         }
 
@@ -696,19 +683,19 @@ switch ($service) {
                 } catch (Exception $ex) {
                     //TODO: Show error without NVLL_Exception!
                     $ev = new NVLL_Exception($ex->getMessage());
-                    require './html/header.php';
-                    require './html/error.php';
-                    require './html/footer.php';
+                    require dirname(__FILE__) . '/html/header.php';
+                    require dirname(__FILE__) . '/html/error.php';
+                    require dirname(__FILE__) . '/html/footer.php';
                     break;
                 }
             }
             $list_of_folders = set_list_of_folders($pop, $subscribed);
         }
 
-        require './html/html_bottom_table.php';
-        require './html/menu_inbox.php';
-        require './html/script.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/html_bottom_table.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/script.php';
+        require dirname(__FILE__) . '/html/footer.php';
 
         $pop->close();
 
@@ -808,7 +795,7 @@ function display_rfc822(&$content, $pop, $attachmentPart, $name = '', $header = 
         $content = $content . '<br />';
         $content = $content . $body;
         $content = $content . '</div> <!-- .mailTextAttach -->';
-    } else if ($partStructure->hasParts()) {
+    } elseif ($partStructure->hasParts()) {
         $parts = $partStructure->getParts();
         $body_index = -1;
 
@@ -901,7 +888,7 @@ function display_attachments($content, $pop, $attachmentParts)
             //TODO: Replace URLs and Smilies in text/plain attachment?
             echo view_part($pop, $_REQUEST['mail'], $attachmentPart->getPartNumber(), $attachmentPart->getEncoding()->__toString(), $partStructure->getCharset());
             echo '</div> <!-- .mailTextAttach -->';
-        } else if ($partStructure->getInternetMediaType()->isImage() && $partStructure->isAttachment() && $conf->display_img_attach) { //if attached image...
+        } elseif ($partStructure->getInternetMediaType()->isImage() && $partStructure->isAttachment() && $conf->display_img_attach) { //if attached image...
             $imageType = $attachmentPart->getInternetMediaType()->__toString();
             if (NVLL_Security::isSupportedImageType($imageType)) {
                 echo $name . '<hr class="mailAttachSep" />';
@@ -926,7 +913,6 @@ function display_embedded_html_images(&$content, $attachmentParts)
 
     foreach ($attachmentParts as $attachmentPart) { //for all attachment parts...
         $partStructure = $attachmentPart->getPartStructure();
-
         if ($partStructure->getInternetMediaType()->isImage() && ! $partStructure->isAttachment() && $conf->display_img_attach) { //if embedded image...
             $imageType = $attachmentPart->getInternetMediaType()->__toString();
             if (NVLL_Security::isSupportedImageType($imageType)) {
@@ -945,17 +931,18 @@ function add_signature(&$body)
     if ($user_prefs->getSignature() != '') {
         // Add signature with separation if needed
         //TODO: Really add separator if HTML mail?
-        if ($user_prefs->getUseSignatureSeparator())
+        if ($user_prefs->getUseSignatureSeparator()) {
             $body .= "\r\n\r\n" . "-- \r\n" . $user_prefs->getSignature();
-        else
+        } else {
             $body .= "\r\n\r\n" . $user_prefs->getSignature();
+        }
     }
 }
 
 function add_quoting(&$mail_body, $content)
 {
     global $user_prefs, $conf;
-    global $html_from_label, $html_to_label, $html_date_label, $html_subject_label;
+    global $html_original_msg, $html_from_label, $html_to_label, $html_date_label, $html_subject_label;
     global $html_quote_wrote;
 
     $from = $content['from'];
@@ -982,14 +969,13 @@ function add_quoting(&$mail_body, $content)
         $crlf = "\r\n";
         $body = $content['body'];
         $stripped_content = NVLL_Security::convertHtmlToPlainText($body, $content['body_mime']);
-        $stripped_content = NVLL_Body::prepareTextLinks($stripped_content);
         $stripped_content = preg_replace('/(\r?\n){2,}/', "\n\n", $stripped_content); // Keep a single blank line between paragraphs.
         $stripped_content = preg_replace('/^[ \t]+|[ \t]+$/m', '', $stripped_content); // Remove leading/trailing spaces per line.
         $stripped_content = trim($stripped_content);
     }
 
     if ($user_prefs->getOutlookQuoting()) {
-        $mail_body = "-------------------- Original Message --------------------" . $crlf
+        $mail_body = '-------------------- ' . $html_original_msg . ' --------------------' . $crlf
             . $html_from_label . ' ' . $from . $crlf
             . $html_to_label . ' ' . $to . $crlf
             . $html_date_label . ' ' . $content['complete_date'] . $crlf
@@ -998,12 +984,7 @@ function add_quoting(&$mail_body, $content)
             . $crlf
             . $stripped_content;
     } else {
-        if (
-            isset($conf->enable_reply_leadin)
-            && $conf->enable_reply_leadin == true
-            && isset($user_prefs->reply_leadin)
-            && ($user_prefs->reply_leadin != '')
-        ) {
+        if (isset($conf->enable_reply_leadin) && $conf->enable_reply_leadin == true && isset($user_prefs->reply_leadin) && ($user_prefs->reply_leadin != '')) {
             $parsed_leadin = NVLL_UserPrefs::parseLeadin($user_prefs->reply_leadin, $content);
             $mail_body = mailquote($stripped_content, $parsed_leadin, '', $content['body_mime']);
         } else {
@@ -1035,6 +1016,7 @@ function set_list_of_folders($pop, $subscribed)
 
     $new_folders = array();
     $list_of_folders = '';
+
     foreach ($subscribed as $folder) {
         $folder_name = substr(strstr($folder->name, '}'), 1);
         $status = $pop->status($folder->name);
@@ -1049,5 +1031,6 @@ function set_list_of_folders($pop, $subscribed)
             }
         }
     }
+
     return $list_of_folders;
 }

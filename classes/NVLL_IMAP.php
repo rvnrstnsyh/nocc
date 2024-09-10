@@ -11,13 +11,13 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_Header.php';
-require_once 'NVLL_Exception.php';
-require_once 'NVLL_HeaderInfo.php';
-require_once 'NVLL_MailStructure.php';
+require_once dirname(__FILE__) . '/NVLL_Header.php';
+require_once dirname(__FILE__) . '/NVLL_Exception.php';
+require_once dirname(__FILE__) . '/NVLL_HeaderInfo.php';
+require_once dirname(__FILE__) . '/NVLL_MailStructure.php';
 
-require_once './utils/crypt.php';
-require_once './utils/detect_cyr_charset.php';
+require_once dirname(__FILE__) . '/../functions/crypt.php';
+require_once dirname(__FILE__) . '/../functions/detect_cyr_charset.php';
 
 class result
 {
@@ -378,18 +378,18 @@ class NVLL_IMAP
 		if (NVLL_Exception::isException($ev)) {
 			$_SESSION['nvll_folder'] = $remember_folder;
 			unset($_SESSION['fd_message']);
-			require('./html/header.php');
-			require('./html/error.php');
-			require('./html/footer.php');
+			require dirname(__FILE__) . '/../html/header.php';
+			require dirname(__FILE__) . '/../html/error.php';
+			require dirname(__FILE__) . '/../html/footer.php';
 			return;
 		}
 
 		$memory_limit = ini_get('memory_limit');
 		if (preg_match("/M$/i", $memory_limit)) {
 			$memory_limit = intval($memory_limit) * 1024 * 1024;
-		} else if (preg_match("/K$/i", $memory_limit)) {
+		} elseif (preg_match("/K$/i", $memory_limit)) {
 			$memory_limit = intval($memory_limit) * 1024;
-		} else if (preg_match("/G$/i", $memory_limit)) {
+		} elseif (preg_match("/G$/i", $memory_limit)) {
 			$memory_limit = intval($memory_limit) * 1024 * 1024 * 1024;
 		}
 
@@ -398,7 +398,7 @@ class NVLL_IMAP
 			unset($_SESSION['fd_message']);
 			$ev = new NVLL_Exception("tmp folder tmpdir is not set in config/php.conf.");
 			return;
-		} else if (!is_writable($conf->tmpdir)) {
+		} elseif (!is_writable($conf->tmpdir)) {
 			$_SESSION['nvll_folder'] = $remember_folder;
 			unset($_SESSION['fd_message']);
 			$ev = new NVLL_Exception("tmp folder " . $conf->tmpdir . " is not writeable.");

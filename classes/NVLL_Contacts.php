@@ -165,7 +165,7 @@ class NVLL_Contacts
 			if (! $lists_only || $contacts[$i][5] == 1) {
 				if (strlen($contacts[$i][2]) > 0) {
 					$used = $contacts[$i][2];
-				} else if (strlen($contacts[$i][1]) > 0) {
+				} elseif (strlen($contacts[$i][1]) > 0) {
 					$used = $contacts[$i][1];
 				} else {
 					$used = $contacts[$i][3];
@@ -188,16 +188,16 @@ class NVLL_Contacts
 		//nick name highest sort priority
 		if (strlen($a[2]) > 0) $cmp_a = $a[2];
 		//last name next sort priority
-		else if (strlen($a[1]) > 0) $cmp_a = $a[1];
+		elseif (strlen($a[1]) > 0) $cmp_a = $a[1];
 		//last email last sort priority
-		else if (strlen($a[3]) > 0) $cmp_a = $a[3];
+		elseif (strlen($a[3]) > 0) $cmp_a = $a[3];
 
 		$cmp_b = "";
 		if (strlen($b[2]) > 0) {
 			$cmp_b = $b[2];
-		} else if (strlen($b[1]) > 0) {
+		} elseif (strlen($b[1]) > 0) {
 			$cmp_b = $b[1];
-		} else if (strlen($b[3]) > 0) {
+		} elseif (strlen($b[3]) > 0) {
 			$cmp_b = $b[3];
 		}
 		$r = strcasecmp($cmp_a, $cmp_b);

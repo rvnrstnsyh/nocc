@@ -8,9 +8,9 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_Encoding.php';
-require_once 'NVLL_UserPrefs.php';
-require_once 'NVLL_Validators.php';
+require_once dirname(__FILE__) . '/NVLL_Encoding.php';
+require_once dirname(__FILE__) . '/NVLL_UserPrefs.php';
+require_once dirname(__FILE__) . '/NVLL_Validators.php';
 
 /**
  * Wrapping the $_SESSION array
@@ -91,10 +91,10 @@ class NVLL_Session
 
 			if ($_SESSION['_vmbox'] == "RSS") {
 				$found_session = true;
-			} else if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
+			} elseif (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
 				$_SESSION['restart_session'] = true;
 				$found_session = true;
-			} else if (self::load_session()) {
+			} elseif (self::load_session()) {
 				$_SESSION['restart_session'] = true;
 				$found_session = true;
 			} else {
@@ -150,7 +150,7 @@ class NVLL_Session
 					if (isset($_SESSION['nvll_loggedin']) && $_SESSION['nvll_loggedin']) {
 						$found_session = true;
 						break;
-					} else if (self::load_session()) {
+					} elseif (self::load_session()) {
 						$found_session = true;
 						break;
 					} else {

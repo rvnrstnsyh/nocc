@@ -8,7 +8,7 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './common.php';
+require_once dirname(__FILE__) .  '/common.php';
 
 $lang = $_SESSION['nvll_lang'];
 $theme = new NVLL_Theme($_SESSION['nvll_theme']);

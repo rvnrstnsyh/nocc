@@ -9,38 +9,37 @@
  */
 
 define('NVLL_DEBUG_LEVEL', 0);
+
 if (NVLL_DEBUG_LEVEL > 0) define('NVLL_START_TIME', microtime(true));
-
-if (version_compare(phpversion(), '7.4.30', '<')) {
-    if (!defined('ENT_SUBSTITUTE')) define('ENT_SUBSTITUTE', 8);
-}
-
+if (version_compare(phpversion(), '7.4.30', '<') && !defined('ENT_SUBSTITUTE')) define('ENT_SUBSTITUTE', 8);
 // Define variables
 if (!isset($from_rss)) $from_rss = false;
-if (file_exists('./config/conf.php')) {
-    require_once './config/conf.php';
+if (file_exists(dirname(__FILE__) . '/config/conf.php')) {
+    require_once dirname(__FILE__) . '/config/conf.php';
     // code extraction from conf.php, legacy code support
-    if ((file_exists('./utils/config_check.php')) && (!function_exists('get_default_from_address'))) require_once './utils/config_check.php';
+    if ((file_exists(dirname(__FILE__) . '/functions/config_check.php')) && (!function_exists('get_default_from_address'))) {
+        require_once  dirname(__FILE__) . '/functions/config_check.php';
+    }
 } else {
     //TODO: Make error msg translateble and show nicer error...
-    print("The main configuration file (./config/conf.php) couldn't be found! <p />Please rename the file './config/conf.php.dist' to './config/conf.php'. ");
+    print("The main configuration file ('" . dirname(__FILE__) . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "conf.php') couldn't be found!<br />Please copy the '" . dirname(__FILE__) . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "conf.php.dist' file to '" . dirname(__FILE__) . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "conf.php'.");
     die();
 }
 
-require_once './classes/NVLL_Body.php';
-require_once './classes/NVLL_Themes.php';
-require_once './classes/NVLL_Domain.php';
-require_once './classes/NVLL_Request.php';
-require_once './classes/NVLL_Session.php';
-require_once './classes/NVLL_Security.php';
-require_once './classes/NVLL_Languages.php';
-require_once './classes/NVLL_UserPrefs.php';
-require_once './classes/NVLL_UserFilters.php';
-require_once './classes/NVLL_AttachedFile.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Body.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Themes.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Domain.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Request.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Session.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Security.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Languages.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_UserPrefs.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_UserFilters.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_AttachedFile.php';
 
-require_once './utils/functions.php';
-require_once './utils/crypt.php';
-require_once './utils/translation.php';
+require_once dirname(__FILE__) .  '/functions/crypt.php';
+require_once dirname(__FILE__) .  '/functions/translation.php';
+require_once dirname(__FILE__) .  '/functions/miscellaneous.php';
 
 $conf->nvll_name = 'Non-Violable Liberty Layers (NVLL)';
 $conf->nvll_version = '1.9.15-dev';
@@ -119,14 +118,12 @@ if (isset($_SESSION['nvll_lang']) && $_SESSION['nvll_lang'] != "default") { //if
     if (!isset($_SESSION['nvll_lang']) || $_SESSION['nvll_lang'] != "default") $_SESSION['nvll_lang'] = $languages->getSelectedLangId();
 }
 
-$lang = $languages->getSelectedLangId();
+$language = $languages->getSelectedLangId();
 
-require './languages/en.php';
-if ($lang != 'en') { //if NOT English...
-    $lang_file = './languages/' . basename($lang) . '.php';
-    if (is_file($lang_file)) {
-        require $lang_file;
-    }
+require dirname(__FILE__) . '/languages/en.php';
+if ($language != 'en') { //if NOT English...
+    $lang_file = '/languages/' . basename($lang) . '.php';
+    if (is_file($lang_file)) require dirname(__FILE__) . $lang_file;
 }
 
 //--------------------------------------------------------------------------------
@@ -152,9 +149,9 @@ if (!isset($_SESSION['nvll_theme'])) { //if session theme NOT already set...
 
 if (isset($_SESSION['nvll_passwd']) && $_SESSION['nvll_passwd'] === false) {
     $ev = new NVLL_Exception($lang_strong_encryption_required . ".");
-    require './html/header.php';
-    require './html/error.php';
-    require './html/footer.php';
+    require dirname(__FILE__) . '/html/header.php';
+    require dirname(__FILE__) . '/html/error.php';
+    require dirname(__FILE__) . '/html/footer.php';
     exit;
 }
 
@@ -164,9 +161,9 @@ if ($session_has_expired > 0) {
     if ($session_has_expired == 1) $ev = new NVLL_Exception($html_session_expired);
     if ($session_has_expired == 2) $ev = new NVLL_Exception($html_session_expired . " " . $html_session_ip_changed);
 
-    require './html/header.php';
-    require './html/error.php';
-    require './html/footer.php';
+    require dirname(__FILE__) . '/html/header.php';
+    require dirname(__FILE__) . '/html/error.php';
+    require dirname(__FILE__) . '/html/footer.php';
     exit;
 }
 
@@ -182,9 +179,9 @@ if (
     && !preg_match("|" . $conf->allowed_char . "|", $_SESSION['nvll_login'])
 ) {
     $ev = new NVLL_Exception($html_wrong);
-    require './html/header.php';
-    require './html/error.php';
-    require './html/footer.php';
+    require dirname(__FILE__) . '/html/header.php';
+    require dirname(__FILE__) . '/html/error.php';
+    require dirname(__FILE__) . '/html/footer.php';
     exit;
 }
 
@@ -201,9 +198,9 @@ if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
 
     if (!isset($conf->domains[$domain_index])) {
         $ev = new NVLL_Exception($lang_could_not_connect);
-        require './html/header.php';
-        require './html/error.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/error.php';
+        require dirname(__FILE__) . '/html/footer.php';
         exit;
     }
 
@@ -229,9 +226,9 @@ if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
         if (isset($conf->syslog) && $conf->syslog) syslog(LOG_INFO, $log_string);
         $ev = new NVLL_Exception($html_login_not_allowed);
 
-        require './html/header.php';
-        require './html/error.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/error.php';
+        require dirname(__FILE__) . '/html/footer.php';
         exit;
     }
 
@@ -241,7 +238,7 @@ if (isset($_REQUEST['domain_index']) && !(isset($_REQUEST['server']))) {
     if ($domain->useLoginWithDomain()) {
         if ($domain->hasLoginWithDomainCharacter()) {
             $_SESSION['nvll_login'] .= $domain->getLoginWithDomainCharacter() . $_SESSION['nvll_domain'];
-        } else if (preg_match("|([A-Za-z0-9]+)@([A-Za-z0-9]+)|", $_SESSION['nvll_login'], $regs)) {
+        } elseif (preg_match("|([A-Za-z0-9]+)@([A-Za-z0-9]+)|", $_SESSION['nvll_login'], $regs)) {
             $_SESSION['nvll_login'] = $_SESSION['nvll_login'];
             $_SESSION['nvll_domain'] = $regs[2];
         } else {
@@ -305,8 +302,8 @@ if (isset($_SESSION['nvll_user']) && isset($_SESSION['nvll_domain'])) {
                 //if (($userLang != 'en') && ($userLang != $lang)) { //if NOT English AND current language...
                 if ($userLang != $lang) { //if NOT current language...
                     $_SESSION['nvll_lang'] = $languages->getSelectedLangId();
-                    $lang = $languages->getSelectedLangId();
-                    require './languages/' . $lang . '.php';
+                    $language = $languages->getSelectedLangId();
+                    require dirname(__FILE__) . '/languages/' . $language . '.php';
                 }
             }
             unset($userLang);
@@ -343,8 +340,8 @@ if (isset($_SESSION['nvll_user']) && isset($_SESSION['nvll_domain'])) {
     }
 }
 
-require_once './config/conf_lang.php';
-require_once './config/conf_charset.php';
+require_once dirname(__FILE__) . '/config/conf_lang.php';
+require_once dirname(__FILE__) . '/config/conf_charset.php';
 
 // allow PHP script to consume more memory than default setting for
 // big attachments

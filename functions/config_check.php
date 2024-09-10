@@ -8,7 +8,7 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './classes/NVLL_MailAddress.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_MailAddress.php';
 
 // This function allows you to customise the default e-mail address
 function get_default_from_address()

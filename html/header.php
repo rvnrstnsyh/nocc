@@ -1,9 +1,9 @@
 <?php
 if (!isset($conf->loaded)) die('Hacking attempt');
-if (file_exists('./utils/proxy.php')) {
-	require_once './utils/proxy.php';
+if (file_exists(dirname(__FILE__) . '/../functions/proxy.php')) {
+	require_once  dirname(__FILE__) . '/../functions/proxy.php';
 } else {
-	die('./utils/proxy.php is missing');
+	die(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'functions' . DIRECTORY_SEPARATOR . 'proxy.php is missing');
 }
 
 header("Content-type: text/html; Charset=UTF-8");

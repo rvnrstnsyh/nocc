@@ -8,7 +8,7 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once dirname(__FILE__) . '/../utils/htmLawed.php';
+require_once dirname(__FILE__) . '/../functions/htmLawed.php';
 
 /**
  * Security functions

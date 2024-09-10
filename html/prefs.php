@@ -267,11 +267,9 @@ if (count($big_list) > 1) {
                   for ($i = 0; $i < sizeof($lang_array); $i++) {
                     if ($lang_array[$i]->filename == 'default' || file_exists('lang/' . $lang_array[$i]->filename . '.php')) {
                       echo '<option value="' . $lang_array[$i]->filename . '"';
-                      if (isset($user_prefs->lang)) {
-                        if ($user_prefs->lang == $lang_array[$i]->filename) {
-                          echo ' selected="selected"';
-                        }
-                      } else if ($_SESSION['nvll_lang'] == $lang_array[$i]->filename) {
+                      if (isset($user_prefs->lang) && $user_prefs->lang == $lang_array[$i]->filename) {
+                        echo ' selected="selected"';
+                      } elseif ($_SESSION['nvll_lang'] == $lang_array[$i]->filename) {
                         echo ' selected="selected"';
                       }
                       echo '>' . $lang_array[$i]->label . '</option>';

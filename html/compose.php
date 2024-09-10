@@ -38,12 +38,8 @@ $mail_from = get_default_from_address();
 
     // include old messageid
     // to keep 'treeview' of mailinglist threads etc.
-    if (!empty($mail_messageid)) {
-      print('<div><input type="hidden" name="mail_messageid" value="' . $mail_messageid . '" /></div>');
-    }
-    if (isset($_SESSION['nvll_domain_index']) && $_SESSION['nvll_domain_index'] >= 0) {
-      print('<div><input type="hidden" name="saved_domain_index" value="' . $_SESSION['nvll_domain_index'] . '" /></div>');
-    }
+    if (!empty($mail_messageid)) print('<div><input type="hidden" name="mail_messageid" value="' . $mail_messageid . '" /></div>');
+    if (isset($_SESSION['nvll_domain_index']) && $_SESSION['nvll_domain_index'] >= 0) print('<div><input type="hidden" name="saved_domain_index" value="' . $_SESSION['nvll_domain_index'] . '" /></div>');
     ?>
 
     <table>

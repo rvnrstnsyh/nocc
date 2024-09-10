@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './common.php';
-require_once './classes/NVLL_SMTP.php';
+require_once dirname(__FILE__) . '/common.php';
+require_once dirname(__FILE__) . '/classes/NVLL_SMTP.php';
 
 $ev = null;
 
@@ -18,9 +18,9 @@ try {
 } catch (Exception $ex) {
     //TODO: Show error without NVLL_Exception!
     $ev = new NVLL_Exception($ex->getMessage());
-    require './html/header.php';
-    require './html/error.php';
-    require './html/footer.php';
+    require dirname(__FILE__) . '/html/header.php';
+    require dirname(__FILE__) . '/html/error.php';
+    require dirname(__FILE__) . '/html/footer.php';
     return;
 }
 
@@ -138,14 +138,14 @@ if (isset($_REQUEST['only_one'])) {
 $pop->close();
 
 if (NVLL_Exception::isException($ev)) {
-    require './html/header.php';
-    require './html/error.php';
-    require './html/footer.php';
+    require dirname(__FILE__) . '/html/header.php';
+    require dirname(__FILE__) . '/html/error.php';
+    require dirname(__FILE__) . '/html/footer.php';
     return;
 }
 
 // Redirect user to index
 // TODO: redirect user to next message
-require_once './utils/proxy.php';
+require_once dirname(__FILE__) .  '/functions/proxy.php';
 
 header('Location: ' . $conf->base_url . $url);

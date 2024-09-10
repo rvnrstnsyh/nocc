@@ -16,23 +16,49 @@ class NVLL_Body
     /**
      * Prepare HTML links
      * @param string $body Mail body
-     * @return string Mail body with prepared HMTL links
+     * @return string Mail body with prepared HTML links
      * @static
      */
     public static function prepareHtmlLinks($body)
     {
-        $placeholder = md5($body);
-        $matches = array();
-
-        if ($count = preg_match_all("/\[cid:.*?\]/", $body, $matches)) for ($i = 0; $i < $count; $i++) $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
-
-        $body = preg_replace("|href=\"mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)\"|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
-        $body = preg_replace("|href=mailto:([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)|i", "href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=$1\"", $body);
-
-        for ($i = 0; $i < $count; $i++) $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
-
-        $body = preg_replace("|href=\"([a-zA-Z0-9\+\/\;\-=%&:_.~\?]+[#a-zA-Z0-9\+]*)\"|i", "href=\"$1\" target=\"_blank\"", $body);
-        $body = preg_replace("|href=([a-zA-Z0-9\+\/\;\-=%&:_.~\?]+[#a-zA-Z0-9\+]*)|i", "href=\"$1\" target=\"_blank\"", $body);
+        $placeholder = uniqid('CID_');
+        // Handle CID placeholders
+        $body = preg_replace_callback(
+            '/\[cid:.*?\]/',
+            function ($matches) use (&$placeholder) {
+                static $i = 0;
+                return $placeholder . '_' . $i++;
+            },
+            $body
+        );
+        // Process mailto links
+        $sessionParams = NVLL_Session::getUrlGetSession();
+        $body = preg_replace_callback(
+            '/(href=(?:"mailto:|mailto:))([a-zA-Z0-9\+\-=%&:_.~\?@]+[#a-zA-Z0-9\+]*)/i',
+            function ($matches) use ($sessionParams) {
+                $email = $matches[2];
+                return "href=\"api.php?{$sessionParams}&amp;service=write&amp;mail_to={$email}\" target=\"_blank\" rel=\"noopener noreferrer nofollow\"";
+            },
+            $body
+        );
+        // Process all other href links
+        $body = preg_replace_callback(
+            '/(href=(?:"|\'))([^"\']+)(?:"|\')/',
+            function ($matches) {
+                $url = $matches[2];
+                return "href=\"{$url}\" target=\"_blank\" rel=\"noopener noreferrer nofollow\"";
+            },
+            $body
+        );
+        // Restore CID placeholders
+        $body = preg_replace_callback(
+            '/' . preg_quote($placeholder, '/') . '_\d+/',
+            function ($matches) use ($body) {
+                static $i = 0;
+                return preg_replace('/\[cid:.*?\]/', $matches[0], $body, 1);
+            },
+            $body
+        );
 
         return $body;
     }
@@ -45,20 +71,46 @@ class NVLL_Body
      */
     public static function prepareTextLinks($body)
     {
-        $htmlEntities = array('&quot;', '&lt;', '&gt;');
-        $nvllEntities = array('«quot»', '«lt»', '«gt»');
-        $body = str_replace($htmlEntities, $nvllEntities, $body);
-        $body = preg_replace("{(http|https|ftp)://([a-zA-Z0-9\+\/\;\-=%&:_.~\?]+[#a-zA-Z0-9\+:]*)}i", "<a href=\"$1://$2\" target=\"_blank\">$1://$2</a>", $body);
-        $placeholder = md5($body);
-        $matches = array();
+        $entities = ['&quot;' => '«quot»', '&lt;' => '«lt»', '&gt;' => '«gt»'];
+        $body = strtr($body, $entities);
+        $linkAttributes = " target=\"_blank\" rel=\"noopener noreferrer nofollow\"";
+        $body = preg_replace_callback(
+            '{(https?|ftp)://([a-zA-Z0-9\+\/\;\-=%&:_.~\?]+[#a-zA-Z0-9\+:]*)}i',
+            function ($matches) use ($linkAttributes) {
+                return "<a href=\"{$matches[0]}\"{$linkAttributes}>{$matches[0]}</a>";
+            },
+            $body
+        );
+        $placeholder = uniqid('CID_');
+        // Handle CID placeholders
+        $body = preg_replace_callback(
+            '/\[cid:.*?\]/',
+            function ($matches) use (&$placeholder) {
+                static $i = 0;
+                return $placeholder . '_' . $i++;
+            },
+            $body
+        );
+        // Process all other href links
+        $body = preg_replace_callback(
+            '/([0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,})/',
+            function ($matches) use ($linkAttributes) {
+                $email = $matches[1];
+                return "<a href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to={$email}\"{$linkAttributes}>{$email}</a>";
+            },
+            $body
+        );
+        // Restore CID placeholders
+        $body = preg_replace_callback(
+            '/' . preg_quote($placeholder, '/') . '_\d+/',
+            function ($matches) use ($body) {
+                static $i = 0;
+                return preg_replace('/\[cid:.*?\]/', $matches[0], $body, 1);
+            },
+            $body
+        );
 
-        if ($count = preg_match_all("/\[cid:.*?\]/", $body, $matches)) for ($i = 0; $i < $count; $i++) $body = str_replace($matches[0][$i], $placeholder . "_" . $i, $body);
-
-        $body = preg_replace("/([0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,})/", "<a href=\"api.php?" . NVLL_Session::getUrlGetSession() . "&amp;service=write&amp;mail_to=\\1\">\\1</a>", $body);
-        for ($i = 0; $i < $count; $i++) $body = str_replace($placeholder . "_" . $i, $matches[0][$i], $body);
-        $body = str_replace($nvllEntities, $htmlEntities, $body);
-
-        return $body;
+        return strtr($body, array_flip($entities));
     }
 
     /**

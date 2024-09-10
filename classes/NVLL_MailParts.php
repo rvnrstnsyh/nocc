@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_MailPart.php';
-require_once 'NVLL_MailStructure.php';
+require_once dirname(__FILE__) . '/NVLL_MailPart.php';
+require_once dirname(__FILE__) . '/NVLL_MailStructure.php';
 
 /**
  * Wrapping mail parts
@@ -142,7 +142,7 @@ class NVLL_MailParts
 					$this->_fillArrayWithParts($parts, new NVLL_MailStructure($mailstructure_parts[$i], $parts_info), $partNumber . ($i + 1), $skip_message);
 				}
 			}
-		} else if ($internetMediaType->isMessage()) { //if message...
+		} elseif ($internetMediaType->isMessage()) { //if message...
 			if ($internetMediaType->isRfc822Message()) { //if RFC822 message...
 				if (empty($partNumber)) $partNumber = '1';
 

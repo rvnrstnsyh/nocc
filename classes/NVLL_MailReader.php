@@ -8,12 +8,12 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_SMTP.php';
-require_once 'NVLL_Header.php';
-require_once 'NVLL_MailPart.php';
-require_once 'NVLL_MailParts.php';
-require_once 'NVLL_HeaderInfo.php';
-require_once 'NVLL_MailStructure.php';
+require_once dirname(__FILE__) . '/NVLL_SMTP.php';
+require_once dirname(__FILE__) . '/NVLL_Header.php';
+require_once dirname(__FILE__) . '/NVLL_MailPart.php';
+require_once dirname(__FILE__) . '/NVLL_MailParts.php';
+require_once dirname(__FILE__) . '/NVLL_HeaderInfo.php';
+require_once dirname(__FILE__) . '/NVLL_MailStructure.php';
 
 /**
  * Reading details from a mail

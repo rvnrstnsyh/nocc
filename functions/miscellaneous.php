@@ -8,15 +8,15 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './vendor/autoload.php';
+require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
-require_once './classes/NVLL_IMAP.php';
-require_once './classes/NVLL_Theme.php';
-require_once './classes/NVLL_MailReader.php';
-require_once './classes/NVLL_QuotaUsage.php';
-require_once './classes/NVLL_MailAddress.php';
-require_once './classes/NVLL_AttachedFile.php';
-require_once './classes/NVLL_HTMLPurifier_URIScheme_CID.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_IMAP.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_Theme.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_MailReader.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_QuotaUsage.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_MailAddress.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_AttachedFile.php';
+require_once dirname(__FILE__) . '/../classes/NVLL_HTMLPurifier_URIScheme_CID.php';
 
 /**
  * recursivle traverse a directory and return an array of all files and directories
@@ -513,9 +513,9 @@ function semisplit_address_list($adresses, &$emails, $sep = ',')
         $tmp_email = "";
         if (strlen($all_first[$j]) > 0 && strlen($all_last[$j]) > 0) {
             $tmp_email = '"' . $all_first[$j] . ' ' . $all_last[$j] . '" <' . $all_emails[$j] . '>';
-        } else if (strlen($all_first[$j]) == 0 && strlen($all_last[$j]) > 0) {
+        } elseif (strlen($all_first[$j]) == 0 && strlen($all_last[$j]) > 0) {
             $tmp_email = '"' . $all_last[$j] . '" <' . $all_emails[$j] . '>';
-        } else if (strlen($all_first[$j]) > 0 && strlen($all_last[$j]) == 0) {
+        } elseif (strlen($all_first[$j]) > 0 && strlen($all_last[$j]) == 0) {
             $tmp_email = '"' . $all_first[$j] . '" <' . $all_emails[$j] . '>';
         } else {
             $tmp_email = $all_emails[$j];
@@ -569,7 +569,7 @@ function split_address_list($adresses, &$emails, &$firstnames, &$lastnames, $sep
                     if (preg_match("/^" . $quote . "(.*)[,;](.*)" . $quote . "$/U", trim($matches[$r][1][$i]), $submatches)) {
                         $lastnames[] = trim($submatches[1], " \t\n\r\0\x0B\"");
                         $firstnames[] = trim($submatches[2], " \t\n\r\0\x0B\"");
-                    } else if (preg_match("/^" . $quote . "(.*)\s+(.*)" . $quote . "$/U", trim($matches[$r][1][$i]), $submatches)) {
+                    } elseif (preg_match("/^" . $quote . "(.*)\s+(.*)" . $quote . "$/U", trim($matches[$r][1][$i]), $submatches)) {
                         $firstnames[] = trim($submatches[1], " \t\n\r\0\x0B\"");
                         $lastnames[] = trim($submatches[2], " \t\n\r\0\x0B\"");
                     } else {
@@ -1101,9 +1101,9 @@ function os_iconv($input_charset, $output_charset, &$text)
         $input_charset = strtolower($input_charset);
         if ($input_charset == 'x-unknown' || $input_charset == 'us-ascii') {
             $input_charset = 'ISO8859-1';
-        } else if (preg_match('|^iso[\-_]?8859[\-_]?([1-9][0-9]?)|', $input_charset, $groups)) {
+        } elseif (preg_match('|^iso[\-_]?8859[\-_]?([1-9][0-9]?)|', $input_charset, $groups)) {
             $input_charset = 'ISO8859-' . $groups[0];
-        } else if (preg_match('|^(windows|cp|ibm)[\-_]?([0-9]+)$|', $input_charset, $groups)) {
+        } elseif (preg_match('|^(windows|cp|ibm)[\-_]?([0-9]+)$|', $input_charset, $groups)) {
             $input_charset = 'IBM-' . str_pad($groups[1], 3, '0', STR_PAD_LEFT);
         }
     } else {

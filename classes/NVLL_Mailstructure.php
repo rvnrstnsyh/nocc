@@ -8,8 +8,8 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once 'NVLL_Encoding.php';
-require_once 'NVLL_Internetmediatype.php';
+require_once dirname(__FILE__) . '/NVLL_Encoding.php';
+require_once dirname(__FILE__) . '/NVLL_Internetmediatype.php';
 
 /**
  * Wrapping a imap_fetchstructure() object

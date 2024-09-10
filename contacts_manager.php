@@ -7,9 +7,10 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './common.php';
-require_once './utils/proxy.php';
-require_once './classes/NVLL_Contacts.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_Contacts.php';
+
+require_once dirname(__FILE__) .  '/common.php';
+require_once dirname(__FILE__) .  '/functions/proxy.php';
 
 header("Content-type: text/html; Charset=UTF-8");
 
@@ -18,9 +19,9 @@ try {
 } catch(Exception $ex) {
     //TODO: Show error without NVLL_Exception!
     $ev = new NVLL_Exception($ex->getMessage());
-    require './html/header.php';
-    require './html/error.php';
-    require './html/footer.php';
+    require dirname(__FILE__) . '/html/header.php';
+    require dirname(__FILE__) . '/html/error.php';
+    require dirname(__FILE__) . '/html/footer.php';
     exit;
 }
 
@@ -180,7 +181,7 @@ switch ($service) {
         $listname = '';
         if (isset($_POST['addlist']) && strlen($_POST['addlist']) > 0 && isset($_POST['listname']) && strlen($_POST['listname']) > 0) {
             $listname = trim($_POST['listname']);
-        } else if (isset($_POST['addlist2']) && strlen($_POST['addlist2']) > 0 && isset($_POST['listname2']) && strlen($_POST['listname2']) > 0) {
+        } elseif (isset($_POST['addlist2']) && strlen($_POST['addlist2']) > 0 && isset($_POST['listname2']) && strlen($_POST['listname2']) > 0) {
             $listname = trim($_POST['listname2']);
         }
 
@@ -205,8 +206,8 @@ switch ($service) {
                 array_push($contacts, $line);
                 NVLL_Contacts::saveList($path, $contacts, $conf, $ev);
                 if (NVLL_Exception::isException($ev)) {
-                    require './html/error.php';
-                    require './html/footer.php';
+                    require dirname(__FILE__) . '/html/error.php';
+                    require dirname(__FILE__) . '/html/footer.php';
                     break;
                 }
                 $contacts = NVLL_Contacts::loadList($path);
@@ -240,8 +241,8 @@ switch ($service) {
                 }
                 NVLL_Contacts::saveList($path, $contacts, $conf, $ev);
                 if (NVLL_Exception::isException($ev)) {
-                    require './html/error.php';
-                    require './html/footer.php';
+                    require dirname(__FILE__) . '/html/error.php';
+                    require dirname(__FILE__) . '/html/footer.php';
                     break;
                 }
                 $contacts = NVLL_Contacts::loadList($path);
@@ -287,8 +288,8 @@ switch ($service) {
                 NVLL_Contacts::saveList($path, $contacts, $conf, $ev);
 
                 if (NVLL_Exception::isException($ev)) {
-                    require './html/error.php';
-                    require './html/footer.php';
+                    require dirname(__FILE__) . '/html/error.php';
+                    require dirname(__FILE__) . '/html/footer.php';
                     break;
                 }
             }
@@ -300,8 +301,8 @@ switch ($service) {
                     $contacts[$_POST['id']] = $line;
                     NVLL_Contacts::saveList($path, $contacts, $conf, $ev);
                     if (NVLL_Exception::isException($ev)) {
-                        require './html/error.php';
-                        require './html/footer.php';
+                        require dirname(__FILE__) . '/html/error.php';
+                        require dirname(__FILE__) . '/html/footer.php';
                         break;
                     }
                 }
@@ -320,8 +321,8 @@ switch ($service) {
         for ($i = 0;$i < count($contacts);++$i) if ($_GET['id'] != $i) $new_contacts[] = $contacts[$i];
         NVLL_Contacts::saveList($path, $new_contacts, $conf, $ev);
         if (NVLL_Exception::isException($ev)) {
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             break;
         }
         $contacts = NVLL_Contacts::loadList($path);;
@@ -372,9 +373,9 @@ switch ($service) {
             if ($tab[5] == 0) {
                 if (strlen($tab[0]) > 0 && strlen($tab[1]) > 0) {
                     $checkbox_value = '"' . $tab[0] . ' ' . $tab[1] . '" <' . $checkbox_value . '>';
-                } else if (strlen($tab[0]) == 0 && strlen($tab[1]) > 0) {
+                } elseif (strlen($tab[0]) == 0 && strlen($tab[1]) > 0) {
                     $checkbox_value = '"' . $tab[1] . '" <' . $checkbox_value . '>';
-                } else if (strlen($tab[0]) > 0 && strlen($tab[1]) == 0) {
+                } elseif (strlen($tab[0]) > 0 && strlen($tab[1]) == 0) {
                     $checkbox_value = '"' . $tab[0] . '" <' . $checkbox_value . '>';
                 }
             }

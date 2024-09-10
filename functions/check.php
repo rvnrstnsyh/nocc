@@ -12,9 +12,9 @@ unset($ev);
 // PHP version
 if (!function_exists('version_compare') || version_compare(PHP_VERSION, '7.4.30', '<')) { //if older as PHP 7.4.30...
   $ev = new NVLL_Exception("You don't seem to be running PHP 7 or newer, you need at least PHP 7.4.30 to run NVLL.");
-  require './html/header.php';
-  require './html/error.php';
-  require './html/footer.php';
+  require dirname(__FILE__) . '/../html/header.php';
+  require dirname(__FILE__) . '/../html/error.php';
+  require dirname(__FILE__) . '/../html/footer.php';
   exit;
 }
 
@@ -47,8 +47,8 @@ if (isset($conf->contact_ldap)) {
 
 // Display error message
 if (isset($ev) && NVLL_Exception::isException($ev)) {
-  require './html/header.php';
-  require './html/error.php';
-  require './html/footer.php';
+  require dirname(__FILE__) . '/../html/header.php';
+  require dirname(__FILE__) . '/../html/error.php';
+  require dirname(__FILE__) . '/../html/footer.php';
   exit;
 }

@@ -8,7 +8,7 @@
  * along with NVLL. If not, see <http://www.gnu.org/licenses>.
  */
 
-require_once './common.php';
+require_once dirname(__FILE__) .  '/common.php';
 
 $mail_from = get_default_from_address();
 $domain_index = $_SESSION['nvll_domain_index'];
@@ -48,20 +48,20 @@ $send_backup['mail_priority'] = $mail_priority;
 $_SESSION['send_backup'] = $send_backup;
 
 if (!isset($_SESSION['nvll_loggedin'])) {
-    require_once './utils/proxy.php';
+    require_once dirname(__FILE__) .  '/functions/proxy.php';
     header('Location: ' . $conf->base_url . 'logout.php?' . NVLL_Session::getUrlGetSession());
     return;
 }
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     clear_attachments();
-    require_once './utils/proxy.php';
+    require_once dirname(__FILE__) .  '/functions/proxy.php';
     header('Location: ' . $conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession());
     return;
 }
 
-require_once './classes/NVLL_MIME.php';
-require_once './classes/NVLL_SMTP.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_MIME.php';
+require_once dirname(__FILE__) .  '/classes/NVLL_SMTP.php';
 
 if (ini_get("file_uploads") && isset($_FILES['mail_attachment'])) $mail_attachment = $_FILES['mail_attachment'];
 if (NVLL_Session::getSendHtmlMail()) $mail_body = '<html><head></head><body>' . $mail_body . '</body></html>';
@@ -75,17 +75,17 @@ switch ($_REQUEST['sendaction']) {
         // Check if "$conf->tmpdir" exists
         if (!is_dir($conf->tmpdir)) {
             $ev = new NVLL_Exception($html_tmp_directory_doesnt_exist);
-            require './html/header.php';
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             break;
         }
 
         if (!isset($_FILES['mail_attachment']) || empty($_FILES['mail_attachment']['tmp_name']) || !file_exists($_FILES['mail_attachment']['tmp_name'])) {
             $ev = new NVLL_Exception($html_tmp_file_doesnt_exist);
-            require './html/header.php';
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             break;
         }
 
@@ -96,9 +96,9 @@ switch ($_REQUEST['sendaction']) {
             $attach_array[] = $attachedFile;
         } else {
             $ev = new NVLL_Exception($html_file_upload_attack);
-            require './html/header.php';
-            require './html/error.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/error.php';
+            require dirname(__FILE__) . '/html/footer.php';
             break;
         }
 
@@ -107,11 +107,11 @@ switch ($_REQUEST['sendaction']) {
         $_SESSION['send_backup']['mail_attachment'] = $attach_array;
         // Displaying the sending form with the new attachments array
         //header("Content-type: text/html; Charset=UTF-8");
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        require './html/compose.php';
-        require './html/menu_inbox.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/compose.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/footer.php';
         break;
 
     case unhtmlentities($html_cancel):
@@ -126,13 +126,13 @@ switch ($_REQUEST['sendaction']) {
         if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) unset($_SESSION['send_backup']);
 
         clear_attachments();
-        require_once './utils/proxy.php';
+        require_once dirname(__FILE__) .  '/functions/proxy.php';
         header('Location: ' . $conf->base_url . 'api.php?' . NVLL_Session::getUrlGetSession());
-        //require './html/header.php';
-        //require './html/menu_inbox.php';
-        //require './html/compose.php';
-        //require './html/menu_inbox.php';
-        //require './html/footer.php';
+        //require dirname(__FILE__) . '/html/header.php';
+        //require dirname(__FILE__) . '/html/menu_inbox.php';
+        //require dirname(__FILE__) . '/html/compose.php';
+        //require dirname(__FILE__) . '/html/menu_inbox.php';
+        //require dirname(__FILE__) . '/html/footer.php';
 
         break;
     case unhtmlentities($html_send):
@@ -160,7 +160,7 @@ switch ($_REQUEST['sendaction']) {
 
         if ($user_prefs->getBccSelf()) array_unshift($mail->bcc, $mail->from);
         if ($user_prefs->getCollect() == 1 || $user_prefs->getCollect() == 3) {
-            require_once './classes/NVLL_Contacts.php';
+            require_once dirname(__FILE__) .  '/classes/NVLL_Contacts.php';
 
             $path = $conf->prefs_dir . '/' . preg_replace("/(\\\|\/)/", "_", NVLL_Session::getUserKey()) . '.contacts';
             $contacts_object = new NVLL_Contacts();
@@ -226,9 +226,9 @@ switch ($_REQUEST['sendaction']) {
             } catch (Exception $ex) {
                 //TODO: Show error without NVLL_Exception!
                 $ev = new NVLL_Exception($ex->getMessage());
-                require './html/header.php';
-                require './html/error.php';
-                require './html/footer.php';
+                require dirname(__FILE__) . '/html/header.php';
+                require dirname(__FILE__) . '/html/error.php';
+                require dirname(__FILE__) . '/html/footer.php';
                 break;
             }
 
@@ -249,7 +249,7 @@ switch ($_REQUEST['sendaction']) {
         if (!isset($_SESSION['last_send'])) {
             $ev = $mail->send($conf);
             $_SESSION['last_send'] = time();
-        } else if ($_SESSION['last_send'] + $conf->send_delay < time()) {
+        } elseif ($_SESSION['last_send'] + $conf->send_delay < time()) {
             $ev = $mail->send($conf);
             $_SESSION['last_send'] = time();
         } else {
@@ -259,11 +259,11 @@ switch ($_REQUEST['sendaction']) {
         header("Content-type: text/html; Charset=UTF-8");
         if (NVLL_Exception::isException($ev)) {
             // Error while sending the message, display an error message
-            require './html/header.php';
-            require './html/menu_inbox.php';
-            require './html/send_error.php';
-            require './html/menu_inbox.php';
-            require './html/footer.php';
+            require dirname(__FILE__) . '/html/header.php';
+            require dirname(__FILE__) . '/html/menu_inbox.php';
+            require dirname(__FILE__) . '/html/send_error.php';
+            require dirname(__FILE__) . '/html/menu_inbox.php';
+            require dirname(__FILE__) . '/html/footer.php';
         } else {
             if (isset($_SESSION['nvll_attach_array'])) {
                 $attach_array = $_SESSION['nvll_attach_array'];
@@ -277,7 +277,7 @@ switch ($_REQUEST['sendaction']) {
             if (isset($_SESSION['send_backup']) && $_SESSION['nvll_domain_index'] == $_SESSION['send_backup']['nvll_domain_index']) unset($_SESSION['send_backup']);
             clear_attachments();
             // Redirect user to inbox
-            require_once './utils/proxy.php';
+            require_once dirname(__FILE__) .  '/functions/proxy.php';
             header("Location: " . $conf->base_url . "api.php?" . NVLL_Session::getUrlGetSession() . '&accepted_for_delivery=true');
         }
         break;
@@ -301,20 +301,20 @@ switch ($_REQUEST['sendaction']) {
 
         // Displaying the sending form with the new attachment array 
         header("Content-type: text/html; Charset=UTF-8");
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        require './html/compose.php';
-        require './html/menu_inbox.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/compose.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/footer.php';
         break;
     default:
         // Nothing was set in the sendaction (e.g. no javascript enabled)
         header("Content-type: text/html; Charset=UTF-8");
         $ev = new NVLL_Exception($html_no_sendaction);
-        require './html/header.php';
-        require './html/menu_inbox.php';
-        require './html/send_error.php';
-        require './html/menu_inbox.php';
-        require './html/footer.php';
+        require dirname(__FILE__) . '/html/header.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/send_error.php';
+        require dirname(__FILE__) . '/html/menu_inbox.php';
+        require dirname(__FILE__) . '/html/footer.php';
         break;
 }
