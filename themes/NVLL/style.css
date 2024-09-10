@@ -657,6 +657,10 @@ img.sort {
   text-align: left;
 }
 
+.sendData textarea {
+  max-width: 1031px;
+}
+
 #attachTable {
   max-width: 456px;
   border: 1px solid var(--gray-color);
@@ -878,6 +882,10 @@ hr.mailAttachSep {
 .prefs fieldset {
   border: 0;
   border-top: 1px solid silver;
+}
+
+.prefs textarea {
+  max-width: 960px;
 }
 
 .prefs fieldset legend {
